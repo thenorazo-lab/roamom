@@ -1,0 +1,6 @@
+{
+  "weather": { "T1H": "21", "SKY": "1", "PTY": "0", "WSD": "3" },
+  "scuba": { "water_temp": "16", "wave_height": "0.7", "current_speed": "0.5" },
+  "tide": [ { "tide_time": "2025-12-19T05:30:00", "tide_level": "123", "hl_code": "H" }, { "tide_time": "2025-12-19T11:30:00", "tide_level": "50", "hl_code": "L" } ],
+  "nearestObs": { "name": "샘플항" }
+}

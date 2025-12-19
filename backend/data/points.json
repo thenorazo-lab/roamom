@@ -1,0 +1,26 @@
+[
+  {
+    "id": "p1",
+    "title": "포인트1",
+    "lat": 35.1587,
+    "lng": 129.1604,
+    "image": "https://example.com/p1.jpg",
+    "desc": "좋은 포인트"
+  },
+  {
+    "id": "p2",
+    "title": "포인트2",
+    "lat": 34.7833,
+    "lng": 126.3667,
+    "image": "https://example.com/p2.jpg",
+    "desc": "초심자 추천"
+  },
+  {
+    "id": "p1766135924315",
+    "title": "e2e-test-1766135920155",
+    "lat": 35.1234,
+    "lng": 129.1234,
+    "image": "/uploads/1766135924056-ycz79b.png",
+    "desc": "e2e test point"
+  }
+]

@@ -1,0 +1,196 @@
+/* --- 기본 & CSS 변수 --- */
+:root {
+    --primary-color: #0077be; /* 시원한 파란색 */
+    --secondary-color: #ffffff;
+    --text-color: #333;
+    --bg-gradient-start: #e0f7fa; /* 하늘색 */
+    --bg-gradient-end: #b2ebf2;   /* 청록색 */
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+.App {
+    text-align: center;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+}
+
+/* --- 레이아웃 --- */
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* --- 컴포넌트 --- */
+.main-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 2px var(--shadow-color);
+}
+
+.sub-title {
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 40px;
+}
+
+.nav-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 350px;
+}
+
+.nav-button {
+    padding: 18px 25px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    text-decoration: none; /* a 태그 스타일 초기화 */
+}
+
+.nav-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 119, 190, 0.4);
+}
+
+.nav-button:active {
+    transform: translateY(1px);
+}
+
+/* 페이지 하단 액션 버튼 */
+.page-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 350px;
+}
+/* --- 모바일 반응형 --- */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2rem;
+    }
+    .sub-title {
+        font-size: 1rem;
+    }
+    .nav-button {
+        padding: 15px 20px;
+        font-size: 1.1rem;
+    }
+}
+
+/* --- 페이지 공통 스타일 --- */
+.page-title {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+}
+
+.location-header {
+    width: 100%;
+    max-width: 900px;
+    text-align: left;
+    margin-bottom: 20px;
+}
+.location-header h3 { margin: 0; }
+.debug-info { font-size: 12px; color: #666; }
+
+.error-message {
+    color: #D8000C;
+    background-color: #FFD2D2;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* --- 정보 카드 스타일 --- */
+.info-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+    max-width: 900px;
+}
+
+.card {
+    background-color: var(--secondary-color);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    flex-basis: 280px;
+    flex-grow: 1;
+    text-align: left;
+}
+
+.card.error {
+    background-color: #fff0f0;
+    border-left: 5px solid #D8000C;
+}
+
+.card .error-detail {
+    font-size: 0.8rem;
+    color: #555;
+}
+/* --- 지도 스타일 --- */
+.map-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+.card h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--bg-gradient-end);
+    padding-bottom: 10px;
+}
+
+.card p {
+    margin: 10px 0;
+    font-size: 1rem;
+}
+
+.card ul {
+    padding-left: 20px;
+    margin: 10px 0;
+}
+
+/* Tide UI */
+.tide-list {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.tide-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.98rem;
+}
+.tide-icon { font-size: 18px; }
+.tide-type { font-weight: 700; color: var(--text-color); }
+.tide-time { color: var(--text-color); margin-left: 4px; }
+.tide-level { color: #666; font-size: 0.95rem; margin-left: 6px; }
