@@ -5,10 +5,10 @@ export default function PointsAdmin(){
   const [password, setPassword] = useState('');
   const [authed, setAuthed] = useState(false);
   const [points, setPoints] = useState([]);
-  const [form, setForm] = useState({title:'',lat:'',lng:'',image:'',desc:''});
+  const [form, setForm] = useState({title:'',lat:'',lng:'',image:'',desc:'',url:''});
   const [uploading, setUploading] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const baseUrl = '/api';
+  const baseUrl = process.env.REACT_APP_API_URL || '/api';
 
   function isValidPoint(data){
     return data.title && !isNaN(parseFloat(data.lat)) && !isNaN(parseFloat(data.lng));
@@ -47,20 +47,20 @@ export default function PointsAdmin(){
         form.image = up.data.url;
         setUploading(false);
       }
-      await axios.post(baseUrl + '/points', { title: form.title, lat: form.lat, lng: form.lng, image: form.image, desc: form.desc }, { headers: authHeaders() });
-      setForm({title:'',lat:'',lng:'',image:'',desc:'', _file: null});
+      await axios.post(baseUrl + '/points', { title: form.title, lat: form.lat, lng: form.lng, image: form.image, desc: form.desc, url: form.url }, { headers: authHeaders() });
+      setForm({title:'',lat:'',lng:'',image:'',desc:'',url:'', _file: null});
       fetchPoints();
     }catch(e){ setUploading(false); alert('생성 실패'); }
   }
 
   async function enableEdit(p){
     setEditingId(p.id);
-    setForm({ title: p.title, lat: p.lat, lng: p.lng, image: p.image, desc: p.desc });
+    setForm({ title: p.title, lat: p.lat, lng: p.lng, image: p.image, desc: p.desc, url: p.url || '' });
   }
 
   async function updatePoint(p){
     if(!isValidPoint(form)){ alert('제목, 위도, 경도는 필수입니다.'); return; }
-    try{ await axios.put(baseUrl + '/points/' + p.id, form, { headers: authHeaders() }); setEditingId(null); setForm({title:'',lat:'',lng:'',image:'',desc:''}); fetchPoints(); }catch(e){ alert('수정 실패'); }
+    try{ await axios.put(baseUrl + '/points/' + p.id, form, { headers: authHeaders() }); setEditingId(null); setForm({title:'',lat:'',lng:'',image:'',desc:'',url:''}); fetchPoints(); }catch(e){ alert('수정 실패'); }
   }
 
   async function deletePoint(p){ if(!window.confirm('정말 삭제?')) return; try{ await axios.delete(baseUrl + '/points/' + p.id, { headers: authHeaders() }); fetchPoints(); }catch(e){ alert('삭제 실패'); } }
@@ -72,21 +72,20 @@ export default function PointsAdmin(){
         <div>
           <label>관리자 비밀번호: <input value={password} onChange={e=>setPassword(e.target.value)} type="password" /></label>
           <button onClick={doAuth}>로그인</button>
-          <p>비밀번호는 <code>756400</code>입니다 (개발용)</p>
         </div>
-      ):(
+      ):( 
         <div>
           <h3>새 포인트 추가</h3>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,maxWidth:800}}>
             <input placeholder="title" value={form.title} onChange={e=>setForm({...form,title:e.target.value})} />
             <input placeholder="lat" value={form.lat} onChange={e=>setForm({...form,lat:e.target.value})} />
             <input placeholder="lng" value={form.lng} onChange={e=>setForm({...form,lng:e.target.value})} />
-            <input placeholder="image URL" value={form.image} onChange={e=>setForm({...form,image:e.target.value})} />
-            <input type="file" accept="image/*" onChange={e=>setForm({...form,_file:e.target.files[0]})} />
-            <input placeholder="desc" value={form.desc} onChange={e=>setForm({...form,desc:e.target.value})} />
+            <input type="file" accept="image/*" onChange={e=>setForm({...form,_file:e.target.files[0]})} style={{gridColumn:'1 / -1'}} />
+            <input placeholder="desc" value={form.desc} onChange={e=>setForm({...form,desc:e.target.value})} style={{gridColumn:'1 / -1'}} />
+            <input placeholder="블로그 URL (선택)" value={form.url} onChange={e=>setForm({...form,url:e.target.value})} style={{gridColumn:'1 / -1'}} />
             <div style={{display:'flex',gap:8}}>
               <button onClick={createPoint} disabled={!isValidPoint(form) || uploading}>{uploading ? '업로드 중...' : '추가'}</button>
-              <button onClick={()=>setForm({title:'',lat:'',lng:'',image:'',desc:'',_file:null})}>초기화</button>
+              <button onClick={()=>setForm({title:'',lat:'',lng:'',image:'',desc:'',url:'',_file:null})}>초기화</button>
             </div>
             {form._file && (
               <div style={{gridColumn:'1 / -1'}}>

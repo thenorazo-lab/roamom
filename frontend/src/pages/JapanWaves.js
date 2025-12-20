@@ -1,20 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
+import AdSense from '../components/AdSense';
 
 export default function JapanWaves(){
-  const [date, setDate] = useState(new Date().toISOString().slice(0,10));
-  const [images, setImages] = useState([]);
+  const navigate = useNavigate();
+  const defaultDate = new Date().toISOString().slice(0,10);
   const [idx, setIdx] = useState(0);
+  const apiUrl = process.env.REACT_APP_API_URL || '';
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(()=>{ fetchImages(); },[date]);
+  // 처음 진입 시 오늘 날짜로 자동 로드
+  useEffect(()=>{ fetchImages(); },[]);
+
+  function buildPlaceholder(dateStr){
+    const d = dateStr || new Date().toISOString().slice(0,10);
+    const yyyymmdd = d.replace(/-/g,'');
+    const hours = [0,3,6,9,12,15,18,21];
+    return hours.map(h => {
+      const hh = String(h).padStart(2,'0');
+      const hhmm = `${hh}00`;
+      return {
+        time: `${d} ${hh}:00`,
+        url: `https://placehold.co/800x380?text=Wave+${yyyymmdd}+${hhmm}`
+      };
+    });
+  }
+
+  const [images, setImages] = useState(buildPlaceholder(defaultDate));
 
   async function fetchImages(){
     try{
-      const res = await axios.get(`/api/japan-waves?date=${date}`);
-      setImages(res.data.images || []);
+      const res = await axios.get(`${apiUrl}/api/japan-waves?date=${defaultDate}`);
+      const imgs = res.data?.images || [];
+      setImages(imgs.length > 0 ? imgs : buildPlaceholder(defaultDate));
       setIdx(0);
-    }catch(e){ setImages([]); }
+    }catch(e){
+      setImages(buildPlaceholder(defaultDate));
+      setIdx(0);
+    }
   }
 
   function prev(){ setIdx(i => (i - 1 + images.length) % images.length); }
@@ -22,30 +45,37 @@ export default function JapanWaves(){
 
   return (
     <div className="container">
-      <h2 className="page-title">일본 파고 (타임시리즈)</h2>
-      <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:12}}>
-        <label>날짜: <input type="date" value={date} onChange={e=>setDate(e.target.value)} /></label>
-        <button onClick={fetchImages}>조회</button>
-      </div>
-
+      <h2 className="page-title">일본 파고</h2>
       {images.length===0 ? (
         <p>해당 날짜의 이미지가 없습니다.</p>
       ) : (
         <div style={{maxWidth:800}}>
           <div style={{position:'relative',height:420,display:'flex',alignItems:'center',justifyContent:'center'}}>
             <button onClick={prev} style={{position:'absolute',left:0}}>◀</button>
-            <img src={images[idx].url} alt={images[idx].time} style={{maxHeight:380,maxWidth:'100%'}} />
+            <img src={images[idx].url} alt={images[idx].time} style={{maxHeight:380,maxWidth:'100%'}} crossOrigin="anonymous" referrerPolicy="no-referrer" onError={()=>{ setImages(buildPlaceholder(defaultDate)); setIdx(0); }} />
             <button onClick={next} style={{position:'absolute',right:0}}>▶</button>
           </div>
+          <div style={{textAlign:'center', fontSize:12, color:'#666', marginTop:4}}>ICOM 일본기상청 데이터</div>
           <div style={{textAlign:'center',marginTop:8}}>{images[idx].time}</div>
           <div style={{display:'flex',gap:8,overflowX:'auto',marginTop:12}}>
             {images.map((img,i)=> (
-              <img key={i} src={img.url} alt={img.time} style={{width:120,height:80,objectFit:'cover',border:i===idx? '3px solid #2b7' : '1px solid #ccc',cursor:'pointer'}} onClick={()=>setIdx(i)} />
+              <img
+                key={i}
+                src={img.url}
+                alt={img.time}
+                crossOrigin="anonymous"
+                referrerPolicy="no-referrer"
+                style={{ width:120, height:80, objectFit:'cover', border: i===idx ? '3px solid #2b7' : '1px solid #ccc', cursor:'pointer' }}
+                onClick={()=>setIdx(i)}
+              />
             ))}
           </div>
         </div>
       )}
-
+      <AdSense slot="3456789012" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
+      <div style={{textAlign:'center', marginTop:24}}>
+        <Link to="/" className="nav-button">🏠 홈으로</Link>
+      </div>
     </div>
   );
 }

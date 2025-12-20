@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: sea-weather-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: DISABLE_RATE_LIMIT
+        value: true
+      - key: JAPAN_WAVE_SOURCE
+        value: imocwx-static
+      - key: ENABLE_IMAGE_PROXY
+        value: true
+      - key: DATA_GO_KR_API_KEY
+        sync: false
+      - key: KHOA_API_KEY
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SHEETS_ID
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON_PATH
+        sync: false

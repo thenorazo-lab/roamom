@@ -225,9 +225,9 @@ router.get('/sea-info', async (req, res) => {
             }
         }));
 
-        // B. 조석 예보 (바다누리)
+        // B. 조석 예보 (바다누리) - 극치(고/저조) API 사용
         if (closestTideObs) {
-            promises.push(axios.get('http://www.khoa.go.kr/api/oceangrid/tideObs/search.do', {
+            promises.push(axios.get('http://www.khoa.go.kr/api/oceangrid/tideObsPreTab/search.do', {
                 params: {
                     ServiceKey: KHOA_API_KEY,
                     ObsCode: closestTideObs.code,
@@ -324,14 +324,21 @@ router.get('/sea-info', async (req, res) => {
         if (tideResult.status === 'fulfilled' && tideResult.value?.data) {
             const response = tideResult.value.data;
             if (response.result?.data) {
-                const rawTide = response.result.data;
-                // 고/저조 이벤트가 없으면 분단위 시계열에서 추출
+                // tideObsPreTab는 hl_code/tph_time/tph_level 를 반환 → 표준 필드로 정규화
+                const rawTide = response.result.data.map(e => {
+                    const hl = (e.hl_code === '고조' || e.hl_code === 'H') ? 'H'
+                              : (e.hl_code === '저조' || e.hl_code === 'L') ? 'L'
+                              : e.hl_code;
+                    const tide_time = e.tide_time || e.tph_time || e.record_time;
+                    const tide_level = e.tide_level || e.tph_level;
+                    return { ...e, hl_code: hl, tide_time, tide_level };
+                });
+
                 const hasHL = rawTide.some(e => e.hl_code && e.tide_time);
                 if (hasHL) {
                     tide = rawTide;
                 } else {
                     const derived = extractHighLowFromTideSeries(rawTide);
-                    // 파생 이벤트가 없으면 원본 12개를 관측값으로 표출해 빈 화면을 방지
                     tide = derived.length > 0
                         ? derived
                         : rawTide.slice(0, 12).map(e => ({

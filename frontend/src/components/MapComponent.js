@@ -23,7 +23,7 @@ function ClickHandler({ onClick }) {
   return null;
 }
 
-export default function MapComponent({ center = [36, 128], zoom = 7, markers = [], onMapClick }) {
+export default function MapComponent({ center = [36, 128], zoom = 7, markers = [], onMapClick, onMarkerClick }) {
   const mapRef = useRef();
 
   useEffect(() => {
@@ -43,10 +43,22 @@ export default function MapComponent({ center = [36, 128], zoom = 7, markers = [
         <ClickHandler onClick={(latlng) => onMapClick && onMapClick(latlng)} />
 
         {markers.map((m) => (
-          <Marker key={m.id || `${m.lat}-${m.lng}`} position={[m.lat, m.lng]} eventHandlers={{ click: ()=>{ fetch('/api/points/click',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ pointId: m.id })}).catch(()=>{});} }}>
+          <Marker key={m.id || `${m.lat}-${m.lng}`} position={[m.lat, m.lng]} eventHandlers={{ 
+            click: ()=>{ 
+              fetch('/api/points/click',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ pointId: m.id })}).catch(()=>{});
+            }
+          }}>
             <Popup>
-              <strong>{m.title || m.id}</strong>
-              <div>{m.desc}</div>
+              <div style={{minWidth:200}}>
+                {m.image && (
+                  <div style={{marginBottom:8}}>
+                    <img src={m.image} alt={m.title} style={{width:'100%', maxWidth:250, height:150, objectFit:'contain', borderRadius:4}} />
+                  </div>
+                )}
+                <strong>{m.title || m.id}</strong>
+                <div>{m.desc}</div>
+                {m.url && <div style={{marginTop:8}}><a href={m.url} target="_blank" rel="noopener noreferrer" style={{color:'#0077be',textDecoration:'underline'}}>블로그 보기 →</a></div>}
+              </div>
             </Popup>
           </Marker>
         ))}

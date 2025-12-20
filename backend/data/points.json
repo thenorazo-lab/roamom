@@ -5,7 +5,8 @@
     "lat": 35.1587,
     "lng": 129.1604,
     "image": "https://example.com/p1.jpg",
-    "desc": "좋은 포인트"
+    "desc": "좋은 포인트",
+    "url": ""
   },
   {
     "id": "p2",
@@ -13,7 +14,8 @@
     "lat": 34.7833,
     "lng": 126.3667,
     "image": "https://example.com/p2.jpg",
-    "desc": "초심자 추천"
+    "desc": "초심자 추천",
+    "url": ""
   },
   {
     "id": "p1766135924315",
@@ -22,5 +24,14 @@
     "lng": 129.1234,
     "image": "/uploads/1766135924056-ycz79b.png",
     "desc": "e2e test point"
+  },
+  {
+    "id": "p1766270365423",
+    "title": "슬도 문어낙지 포인트  ",
+    "lat": 35.479399,
+    "lng": 129.431187,
+    "image": "/uploads/1766270365175-5hvhwi.png",
+    "desc": "",
+    "url": "https://m.blog.naver.com/gkfngkfn414/222424964878"
   }
 ]

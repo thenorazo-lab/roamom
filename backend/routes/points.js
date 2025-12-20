@@ -36,12 +36,12 @@ router.get('/points', (req, res) => {
 
 // Admin: create point
 router.post('/points', express.json(), requireAdmin, (req, res) => {
-  const { title, lat, lng, image, desc } = req.body;
+  const { title, lat, lng, image, desc, url } = req.body;
   // accept zero coordinates; validate numerically
   if (!title || lat === undefined || lng === undefined || isNaN(parseFloat(lat)) || isNaN(parseFloat(lng))) return res.status(400).json({ error: 'title, lat, lng required' });
   const points = readPoints();
   const id = 'p' + Date.now();
-  const p = { id, title, lat: parseFloat(lat), lng: parseFloat(lng), image: image || '', desc: desc || '' };
+  const p = { id, title, lat: parseFloat(lat), lng: parseFloat(lng), image: image || '', desc: desc || '', url: url || '' };
   points.push(p);
   writePoints(points);
   res.json(p);
@@ -50,7 +50,7 @@ router.post('/points', express.json(), requireAdmin, (req, res) => {
 // Admin: update point
 router.put('/points/:id', express.json(), requireAdmin, (req, res) => {
   const id = req.params.id;
-  const { title, lat, lng, image, desc } = req.body;
+  const { title, lat, lng, image, desc, url } = req.body;
   const points = readPoints();
   const idx = points.findIndex(p => p.id === id);
   if (idx === -1) return res.status(404).json({ error: 'Not found' });
@@ -60,6 +60,7 @@ router.put('/points/:id', express.json(), requireAdmin, (req, res) => {
   p.lng = lng !== undefined ? parseFloat(lng) : p.lng;
   p.image = image ?? p.image;
   p.desc = desc ?? p.desc;
+  p.url = url ?? p.url;
   points[idx] = p;
   writePoints(points);
   res.json(p);

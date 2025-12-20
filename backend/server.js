@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -15,6 +16,8 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
+// 정적 파일 (예: 업로드된 이미지) 서빙
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // Rate limiter (조건부 활성화)
 const shouldDisableRateLimit = process.env.DISABLE_RATE_LIMIT === 'true';
@@ -31,8 +34,9 @@ if (!shouldDisableRateLimit) {
 
 // 라우트로 분리된 엔드포인트를 사용합니다.
 app.use('/api', require('./routes/weather'));
-// app.use('/api', require('./routes/japan')); // 추후 구현
-// app.use('/api', require('./routes/points')); // 추후 구현
+app.use('/api', require('./routes/japan'));
+app.use('/api', require('./routes/points'));
+app.use('/api', require('./routes/uploads'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
