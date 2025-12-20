@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 
 export default function PointsAdmin(){
@@ -14,12 +14,12 @@ export default function PointsAdmin(){
     return data.title && !isNaN(parseFloat(data.lat)) && !isNaN(parseFloat(data.lng));
   }
 
-  useEffect(()=>{ fetchPoints(); },[]);
+  useEffect(()=>{ fetchPoints(); },[fetchPoints]);
 
-  async function fetchPoints(){
+  const fetchPoints = useCallback(async () => {
     const res = await axios.get(baseUrl + '/points');
     setPoints(res.data);
-  }
+  }, [baseUrl]);
 
   function authHeaders(){ return password ? { 'x-admin-password': password } : {}; }
 

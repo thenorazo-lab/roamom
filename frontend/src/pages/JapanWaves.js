@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import AdSense from '../components/AdSense';
 
 export default function JapanWaves(){
-  const navigate = useNavigate();
   const defaultDate = new Date().toISOString().slice(0,10);
   const [idx, setIdx] = useState(0);
   const apiUrl = process.env.REACT_APP_API_URL || '';
 
   // 처음 진입 시 오늘 날짜로 자동 로드
-  useEffect(()=>{ fetchImages(); },[]);
+  useEffect(()=>{ fetchImages(); },[fetchImages]);
 
   function buildPlaceholder(dateStr){
     const d = dateStr || new Date().toISOString().slice(0,10);
@@ -28,7 +27,7 @@ export default function JapanWaves(){
 
   const [images, setImages] = useState(buildPlaceholder(defaultDate));
 
-  async function fetchImages(){
+  const fetchImages = useCallback(async () => {
     try{
       const res = await axios.get(`${apiUrl}/api/japan-waves?date=${defaultDate}`);
       const imgs = res.data?.images || [];
@@ -38,7 +37,7 @@ export default function JapanWaves(){
       setImages(buildPlaceholder(defaultDate));
       setIdx(0);
     }
-  }
+  }, [apiUrl, defaultDate]);
 
   function prev(){ setIdx(i => (i - 1 + images.length) % images.length); }
   function next(){ setIdx(i => (i + 1) % images.length); }
