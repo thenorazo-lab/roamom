@@ -14,12 +14,12 @@ export default function PointsAdmin(){
     return data.title && !isNaN(parseFloat(data.lat)) && !isNaN(parseFloat(data.lng));
   }
 
-  useEffect(()=>{ fetchPoints(); },[fetchPoints]);
-
   const fetchPoints = useCallback(async () => {
     const res = await axios.get(baseUrl + '/points');
     setPoints(res.data);
   }, [baseUrl]);
+
+  useEffect(()=>{ fetchPoints(); },[fetchPoints]);
 
   function authHeaders(){ return password ? { 'x-admin-password': password } : {}; }
 

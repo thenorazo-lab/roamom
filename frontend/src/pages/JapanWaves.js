@@ -8,9 +8,6 @@ export default function JapanWaves(){
   const [idx, setIdx] = useState(0);
   const apiUrl = process.env.REACT_APP_API_URL || '';
 
-  // 처음 진입 시 오늘 날짜로 자동 로드
-  useEffect(()=>{ fetchImages(); },[fetchImages]);
-
   function buildPlaceholder(dateStr){
     const d = dateStr || new Date().toISOString().slice(0,10);
     const yyyymmdd = d.replace(/-/g,'');
@@ -38,6 +35,9 @@ export default function JapanWaves(){
       setIdx(0);
     }
   }, [apiUrl, defaultDate]);
+
+  // 처음 진입 시 오늘 날짜로 자동 로드
+  useEffect(()=>{ fetchImages(); },[fetchImages]);
 
   function prev(){ setIdx(i => (i - 1 + images.length) % images.length); }
   function next(){ setIdx(i => (i + 1) % images.length); }
