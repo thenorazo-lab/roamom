@@ -21,7 +21,19 @@ const IMOCWX_STATIC_PREFIX = process.env.IMOCWX_STATIC_PREFIX || 'https://www.im
 const IMOCWX_STATIC_SUFFIX = process.env.IMOCWX_STATIC_SUFFIX || '.png?2000a';
 
 function fmtDateParts(dateStr) {
-  const d = dateStr ? new Date(dateStr) : new Date();
+  let d;
+  if (!dateStr) {
+    d = new Date();
+  } else if (/^\d{8}$/.test(dateStr)) {
+    // YYYYMMDD 형식
+    const yyyy = dateStr.slice(0, 4);
+    const mm = dateStr.slice(4, 6);
+    const dd = dateStr.slice(6, 8);
+    d = new Date(`${yyyy}-${mm}-${dd}`);
+  } else {
+    // ISO 형식 (YYYY-MM-DD 등)
+    d = new Date(dateStr);
+  }
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const dd = String(d.getDate()).padStart(2, '0');

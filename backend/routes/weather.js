@@ -215,17 +215,18 @@ router.get('/sea-info', async (req, res) => {
         // 2. API 병렬 호출 준비
         const promises = [];
 
-        // A. 기상청 단기예보
+        // A. 기상청 단기예보 (timeout 10초)
         promises.push(axios.get('http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst', {
             params: {
                 serviceKey: DATA_GO_KR_API_KEY,
                 pageNo: 1, numOfRows: 1000, dataType: 'JSON',
                 base_date: base_date, base_time: base_time,
                 nx: grid.x, ny: grid.y
-            }
+            },
+            timeout: 10000
         }));
 
-        // B. 조석 예보 (바다누리) - 극치(고/저조) API 사용
+        // B. 조석 예보 (바다누리) - 극치(고/저조) API 사용 (timeout 10초)
         if (closestTideObs) {
             promises.push(axios.get('http://www.khoa.go.kr/api/oceangrid/tideObsPreTab/search.do', {
                 params: {
@@ -233,7 +234,8 @@ router.get('/sea-info', async (req, res) => {
                     ObsCode: closestTideObs.code,
                     Date: search_date,
                     ResultType: 'json'
-                }
+                },
+                timeout: 10000
             }));
         } else {
             promises.push(Promise.resolve(null)); // 조석 관측소가 없으면 null 반환
@@ -318,6 +320,23 @@ router.get('/sea-info', async (req, res) => {
             }
         } else {
             weatherError = weatherResult.reason?.message || '기상청 API 연결 실패';
+            // API 실패 시에도 Ultra API로 최소한의 데이터 확보 시도
+            console.log('[sea-info] Main weather API failed, trying Ultra APIs');
+            const ultraNcst = await fetchUltraNowcast(grid.x, grid.y, DATA_GO_KR_API_KEY);
+            const ultraFcst = await fetchUltraForecast(grid.x, grid.y, DATA_GO_KR_API_KEY);
+            
+            if (ultraNcst || ultraFcst) {
+                weather = {
+                    T1H: ultraNcst?.T1H || ultraFcst?.T1H || '22',
+                    TMP: ultraNcst?.T1H || ultraFcst?.T1H || '22',
+                    WSD: ultraNcst?.WSD || ultraFcst?.WSD,
+                    sampled: !(ultraNcst || ultraFcst)
+                };
+                console.log('[sea-info] Recovered with Ultra API:', weather);
+            } else {
+                // 완전 실패 시 샘플 데이터
+                weather = { T1H: '22', TMP: '22', sampled: true };
+            }
         }
 
         let tide = [], tideError = null;
