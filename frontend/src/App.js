@@ -103,6 +103,8 @@ const WeatherPage = () => {
       return;
     }
 
+    const apiUrl = process.env.REACT_APP_API_URL || '';
+
     const fetchWithTimeout = async (url, opts = {}, timeoutMs = 8000) => {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeoutMs);
@@ -125,7 +127,7 @@ const WeatherPage = () => {
         if (new URLSearchParams(window.location.search).get('sample') === 'true') params.set('useSample', 'true');
         params.set('_ts', Date.now()); // cache bust to avoid 304
 
-        const url = `/api/sea-info?${params.toString()}`;
+        const url = `${apiUrl}/api/sea-info?${params.toString()}`;
         const response = await fetchWithTimeout(url, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } }, 10000);
         if (!response.ok) {
           const errorText = await response.text();
@@ -331,7 +333,8 @@ const PointsPage = () => {
   const [points, setPoints] = React.useState([]);
 
   React.useEffect(() => {
-    fetch('/api/points')
+    const apiUrl = process.env.REACT_APP_API_URL || '';
+    fetch(`${apiUrl}/api/points`)
       .then(r => r.json())
       .then(setPoints)
       .catch(() => setPoints([]));
@@ -470,7 +473,8 @@ const MapPage = () => {
     setError(null);
     setInfo(null);
     try {
-      const url = `/api/sea-info?lat=${latlng.lat}&lon=${latlng.lng}&_ts=${Date.now()}`;
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const url = `${apiUrl}/api/sea-info?lat=${latlng.lat}&lon=${latlng.lng}&_ts=${Date.now()}`;
       console.log('[MapPage] Fetching:', url);
       const controller = new AbortController();
       const t = setTimeout(() => controller.abort(), 10000);
