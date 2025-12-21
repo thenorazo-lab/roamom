@@ -28,7 +28,12 @@ export default function JapanWaves(){
     try{
       const res = await axios.get(`${apiUrl}/api/japan-waves?date=${defaultDate}`);
       const imgs = res.data?.images || [];
-      setImages(imgs.length > 0 ? imgs : buildPlaceholder(defaultDate));
+      // 상대 경로를 절대 경로로 변환
+      const imgsWithAbsoluteUrls = imgs.map(img => ({
+        ...img,
+        url: img.url.startsWith('http') ? img.url : `${apiUrl}${img.url}`
+      }));
+      setImages(imgsWithAbsoluteUrls.length > 0 ? imgsWithAbsoluteUrls : buildPlaceholder(defaultDate));
       setIdx(0);
     }catch(e){
       setImages(buildPlaceholder(defaultDate));
