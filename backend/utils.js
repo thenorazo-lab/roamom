@@ -92,23 +92,42 @@ const findClosest = (lat, lon, locations) => {
 
 // 오늘 날짜와 현재 시간을 API 형식에 맞게 반환하는 함수
 const getApiDateTime = () => {
+    // 한국 시간(KST = UTC+9)으로 변환
     const now = new Date();
-    const year = now.getFullYear();
-    const month = ('0' + (now.getMonth() + 1)).slice(-2);
-    const day = ('0' + now.getDate()).slice(-2);
-    const hours = now.getHours();
+    const kstOffset = 9 * 60; // 분 단위
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const kstTime = new Date(utc + (kstOffset * 60000));
+    
+    const year = kstTime.getFullYear();
+    const month = ('0' + (kstTime.getMonth() + 1)).slice(-2);
+    const day = ('0' + kstTime.getDate()).slice(-2);
+    const hours = kstTime.getHours();
+    const minutes = kstTime.getMinutes();
 
+    // 기상청 단기예보: 02, 05, 08, 11, 14, 17, 20, 23시 발표 (발표 후 10분 뒤 데이터 사용 가능)
     const baseTimes = ['0200', '0500', '0800', '1100', '1400', '1700', '2000', '2300'];
     let base_time = '2300';
+    let base_date = `${year}${month}${day}`;
+    
     for (let i = baseTimes.length - 1; i >= 0; i--) {
-        if (hours >= parseInt(baseTimes[i].substring(0, 2), 10)) {
+        const baseHour = parseInt(baseTimes[i].substring(0, 2), 10);
+        // 발표 시간 + 10분 이후부터 사용 가능
+        if (hours > baseHour || (hours === baseHour && minutes >= 10)) {
             base_time = baseTimes[i];
             break;
         }
     }
+    
+    // 자정 이전인데 23시 발표를 못 쓰는 경우, 전날 23시 발표 사용
+    if (hours === 0 && minutes < 10) {
+        const yesterday = new Date(kstTime);
+        yesterday.setDate(yesterday.getDate() - 1);
+        base_date = `${yesterday.getFullYear()}${('0' + (yesterday.getMonth() + 1)).slice(-2)}${('0' + yesterday.getDate()).slice(-2)}`;
+        base_time = '2300';
+    }
 
     return {
-        base_date: `${year}${month}${day}`,
+        base_date: base_date,
         base_time: base_time,
         search_date: `${year}${month}${day}`
     };
