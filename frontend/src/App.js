@@ -500,6 +500,7 @@ const MapPage = () => {
       const json = await res.json();
       console.log('[MapPage] Data received:', json);
       console.log('[MapPage] Tide data specifically:', json.tide);
+      console.log('[MapPage] Tide times:', json.tide?.map(t => t.tide_time || t.record_time));
       console.log('[MapPage] nearestObs:', json.nearestObs);
       setInfo(json);
     } catch (e) {
