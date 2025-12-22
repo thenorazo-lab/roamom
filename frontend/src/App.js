@@ -79,8 +79,8 @@ const HomePage = () => (
     <h1 className="main-title">해루질가자</h1>
     <p className="sub-title">바다날씨, 포인트, 일본 파고를 한 곳에서</p>
     <div className="nav-buttons">
-      <Link to="/weather" className="nav-button">🌊 바다날씨</Link>
-      <Link to="/jp-wave" className="nav-button">🇯🇵 일본 파고</Link>
+      <Link to="/weather" className="nav-button">☁️ 바다날씨</Link>
+      <Link to="/jp-wave" className="nav-button">🌊 일본 기상청 파고</Link>
       <Link to="/points" className="nav-button">📍 해루질 포인트</Link>
       <Link to="/guide" className="nav-button">📖 해루질 가이드</Link>
       <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>⚙️ 포인트 관리자</Link>
