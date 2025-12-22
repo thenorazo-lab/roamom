@@ -238,9 +238,8 @@ router.get('/sea-info', async (req, res) => {
             const tideApiUrl = 'http://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService';
             const tideParams = {
                 serviceKey: DATA_GO_KR_NEW_API_KEY || DATA_GO_KR_API_KEY,
-                ObsCode: closestTideObs.code, // ObsCode는 필수 파라미터
-                Date: search_date, // YYYYMMDD 형식
-                ResultType: 'json'
+                obsCode: closestTideObs.code,
+                date: search_date
             };
             console.log('[/api/sea-info] Tide API request:', tideApiUrl, tideParams);
             promises.push(axios.get(tideApiUrl, {
