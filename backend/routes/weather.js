@@ -375,9 +375,14 @@ router.get('/sea-info', async (req, res) => {
                 const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
                 console.log('[sea-info] Tide data array length:', dataArray.length);
                 console.log('[sea-info] First 3 items:', dataArray.slice(0, 3));
+                console.log('[sea-info] Observatory name:', dataArray[0]?.obsvtrNm);
+                
+                // extrSe가 1(고조) 또는 2(저조)인 것만 필터링
+                const filteredData = dataArray.filter(e => e.extrSe === '1' || e.extrSe === '2');
+                console.log('[sea-info] Filtered tide data (extrSe 1 or 2):', filteredData.length, 'items');
                 
                 // 새 API 형식: predcDt(날짜시간), predcTdlvVl(조위), extrSe(1=고조, 2=저조)
-                const rawTide = dataArray.map(e => {
+                const rawTide = filteredData.map(e => {
                     const hl = (e.extrSe === '1' || e.extrSe === 1) ? 'H' 
                              : (e.extrSe === '2' || e.extrSe === 2) ? 'L'
                              : (e.hl_code === '고조' || e.hl_code === 'H') ? 'H'
