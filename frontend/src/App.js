@@ -350,6 +350,7 @@ const PointsPage = () => {
     <div className="container">
       <h2 className="page-title">📍 해루질 포인트</h2>
       <p>지도의 포인트를 눌러 정보를 확인하고 블로그 글을 읽어보세요.</p>
+      <p style={{fontSize: '14px', color: '#666', marginTop: '8px'}}>공유하고 싶은 포인트를 thenorazo@gmail.com 로 제보해주세요!</p>
       <MapComponent center={[36.5, 127.5]} zoom={7} markers={points} onMapClick={() => {}} onMarkerClick={handleMarkerClick} />
       <AdSense slot="5678901234" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
       <Link to="/" className="nav-button" style={{marginTop: '20px'}}>🏠 홈으로</Link>
