@@ -353,8 +353,21 @@ router.get('/sea-info', async (req, res) => {
             const response = tideResult.value.data;
             console.log('[sea-info] Tide API raw response:', typeof response === 'string' ? response.substring(0, 500) : JSON.stringify(response).substring(0, 500));
             
-            // JSON 응답 파싱
-            const parsedData = response.result?.data;
+            // XML 응답을 JSON으로 파싱
+            let parsedData = null;
+            if (typeof response === 'string' && response.startsWith('<')) {
+                try {
+                    const parser = new xml2js.Parser({ explicitArray: false });
+                    const result = await parser.parseStringPromise(response);
+                    parsedData = result?.response?.body?.items?.item;
+                    console.log('[sea-info] Parsed XML tide data:', parsedData ? 'success' : 'null');
+                } catch (e) {
+                    console.error('[sea-info] XML parsing error:', e.message);
+                    tideError = 'XML 파싱 오류';
+                }
+            } else {
+                parsedData = response.result?.data;
+            }
             
             if (parsedData) {
                 // 데이터 배열화 (단일 객체일 수 있음)
@@ -362,13 +375,13 @@ router.get('/sea-info', async (req, res) => {
                 console.log('[sea-info] Tide data array length:', dataArray.length);
                 console.log('[sea-info] First 3 items:', dataArray.slice(0, 3));
                 
-                // 바다누리 API 형식: tph_time(시각), tph_level(조위), hl_code(고조/저조)
+                // 공공데이터 API 형식: predcDt(시각), predcTdlvVl(조위), extrSe(1,3=고조 / 2,4=저조)
                 const rawTide = dataArray.map(e => {
-                    const hl = (e.hl_code === '고조' || e.hl_code === 'H') ? 'H'
-                             : (e.hl_code === '저조' || e.hl_code === 'L') ? 'L'
-                             : e.hl_code || 'O';
-                    const tide_time = e.tph_time || e.tide_time || e.record_time;
-                    const tide_level = e.tph_level || e.tide_level;
+                    const hl = (e.extrSe === '1' || e.extrSe === 1 || e.extrSe === '3' || e.extrSe === 3) ? 'H'
+                             : (e.extrSe === '2' || e.extrSe === 2 || e.extrSe === '4' || e.extrSe === 4) ? 'L'
+                             : 'O';
+                    const tide_time = e.predcDt || e.tph_time || e.tide_time || e.record_time;
+                    const tide_level = e.predcTdlvVl || e.tph_level || e.tide_level;
                     return { ...e, hl_code: hl, tide_time, tide_level };
                 });
 
