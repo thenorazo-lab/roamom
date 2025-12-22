@@ -550,7 +550,7 @@ const MapPage = () => {
             </div>
 
             <div className="card">
-              <h3>🌊 물때</h3>
+              <h3>🌊 물때 {info.nearestObs && <span style={{fontSize: '12px', fontWeight: 'normal', color: '#666'}}>({info.nearestObs.name})</span>}</h3>
               {info.tideError ? (
                 <p style={{color:'#a33'}}>조석 데이터를 불러올 수 없습니다.</p>
               ) : info.tide && info.tide.length > 0 ? (
