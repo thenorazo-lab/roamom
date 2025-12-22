@@ -499,6 +499,8 @@ const MapPage = () => {
       }
       const json = await res.json();
       console.log('[MapPage] Data received:', json);
+      console.log('[MapPage] Tide data specifically:', json.tide);
+      console.log('[MapPage] nearestObs:', json.nearestObs);
       setInfo(json);
     } catch (e) {
       console.error('[MapPage] Error:', e.message);
