@@ -234,15 +234,18 @@ router.get('/sea-info', async (req, res) => {
         }));
 
         // B. 조석 예보 (공공데이터포털) - 고저조 예보 API 사용 (timeout 10초)
+        // 관측소 코드 없이 전체 데이터를 받고, 응답에서 가장 가까운 관측소 필터링
         if (closestTideObs) {
             const tideApiUrl = 'http://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService';
             const tideParams = {
                 serviceKey: DATA_GO_KR_NEW_API_KEY || DATA_GO_KR_API_KEY,
-                obsCode: closestTideObs.code,
+                // obsCode 파라미터 제거 - API가 전체 데이터 반환
                 date: tideSearchDate,
-                dataType: 'JSON'
+                dataType: 'JSON',
+                numOfRows: 999 // 모든 관측소 데이터 요청
             };
             console.log('[/api/sea-info] Tide API request:', tideApiUrl, tideParams);
+            console.log('[/api/sea-info] Will filter for:', closestTideObs.name);
             promises.push(axios.get(tideApiUrl, {
                 params: tideParams,
                 timeout: 10000
@@ -375,10 +378,14 @@ router.get('/sea-info', async (req, res) => {
                 const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
                 console.log('[sea-info] Tide data array length:', dataArray.length);
                 console.log('[sea-info] First 3 items:', dataArray.slice(0, 3));
-                console.log('[sea-info] Observatory name:', dataArray[0]?.obsvtrNm);
+                
+                // 요청한 관측소 이름으로 필터링
+                const targetObsName = closestTideObs.name;
+                const obsFiltered = dataArray.filter(e => e.obsvtrNm === targetObsName);
+                console.log('[sea-info] Filtered by observatory name:', targetObsName, '->', obsFiltered.length, 'items');
                 
                 // extrSe가 1(고조) 또는 2(저조)인 것만 필터링
-                const filteredData = dataArray.filter(e => e.extrSe === '1' || e.extrSe === '2');
+                const filteredData = obsFiltered.filter(e => e.extrSe === '1' || e.extrSe === '2');
                 console.log('[sea-info] Filtered tide data (extrSe 1 or 2):', filteredData.length, 'items');
                 
                 // 새 API 형식: predcDt(날짜시간), predcTdlvVl(조위), extrSe(1=고조, 2=저조)
