@@ -212,6 +212,10 @@ router.get('/sea-info', async (req, res) => {
         const { base_date, base_time, search_date } = getApiDateTime();
         console.log('[/api/sea-info] API DateTime:', { base_date, base_time, search_date });
         console.log('[/api/sea-info] TIDE API will use Date:', search_date, 'for ObsCode:', closestTideObs?.code);
+        
+        // 조석 API는 YYYY-MM-DD 형식 필요
+        const tideSearchDate = `${search_date.substring(0, 4)}-${search_date.substring(4, 6)}-${search_date.substring(6, 8)}`;
+        console.log('[/api/sea-info] Tide API formatted date:', tideSearchDate);
 
         // 2. API 병렬 호출 준비
         const promises = [];
@@ -233,7 +237,7 @@ router.get('/sea-info', async (req, res) => {
                 params: {
                     ServiceKey: KHOA_API_KEY,
                     ObsCode: closestTideObs.code,
-                    Date: search_date,
+                    Date: tideSearchDate,
                     ResultType: 'json'
                 },
                 timeout: 10000
@@ -370,9 +374,11 @@ router.get('/sea-info', async (req, res) => {
                 }
             } else {
                 tideError = response.result?.error || '조석 정보 없음';
+                console.log('[sea-info] Tide API response has no data:', response.result);
             }
         } else {
             tideError = tideResult.reason?.message || '조석 API 연결 실패';
+            console.log('[sea-info] Tide API failed:', tideResult.status, tideResult.reason?.message);
         }
 
         // 스쿠버: 주변 후보 순회로 성공값 우선 적용
