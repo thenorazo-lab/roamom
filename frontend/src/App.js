@@ -82,7 +82,7 @@ const HomePage = () => (
       <Link to="/weather" className="nav-button">🌊 바다날씨</Link>
       <Link to="/jp-wave" className="nav-button">🇯🇵 일본 파고</Link>
       <Link to="/points" className="nav-button">📍 해루질 포인트</Link>
-      <Link to="/guide" className="nav-button">📖 해루진 가이드</Link>
+      <Link to="/guide" className="nav-button">📖 해루질 가이드</Link>
       <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>⚙️ 포인트 관리자</Link>
     </div>
     <AdSense slot="1234567890" />
