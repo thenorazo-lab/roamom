@@ -325,7 +325,24 @@ router.get('/sea-info', async (req, res) => {
                 }
                 console.log('[sea-info] Parsed weather:', weather, 'ultraNcst:', ultraNcst);
             } else {
+                // resultCode가 00이 아닌 경우 (예: 03=데이터 없음)
                 weatherError = `[${response.header.resultCode}] ${response.header.resultMsg}`;
+                console.log('[sea-info] Main weather API returned error, trying Ultra APIs');
+                const ultraNcst = await fetchUltraNowcast(grid.x, grid.y, DATA_GO_KR_API_KEY);
+                const ultraFcst = await fetchUltraForecast(grid.x, grid.y, DATA_GO_KR_API_KEY);
+                
+                if (ultraNcst || ultraFcst) {
+                    weather = {
+                        T1H: ultraNcst?.T1H || ultraFcst?.T1H || '22',
+                        TMP: ultraNcst?.T1H || ultraFcst?.T1H || '22',
+                        SKY: ultraNcst?.SKY || ultraFcst?.SKY,
+                        PTY: ultraNcst?.PTY || ultraFcst?.PTY,
+                        WSD: ultraNcst?.WSD || ultraFcst?.WSD,
+                        sampled: !(ultraNcst || ultraFcst)
+                    };
+                    console.log('[sea-info] Recovered with Ultra API after main API error:', weather);
+                    weatherError = null; // Ultra로 복구했으므로 에러 제거
+                }
             }
         } else {
             weatherError = weatherResult.reason?.message || '기상청 API 연결 실패';
