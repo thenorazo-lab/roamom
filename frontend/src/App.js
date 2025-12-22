@@ -280,12 +280,8 @@ const WeatherPage = () => {
     const formatDateLabel = (dateStr) => {
       const today = new Date();
       const todayStr = today.toISOString().substring(0, 10);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const tomorrowStr = tomorrow.toISOString().substring(0, 10);
       
       if (dateStr === todayStr) return `오늘 (${dateStr.substring(5).replace('-', '/')})`;
-      if (dateStr === tomorrowStr) return `내일 (${dateStr.substring(5).replace('-', '/')})`;
       return dateStr.substring(5).replace('-', '/');
     };
 
