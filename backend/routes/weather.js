@@ -335,8 +335,8 @@ router.get('/sea-info', async (req, res) => {
                     weather = {
                         T1H: ultraNcst?.T1H || ultraFcst?.T1H || '22',
                         TMP: ultraNcst?.T1H || ultraFcst?.T1H || '22',
-                        SKY: ultraNcst?.SKY || ultraFcst?.SKY,
-                        PTY: ultraNcst?.PTY || ultraFcst?.PTY,
+                        SKY: ultraNcst?.SKY || ultraFcst?.SKY || '1',
+                        PTY: ultraNcst?.PTY || ultraFcst?.PTY || '0',
                         WSD: ultraNcst?.WSD || ultraFcst?.WSD,
                         sampled: !(ultraNcst || ultraFcst)
                     };
@@ -355,13 +355,15 @@ router.get('/sea-info', async (req, res) => {
                 weather = {
                     T1H: ultraNcst?.T1H || ultraFcst?.T1H || '22',
                     TMP: ultraNcst?.T1H || ultraFcst?.T1H || '22',
+                    SKY: ultraNcst?.SKY || ultraFcst?.SKY || '1',
+                    PTY: ultraNcst?.PTY || ultraFcst?.PTY || '0',
                     WSD: ultraNcst?.WSD || ultraFcst?.WSD,
                     sampled: !(ultraNcst || ultraFcst)
                 };
                 console.log('[sea-info] Recovered with Ultra API:', weather);
             } else {
                 // 완전 실패 시 샘플 데이터
-                weather = { T1H: '22', TMP: '22', sampled: true };
+                weather = { T1H: '22', TMP: '22', SKY: '1', PTY: '0', sampled: true };
             }
         }
 
