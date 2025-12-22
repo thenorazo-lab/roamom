@@ -233,19 +233,16 @@ router.get('/sea-info', async (req, res) => {
             timeout: 10000
         }));
 
-        // B. 조석 예보 (공공데이터포털) - 고저조 예보 API 사용 (timeout 10초)
-        // 관측소 코드 없이 전체 데이터를 받고, 응답에서 가장 가까운 관측소 필터링
+        // B. 조석 예보 (바다누리 해양정보서비스) - 조석예보 API 사용 (timeout 10초)
         if (closestTideObs) {
-            const tideApiUrl = 'http://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService';
+            const tideApiUrl = 'http://www.khoa.go.kr/api/oceangrid/tideObsFcst/search.do';
             const tideParams = {
-                serviceKey: DATA_GO_KR_NEW_API_KEY || DATA_GO_KR_API_KEY,
-                // obsCode 파라미터 제거 - API가 전체 데이터 반환
-                date: tideSearchDate,
-                // dataType 파라미터 제거 - 이 API는 XML만 지원
-                numOfRows: 999 // 모든 관측소 데이터 요청
+                ServiceKey: KHOA_API_KEY,
+                ObsCode: closestTideObs.code,
+                Date: search_date, // YYYYMMDD 형식
+                ResultType: 'json'
             };
             console.log('[/api/sea-info] Tide API request:', tideApiUrl, tideParams);
-            console.log('[/api/sea-info] Will filter for:', closestTideObs.name);
             promises.push(axios.get(tideApiUrl, {
                 params: tideParams,
                 timeout: 10000
@@ -357,21 +354,8 @@ router.get('/sea-info', async (req, res) => {
             const response = tideResult.value.data;
             console.log('[sea-info] Tide API raw response:', typeof response === 'string' ? response.substring(0, 500) : JSON.stringify(response).substring(0, 500));
             
-            // XML 응답을 JSON으로 파싱
-            let parsedData = null;
-            if (typeof response === 'string' && response.startsWith('<')) {
-                try {
-                    const parser = new xml2js.Parser({ explicitArray: false });
-                    const result = await parser.parseStringPromise(response);
-                    parsedData = result?.response?.body?.items?.item;
-                    console.log('[sea-info] Parsed XML tide data:', parsedData);
-                } catch (e) {
-                    console.error('[sea-info] XML parsing error:', e.message);
-                    tideError = 'XML 파싱 오류';
-                }
-            } else {
-                parsedData = response.result?.data;
-            }
+            // JSON 응답 파싱
+            const parsedData = response.result?.data;
             
             if (parsedData) {
                 // 데이터 배열화 (단일 객체일 수 있음)
@@ -379,24 +363,13 @@ router.get('/sea-info', async (req, res) => {
                 console.log('[sea-info] Tide data array length:', dataArray.length);
                 console.log('[sea-info] First 3 items:', dataArray.slice(0, 3));
                 
-                // 요청한 관측소 이름으로 필터링
-                const targetObsName = closestTideObs.name;
-                const obsFiltered = dataArray.filter(e => e.obsvtrNm === targetObsName);
-                console.log('[sea-info] Filtered by observatory name:', targetObsName, '->', obsFiltered.length, 'items');
-                
-                // extrSe가 1(고조) 또는 2(저조)인 것만 필터링
-                const filteredData = obsFiltered.filter(e => e.extrSe === '1' || e.extrSe === '2');
-                console.log('[sea-info] Filtered tide data (extrSe 1 or 2):', filteredData.length, 'items');
-                
-                // 새 API 형식: predcDt(날짜시간), predcTdlvVl(조위), extrSe(1=고조, 2=저조)
-                const rawTide = filteredData.map(e => {
-                    const hl = (e.extrSe === '1' || e.extrSe === 1) ? 'H' 
-                             : (e.extrSe === '2' || e.extrSe === 2) ? 'L'
-                             : (e.hl_code === '고조' || e.hl_code === 'H') ? 'H'
+                // 바다누리 API 형식: tph_time(시각), tph_level(조위), hl_code(고조/저조)
+                const rawTide = dataArray.map(e => {
+                    const hl = (e.hl_code === '고조' || e.hl_code === 'H') ? 'H'
                              : (e.hl_code === '저조' || e.hl_code === 'L') ? 'L'
                              : e.hl_code || 'O';
-                    const tide_time = e.predcDt || e.tide_time || e.tph_time || e.record_time;
-                    const tide_level = e.predcTdlvVl || e.tide_level || e.tph_level;
+                    const tide_time = e.tph_time || e.tide_time || e.record_time;
+                    const tide_level = e.tph_level || e.tide_level;
                     return { ...e, hl_code: hl, tide_time, tide_level };
                 });
 
