@@ -233,13 +233,16 @@ router.get('/sea-info', async (req, res) => {
 
         // B. 조석 예보 (공공데이터포털) - 고저조 예보 API 사용 (timeout 10초)
         if (closestTideObs) {
-            promises.push(axios.get('http://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService', {
-                params: {
-                    serviceKey: DATA_GO_KR_API_KEY,
-                    obsCode: closestTideObs.code,
-                    date: tideSearchDate,
-                    dataType: 'JSON'
-                },
+            const tideApiUrl = 'http://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService';
+            const tideParams = {
+                serviceKey: DATA_GO_KR_API_KEY,
+                obsCode: closestTideObs.code,
+                date: tideSearchDate,
+                dataType: 'JSON'
+            };
+            console.log('[/api/sea-info] Tide API request:', tideApiUrl, tideParams);
+            promises.push(axios.get(tideApiUrl, {
+                params: tideParams,
                 timeout: 10000
             }));
         } else {
