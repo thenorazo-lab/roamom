@@ -8,9 +8,9 @@ import PointsAdmin from './pages/PointsAdmin';
 import JapanWaves from './pages/JapanWaves';
 import AdSense from './components/AdSense';
 
-// ¿ÀÇÁ¶óÀÎ(file://) Àü¿ë »ùÇÃ µ¥ÀÌÅÍ
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(file://) ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 const getSampleSeaInfo = () => ({
-  nearestObs: { name: '»ùÇÃ °üÃø¼Ò' },
+  nearestObs: { name: 'ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½' },
   weather: { T1H: '20', TMP: '20', SKY: '1', PTY: '0', WSD: '3.2', sampled: true },
   scuba: { water_temp: '20', wave_height: '0.5', current_speed: '0.4', sampled: true },
   tide: [
@@ -23,80 +23,80 @@ const getSampleSeaInfo = () => ({
   recorded: false,
 });
 
-// °¡ÀÌµå ÆäÀÌÁö
+// ï¿½ï¿½ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 const GuidePage = () => (
   <div className="container">
-    <h2 className="page-title">?? ÇØ·çÁú °¡ÀÌµå</h2>
+    <h2 className="page-title">?? ï¿½Ø·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìµï¿½</h2>
     <div style={{maxWidth: '800px', textAlign: 'left', padding: '20px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)'}}>
-      <h3>?? ÇØ·çÁúÀÌ¶õ?</h3>
-      <p>ÇØ·çÁúÀº ¹Ù´å°¡¿¡¼­ Á¶°³, ¼Ò¶ó, ¼º°Ô µî ÇØ»ê¹°À» Ã¤ÃëÇÏ´Â ÀüÅëÀûÀÎ È°µ¿ÀÔ´Ï´Ù.</p>
+      <h3>?? ï¿½Ø·ï¿½ï¿½ï¿½ï¿½Ì¶ï¿½?</h3>
+      <p>ï¿½Ø·ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù´å°¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½Ò¶ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ø»ê¹°ï¿½ï¿½ Ã¤ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È°ï¿½ï¿½ï¿½Ô´Ï´ï¿½.</p>
       
-      <h3>?? ¾ÈÀüÇÑ ÇØ·çÁúÀ» À§ÇÑ ÆÁ</h3>
+      <h3>?? ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ø·ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½</h3>
       <ul>
-        <li>°£Á¶ ½Ã°£À» È®ÀÎÇÏ¼¼¿ä</li>
-        <li>ÆÄ°í°¡ ³·Àº ³¯À» ¼±ÅÃÇÏ¼¼¿ä</li>
-        <li>¼ö¿Â°ú ±â»ó »óÅÂ¸¦ Ã¼Å©ÇÏ¼¼¿ä</li>
-        <li>¾ÈÀü Àåºñ¸¦ Âø¿ëÇÏ¼¼¿ä</li>
+        <li>ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½</li>
+        <li>ï¿½Ä°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½</li>
+        <li>ï¿½ï¿½ï¿½Â°ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ Ã¼Å©ï¿½Ï¼ï¿½ï¿½ï¿½</li>
+        <li>ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½</li>
       </ul>
       
-      <h3>?? ÀÌ ¾Û »ç¿ë¹ý</h3>
+      <h3>?? ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½</h3>
       <ul>
-        <li><strong>¹Ù´Ù³¯¾¾:</strong> ½Ç½Ã°£ ¹Ù´Ù ±â»ó Á¤º¸ È®ÀÎ</li>
-        <li><strong>ÀÏº» ÆÄ°í:</strong> ÀÏº» ÁÖº¯ ÆÄ°í ¿¹º¸ È®ÀÎ</li>
-        <li><strong>ÇØ·çÁú Æ÷ÀÎÆ®:</strong> ÃßÃµ ÇØ·çÁú Àå¼Ò Å½»ö</li>
+        <li><strong>ï¿½Ù´Ù³ï¿½ï¿½ï¿½:</strong> ï¿½Ç½Ã°ï¿½ ï¿½Ù´ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½</li>
+        <li><strong>ï¿½Ïºï¿½ ï¿½Ä°ï¿½:</strong> ï¿½Ïºï¿½ ï¿½Öºï¿½ ï¿½Ä°ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½</li>
+        <li><strong>ï¿½Ø·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®:</strong> ï¿½ï¿½Ãµ ï¿½Ø·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ Å½ï¿½ï¿½</li>
       </ul>
       
-      <h3>?? ¿öÅ· ÇØ·çÁú °¡ÀÌµå ¸ðÀ½</h3>
+      <h3>?? ï¿½ï¿½Å· ï¿½Ø·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½</h3>
       <p>
         <a href="https://roafather.tistory.com/entry/%EC%9B%8C%ED%82%B9%ED%95%B4%EB%A3%A8%EC%A7%88-%EA%B0%80%EC%9D%B4%EB%93%9C" 
            target="_blank" 
            rel="noopener noreferrer" 
            style={{color:'#0077be', fontSize:'1.1rem', fontWeight:'600', textDecoration:'underline'}}>
-          ¡æ ¿öÅ· ÇØ·çÁú °¡ÀÌµå º¸·¯°¡±â
+          ï¿½ï¿½ ï¿½ï¿½Å· ï¿½Ø·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         </a>
       </p>
       
-      <h3>?? ½ºÅ² ÇØ·çÁú °¡ÀÌµå ¸ðÀ½</h3>
+      <h3>?? ï¿½ï¿½Å² ï¿½Ø·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½</h3>
       <p>
         <a href="https://roafather.tistory.com/entry/%EC%8A%A4%ED%82%A8-%ED%95%B4%EB%A3%A8%EC%A7%88-%EA%B0%80%EC%9D%B4%EB%93%9C" 
            target="_blank" 
            rel="noopener noreferrer" 
            style={{color:'#0077be', fontSize:'1.1rem', fontWeight:'600', textDecoration:'underline'}}>
-          ¡æ ½ºÅ² ÇØ·çÁú °¡ÀÌµå º¸·¯°¡±â
+          ï¿½ï¿½ ï¿½ï¿½Å² ï¿½Ø·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         </a>
       </p>
     </div>
     <AdSense slot="2345678901" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
     <div style={{marginTop: '24px'}}>
-      <Link to="/" className="nav-button">?? È¨À¸·Î</Link>
+      <Link to="/" className="nav-button">?? È¨ï¿½ï¿½ï¿½ï¿½</Link>
     </div>
   </div>
 );
 
-// È¨ È­¸é
+// È¨ È­ï¿½ï¿½
 const HomePage = () => (
   <div className="container">
-    <h1 className="main-title">ÇØ·çÁú°¡ÀÚ</h1>
-    <p className="sub-title">¹Ù´Ù³¯¾¾, Æ÷ÀÎÆ®, ÀÏº» ÆÄ°í¸¦ ÇÑ °÷¿¡¼­</p>
+    <h1 className="main-title">ï¿½Ø·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</h1>
+    <p className="sub-title">ï¿½Ù´Ù³ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½Æ®, ï¿½Ïºï¿½ ï¿½Ä°ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</p>
     <div className="nav-buttons">
-      <Link to="/weather" className="nav-button">?? ¹Ù´Ù³¯¾¾</Link>
-      <Link to="/jp-wave" className="nav-button">?? ÀÏº» ±â»óÃ» ÆÄ°í</Link>
-      <Link to="/points" className="nav-button">?? ÇØ·çÁú Æ÷ÀÎÆ®</Link>
-      <Link to="/guide" className="nav-button">?? ÇØ·çÁú °¡ÀÌµå</Link>
-      <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>?? Æ÷ÀÎÆ® °ü¸®ÀÚ</Link>
+      <Link to="/weather" className="nav-button">?? ï¿½Ù´Ù³ï¿½ï¿½ï¿½</Link>
+      <Link to="/jp-wave" className="nav-button">?? ï¿½Ïºï¿½ ï¿½ï¿½ï¿½Ã» ï¿½Ä°ï¿½</Link>
+      <Link to="/points" className="nav-button">?? ï¿½Ø·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®</Link>
+      <Link to="/guide" className="nav-button">?? ï¿½Ø·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìµï¿½</Link>
+      <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>?? ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</Link>
     </div>
     <AdSense slot="1234567890" />
   </div>
 );
 
-// ¹Ù´Ù³¯¾¾ ÆäÀÌÁö
+// ï¿½Ù´Ù³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 const WeatherPage = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // file:// ·Î ¿­·ÈÀ» ¶§´Â API È£Ãâ ´ë½Å »ùÇÃ µ¥ÀÌÅÍ¸¦ »ç¿ë
+    // file:// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ API È£ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½
     if (window.location.protocol === 'file:') {
       setData(getSampleSeaInfo());
       setLoading(false);
@@ -131,7 +131,7 @@ const WeatherPage = () => {
         const response = await fetchWithTimeout(url, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } }, 10000);
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(`¼­¹ö ¿À·ù (${response.status}): ${response.statusText}. ${errorText}`);
+          throw new Error(`ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (${response.status}): ${response.statusText}. ${errorText}`);
         }
         const result = await response.json();
         setData(result);
@@ -143,7 +143,7 @@ const WeatherPage = () => {
       }
     };
 
-    // 1) URL·Î ÁÂÇ¥°¡ ³Ñ¾î¿Â °æ¿ì ¿ì¼± »ç¿ë (¿¹: ?lat=35.1&lon=129.1&sample=true)
+    // 1) URLï¿½ï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½Ñ¾ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ì¼± ï¿½ï¿½ï¿½ (ï¿½ï¿½: ?lat=35.1&lon=129.1&sample=true)
     const qs = new URLSearchParams(window.location.search);
     const qsLat = qs.get('lat');
     const qsLon = qs.get('lon');
@@ -153,7 +153,7 @@ const WeatherPage = () => {
       return;
     }
 
-    // 2) ±×·¸Áö ¾ÊÀ¸¸é ºê¶ó¿ìÀú À§Ä¡ ±ÇÇÑ ½Ãµµ (¹ÌÁö¿ø/¹«ÀÀ´ä Å¸ÀÓ¾Æ¿ô Æú¹é)
+    // 2) ï¿½×·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½Ãµï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½Ó¾Æ¿ï¿½ ï¿½ï¿½ï¿½ï¿½)
     if (!('geolocation' in navigator)) {
       fetchWeatherData(35.1, 129.1, true);
       return;
@@ -161,7 +161,7 @@ const WeatherPage = () => {
 
     const timeoutMs = 5000;
     const timerId = setTimeout(() => {
-      // À§Ä¡ ±ÇÇÑ ¹«ÀÀ´ä µîÀ¸·Î Áö¿¬µÉ ¶§ »ùÇÃ·Î Æú¹é
+      // ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ã·ï¿½ ï¿½ï¿½ï¿½ï¿½
       fetchWeatherData(35.1, 129.1, true);
     }, timeoutMs);
 
@@ -173,7 +173,7 @@ const WeatherPage = () => {
       },
       async () => {
         clearTimeout(timerId);
-        // ±ÇÇÑ °ÅºÎ µî ½ÇÆÐ ½Ã »ùÇÃ·Î Ç¥½Ã
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½Åºï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ã·ï¿½ Ç¥ï¿½ï¿½
         await fetchWeatherData(35.1, 129.1, true);
       }
     );
@@ -181,19 +181,19 @@ const WeatherPage = () => {
 
   const getWeatherStatus = (sky, pty) => {
     if (pty && pty !== '0') {
-      if (pty === '1') return 'ºñ';
-      if (pty === '2') return 'ºñ/´«';
-      if (pty === '3') return '´«';
-      if (pty === '5') return 'ºø¹æ¿ï';
-      if (pty === '6') return 'ºø¹æ¿ï/´«³¯¸²';
-      if (pty === '7') return '´«³¯¸²';
+      if (pty === '1') return 'ï¿½ï¿½';
+      if (pty === '2') return 'ï¿½ï¿½/ï¿½ï¿½';
+      if (pty === '3') return 'ï¿½ï¿½';
+      if (pty === '5') return 'ï¿½ï¿½ï¿½ï¿½ï¿½';
+      if (pty === '6') return 'ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½';
+      if (pty === '7') return 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½';
     }
     if (sky) {
-      if (sky === '1') return '¸¼À½';
-      if (sky === '3') return '±¸¸§¸¹À½';
-      if (sky === '4') return 'Èå¸²';
+      if (sky === '1') return 'ï¿½ï¿½ï¿½ï¿½';
+      if (sky === '3') return 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½';
+      if (sky === '4') return 'ï¿½å¸²';
     }
-    return 'Á¤º¸ ¾øÀ½';
+    return 'ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½';
   };
 
   const formatTideTime = (t) => {
@@ -203,10 +203,10 @@ const WeatherPage = () => {
 
   const extractHighLowTides = (tideArr) => {
     if (!tideArr || !tideArr.length) return [];
-    // ÀÌ¹Ì H/L ÅÂ±×°¡ ÀÖÀ¸¸é ±×°Í¸¸ ÇÊÅÍ¸µ
+    // ï¿½Ì¹ï¿½ H/L ï¿½Â±×°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×°Í¸ï¿½ ï¿½ï¿½ï¿½Í¸ï¿½
     const hlOnly = tideArr.filter(t => t.hl_code === 'H' || t.hl_code === 'L');
     if (hlOnly.length > 0) return hlOnly;
-    // ¾øÀ¸¸é ÃÖ°í/ÃÖÀú°ª¸¸ ÃßÃâ
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö°ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     const levels = tideArr.map(t => parseInt(t.tide_level) || 0);
     const maxLevel = Math.max(...levels);
     const minLevel = Math.min(...levels);
@@ -243,9 +243,9 @@ const WeatherPage = () => {
   const renderTideList = (tideArr) => {
     if (!tideArr || !tideArr.length) return null;
     const filtered = extractHighLowTides(tideArr);
-    if (!filtered.length) return <p style={{color:'#666'}}>°íÁ¶/ÀúÁ¶ Á¤º¸°¡ ¾ø½À´Ï´Ù.</p>;
+    if (!filtered.length) return <p style={{color:'#666'}}>ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.</p>;
     
-    // ³¯Â¥º°·Î ±×·ìÇÎ
+    // ï¿½ï¿½Â¥ï¿½ï¿½ï¿½ï¿½ ï¿½×·ï¿½ï¿½ï¿½
     const groupedByDate = {};
     filtered.forEach(item => {
       const fullTime = item.tide_time || item.record_time;
@@ -267,7 +267,7 @@ const WeatherPage = () => {
     
     const renderTideItem = (item) => {
       const change = calculateTideChange(tideArr, item);
-      const changeText = change !== null ? (change >= 0 ? `¡ã+${change}` : `¡å${change}`) : '';
+      const changeText = change !== null ? (change >= 0 ? `ï¿½ï¿½+${change}` : `ï¿½ï¿½${change}`) : '';
       return (
         <div key={`${item.tide_time || item.record_time}`} style={{marginBottom:'8px', fontSize:'14px'}}>
           <span style={{marginRight:'12px'}}>{formatTideTime(item.tide_time || item.record_time)}</span>
@@ -280,7 +280,7 @@ const WeatherPage = () => {
     const formatDateLabel = (dateStr) => {
       const today = new Date();
       const todayStr = today.toISOString().substring(0, 10);
-      if (dateStr === todayStr) return `¿À´Ã (${dateStr.substring(5).replace('-', '/')})`;
+      if (dateStr === todayStr) return `ï¿½ï¿½ï¿½ï¿½ (${dateStr.substring(5).replace('-', '/')})`;
       
       return dateStr.substring(5).replace('-', '/');
     };
@@ -297,14 +297,14 @@ const WeatherPage = () => {
               
               {high.length > 0 && (
                 <div style={{marginBottom:'12px'}}>
-                  <div style={{fontWeight:'bold', marginBottom:'8px', color:'#2196F3', fontSize:'13px'}}>¡ã ¸¸Á¶</div>
+                  <div style={{fontWeight:'bold', marginBottom:'8px', color:'#2196F3', fontSize:'13px'}}>ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½</div>
                   {high.map(renderTideItem)}
                 </div>
               )}
               
               {low.length > 0 && (
                 <div>
-                  <div style={{fontWeight:'bold', marginBottom:'8px', color:'#f44336', fontSize:'13px'}}>¡å °£Á¶</div>
+                  <div style={{fontWeight:'bold', marginBottom:'8px', color:'#f44336', fontSize:'13px'}}>ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½</div>
                   {low.map(renderTideItem)}
                 </div>
               )}
@@ -317,52 +317,52 @@ const WeatherPage = () => {
 
   return (
     <div className="container">
-      <h2 className="page-title">ÇöÀç À§Ä¡ ¹Ù´Ù ³¯¾¾</h2>
-      {loading && <p>µ¥ÀÌÅÍ¸¦ ºÒ·¯¿À´Â ÁßÀÔ´Ï´Ù...</p>}
-      {error && <p className="error-message">¿À·ù: {error}</p>}
+      <h2 className="page-title">ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½Ù´ï¿½ ï¿½ï¿½ï¿½ï¿½</h2>
+      {loading && <p>ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½Ò·ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ô´Ï´ï¿½...</p>}
+      {error && <p className="error-message">ï¿½ï¿½ï¿½ï¿½: {error}</p>}
       {data && (
         <div>
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-            <h3>À§Ä¡: {data.nearestObs?.name || 'ÇöÀç À§Ä¡'}</h3>
-            <div style={{fontSize:12, color:'#666'}}>±â·Ï »óÅÂ: {data.recorded ? '±â·ÏµÊ' : '±â·Ï ½ÇÆÐ/ºñÈ°¼º'}{data.usingMockData ? ' (»ùÇÃ µ¥ÀÌÅÍ »ç¿ë Áß)' : ''}</div>
+            <h3>ï¿½ï¿½Ä¡: {data.nearestObs?.name || 'ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡'}</h3>
+            <div style={{fontSize:12, color:'#666'}}>ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: {data.recorded ? 'ï¿½ï¿½Ïµï¿½' : 'ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½È°ï¿½ï¿½'}{data.usingMockData ? ' (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½)' : ''}</div>
           </div>
 
           <div className="info-cards">
             <div className="card">
-              <h3>?? ³¯¾¾ {data.weatherError && <span style={{color:'#a33', fontSize:12, marginLeft:8}}>(µ¥ÀÌÅÍ ÀÏºÎ ¾øÀ½)</span>}</h3>
-              <p>»óÅÂ: {getWeatherStatus(data.weather?.SKY, data.weather?.PTY) ?? 'Á¤º¸ ¾øÀ½'}</p>
-              <p>±â¿Â: {data.weather?.T1H ?? data.weather?.TMP ?? 'N/A'}¡ÆC</p>
-              <p>Ç³¼Ó: {data.weather?.WSD ?? 'N/A'} m/s</p>
+              <h3>?? ï¿½ï¿½ï¿½ï¿½ {data.weatherError && <span style={{color:'#a33', fontSize:12, marginLeft:8}}>(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ïºï¿½ ï¿½ï¿½ï¿½ï¿½)</span>}</h3>
+              <p>ï¿½ï¿½ï¿½ï¿½: {getWeatherStatus(data.weather?.SKY, data.weather?.PTY) ?? 'ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½'}</p>
+              <p>ï¿½ï¿½ï¿½: {data.weather?.T1H ?? data.weather?.TMP ?? 'N/A'}ï¿½ï¿½C</p>
+              <p>Ç³ï¿½ï¿½: {data.weather?.WSD ?? 'N/A'} m/s</p>
             </div>
 
             <div className="card">
-              <h3>?? ÇØ¾ç Á¤º¸</h3>
-              <p>¼ö¿Â: {data.scuba?.water_temp ?? 'N/A'}¡ÆC</p>
-              <p>ÆÄ°í: {data.scuba?.wave_height ?? 'N/A'} m</p>
-              <p>À¯¼Ó: {data.scuba?.current_speed ?? 'N/A'} knots</p>
+              <h3>?? ï¿½Ø¾ï¿½ ï¿½ï¿½ï¿½ï¿½</h3>
+              <p>ï¿½ï¿½ï¿½ï¿½: {data.scuba?.water_temp ?? 'N/A'}ï¿½ï¿½C</p>
+              <p>ï¿½Ä°ï¿½: {data.scuba?.wave_height ?? 'N/A'} m</p>
+              <p>ï¿½ï¿½ï¿½ï¿½: {data.scuba?.current_speed ?? 'N/A'} knots</p>
             </div>
 
             <div className="card">
-              <h3>?? ¹°¶§</h3>
+              <h3>?? ï¿½ï¿½ï¿½ï¿½</h3>
               {data.tideError ? (
-                <div style={{color:'#a33'}}>Á¶¼® µ¥ÀÌÅÍ¸¦ ºÒ·¯¿ÀÁö ¸øÇß½À´Ï´Ù.</div>
+                <div style={{color:'#a33'}}>ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½Ò·ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ß½ï¿½ï¿½Ï´ï¿½.</div>
               ) : data.tide && data.tide.length > 0 ? (
                 <div style={{maxHeight:'400px', overflowY:'auto'}}>
                   {renderTideList(data.tide)}
                 </div>
-              ) : <p>¹°¶§ Á¤º¸°¡ ¾ø½À´Ï´Ù.</p>}
+              ) : <p>ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.</p>}
             </div>
           </div>
 
-          <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>ÃâÃ³: ¿ÀÇÂAPI ±â»óÃ»_´Ü±â¿¹º¸ / ÇØ¾ç¼ö»êºÎ ±¹¸³ÇØ¾çÁ¶»ç¿ø_½ºÅ²½ºÄí¹öÁö¼ö Á¶È¸ / ÇØ¾ç¼ö»êºÎ ±¹¸³ÇØ¾çÁ¶»ç¿ø_Á¶¼®¿¹º¸</p>
+          <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>ï¿½ï¿½Ã³: ï¿½ï¿½ï¿½ï¿½API ï¿½ï¿½ï¿½Ã»_ï¿½Ü±â¿¹ï¿½ï¿½ / ï¿½Ø¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½Å²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¸ / ï¿½Ø¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</p>
 
           <AdSense slot="4567890123" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
 
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <Link to="/map" className="nav-button" style={{ backgroundColor: '#2196F3', marginRight: '10px' }}>
-              ??? Áöµµ º¸±â
+              ??? ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             </Link>
-            <Link to="/" className="nav-button">?? È¨À¸·Î</Link>
+            <Link to="/" className="nav-button">?? È¨ï¿½ï¿½ï¿½ï¿½</Link>
           </div>
         </div>
       )}
@@ -389,12 +389,12 @@ const PointsPage = () => {
 
   return (
     <div className="container">
-      <h2 className="page-title">?? ÇØ·çÁú Æ÷ÀÎÆ®</h2>
-      <p>ÁöµµÀÇ Æ÷ÀÎÆ®¸¦ ´­·¯ Á¤º¸¸¦ È®ÀÎÇÏ°í ºí·Î±× ±ÛÀ» ÀÐ¾îº¸¼¼¿ä.</p>
-      <p style={{fontSize: '14px', color: '#666', marginTop: '8px'}}>°øÀ¯ÇÏ°í ½ÍÀº Æ÷ÀÎÆ®¸¦ thenorazo@gmail.com ·Î Á¦º¸ÇØÁÖ¼¼¿ä!</p>
+      <h2 className="page-title">?? ï¿½Ø·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®</h2>
+      <p>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½Î±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ð¾îº¸ï¿½ï¿½ï¿½ï¿½.</p>
+      <p style={{fontSize: '14px', color: '#666', marginTop: '8px'}}>ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ thenorazo@gmail.com ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¼ï¿½ï¿½ï¿½!</p>
       <MapComponent center={[36.5, 127.5]} zoom={7} markers={points} onMapClick={() => {}} onMarkerClick={handleMarkerClick} />
       <AdSense slot="5678901234" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
-      <Link to="/" className="nav-button" style={{marginTop: '20px'}}>?? È¨À¸·Î</Link>
+      <Link to="/" className="nav-button" style={{marginTop: '20px'}}>?? È¨ï¿½ï¿½ï¿½ï¿½</Link>
     </div>
   );
 };
@@ -405,7 +405,7 @@ const MapPage = () => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
 
-  // file:// ·Î ¿­·ÈÀ» ¶§´Â API È£Ãâ ´ë½Å »ùÇÃ µ¥ÀÌÅÍ¸¦ »ç¿ë
+  // file:// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ API È£ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½
   React.useEffect(() => {
     if (window.location.protocol === 'file:') {
       setInfo(getSampleSeaInfo());
@@ -414,19 +414,19 @@ const MapPage = () => {
 
   const getWeatherStatus = (sky, pty) => {
     if (pty && pty !== '0') {
-      if (pty === '1') return 'ºñ';
-      if (pty === '2') return 'ºñ/´«';
-      if (pty === '3') return '´«';
-      if (pty === '5') return 'ºø¹æ¿ï';
-      if (pty === '6') return 'ºø¹æ¿ï/´«³¯¸²';
-      if (pty === '7') return '´«³¯¸²';
+      if (pty === '1') return 'ï¿½ï¿½';
+      if (pty === '2') return 'ï¿½ï¿½/ï¿½ï¿½';
+      if (pty === '3') return 'ï¿½ï¿½';
+      if (pty === '5') return 'ï¿½ï¿½ï¿½ï¿½ï¿½';
+      if (pty === '6') return 'ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½';
+      if (pty === '7') return 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½';
     }
     if (sky) {
-      if (sky === '1') return '¸¼À½';
-      if (sky === '3') return '±¸¸§¸¹À½';
-      if (sky === '4') return 'Èå¸²';
+      if (sky === '1') return 'ï¿½ï¿½ï¿½ï¿½';
+      if (sky === '3') return 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½';
+      if (sky === '4') return 'ï¿½å¸²';
     }
-    return 'Á¤º¸ ¾øÀ½';
+    return 'ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½';
   };
 
   const formatTideTime = (t) => {
@@ -474,9 +474,9 @@ const MapPage = () => {
   const renderTideList = (tideArr) => {
     if (!tideArr || !tideArr.length) return null;
     const filtered = extractHighLowTides(tideArr);
-    if (!filtered.length) return <p style={{color:'#666'}}>°íÁ¶/ÀúÁ¶ Á¤º¸°¡ ¾ø½À´Ï´Ù.</p>;
+    if (!filtered.length) return <p style={{color:'#666'}}>ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.</p>;
     
-    // ³¯Â¥º°·Î ±×·ìÇÎ
+    // ï¿½ï¿½Â¥ï¿½ï¿½ï¿½ï¿½ ï¿½×·ï¿½ï¿½ï¿½
     const groupedByDate = {};
     filtered.forEach(item => {
       const fullTime = item.tide_time || item.record_time;
@@ -498,7 +498,7 @@ const MapPage = () => {
     
     const renderTideItem = (item) => {
       const change = calculateTideChange(tideArr, item);
-      const changeText = change !== null ? (change >= 0 ? `¡ã+${change}` : `¡å${change}`) : '';
+      const changeText = change !== null ? (change >= 0 ? `ï¿½ï¿½+${change}` : `ï¿½ï¿½${change}`) : '';
       return (
         <div key={`${item.tide_time || item.record_time}`} style={{marginBottom:'8px', fontSize:'14px'}}>
           <span style={{marginRight:'12px'}}>{formatTideTime(item.tide_time || item.record_time)}</span>
@@ -511,7 +511,7 @@ const MapPage = () => {
     const formatDateLabel = (dateStr) => {
       const today = new Date();
       const todayStr = today.toISOString().substring(0, 10);
-      if (dateStr === todayStr) return `¿À´Ã (${dateStr.substring(5).replace('-', '/')})`;
+      if (dateStr === todayStr) return `ï¿½ï¿½ï¿½ï¿½ (${dateStr.substring(5).replace('-', '/')})`;
       
       return dateStr.substring(5).replace('-', '/');
     };
@@ -528,14 +528,14 @@ const MapPage = () => {
               
               {high.length > 0 && (
                 <div style={{marginBottom:'12px'}}>
-                  <div style={{fontWeight:'bold', marginBottom:'8px', color:'#2196F3', fontSize:'13px'}}>¡ã ¸¸Á¶</div>
+                  <div style={{fontWeight:'bold', marginBottom:'8px', color:'#2196F3', fontSize:'13px'}}>ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½</div>
                   {high.map(renderTideItem)}
                 </div>
               )}
               
               {low.length > 0 && (
                 <div>
-                  <div style={{fontWeight:'bold', marginBottom:'8px', color:'#f44336', fontSize:'13px'}}>¡å °£Á¶</div>
+                  <div style={{fontWeight:'bold', marginBottom:'8px', color:'#f44336', fontSize:'13px'}}>ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½</div>
                   {low.map(renderTideItem)}
                 </div>
               )}
@@ -581,7 +581,7 @@ const MapPage = () => {
       setInfo(json);
     } catch (e) {
       console.error('[MapPage] Error:', e.message);
-      setError('µ¥ÀÌÅÍ¸¦ ºÒ·¯¿ÀÁö ¸øÇß½À´Ï´Ù.\n' + e.message + '\n(F12 °³¹ßÀÚµµ±¸ Console ÅÇ¿¡¼­ "[MapPage]" ·Î±× È®ÀÎ)');
+      setError('ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½Ò·ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ß½ï¿½ï¿½Ï´ï¿½.\n' + e.message + '\n(F12 ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ Console ï¿½Ç¿ï¿½ï¿½ï¿½ "[MapPage]" ï¿½Î±ï¿½ È®ï¿½ï¿½)');
     } finally {
       setLoading(false);
     }
@@ -589,58 +589,58 @@ const MapPage = () => {
 
   return (
     <div className="container">
-      <h2 className="page-title">Áöµµ¿¡¼­ À§Ä¡ ¼±ÅÃ</h2>
+      <h2 className="page-title">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½</h2>
       <p style={{ marginBottom: '20px', fontSize: '14px', color: '#666' }}>
-        ??? Áöµµ¸¦ Å¬¸¯ÇØ ÇÉÀ» ²È°í ±× À§Ä¡ÀÇ ¹Ù´Ù ³¯¾¾ Á¤º¸¸¦ È®ÀÎÇÏ¼¼¿ä!
+        ??? ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½È°ï¿½ ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ù´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½!
       </p>
       
       <MapComponent 
         center={[36.5, 127.5]} 
         zoom={7} 
-        markers={marker ? [{ id: 'sel', title: '¼±ÅÃ À§Ä¡', lat: marker.lat, lng: marker.lng }] : []} 
+        markers={marker ? [{ id: 'sel', title: 'ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡', lat: marker.lat, lng: marker.lng }] : []} 
         onMapClick={handleMapClick} 
       />
 
-      {loading && <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '16px' }}>?? µ¥ÀÌÅÍ¸¦ ºÒ·¯¿À´Â ÁßÀÔ´Ï´Ù...</p>}
+      {loading && <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '16px' }}>?? ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½Ò·ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ô´Ï´ï¿½...</p>}
       {error && <p className="error-message" style={{ marginTop: '20px' }}>?? {error}</p>}
       
       {info && (
         <div style={{ marginTop: '30px' }}>
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: '20px'}}>
-            <h3>?? {info.nearestObs?.name || '¼±ÅÃµÈ À§Ä¡'}</h3>
+            <h3>?? {info.nearestObs?.name || 'ï¿½ï¿½ï¿½Ãµï¿½ ï¿½ï¿½Ä¡'}</h3>
             <div style={{fontSize:12, color:'#666'}}>
-              ÁÂÇ¥: {marker.lat.toFixed(3)}, {marker.lng.toFixed(3)}
+              ï¿½ï¿½Ç¥: {marker.lat.toFixed(3)}, {marker.lng.toFixed(3)}
             </div>
           </div>
 
           <div className="info-cards">
             <div className="card">
-              <h3>?? ³¯¾¾ {info.weatherError && <span style={{color:'#a33', fontSize:12, marginLeft:8}}>(µ¥ÀÌÅÍ ÀÏºÎ ¾øÀ½)</span>}</h3>
-              <p>»óÅÂ: {getWeatherStatus(info.weather?.SKY, info.weather?.PTY) ?? 'N/A'}</p>
-              <p>±â¿Â: {info.weather?.T1H ?? info.weather?.TMP ?? 'N/A'}¡ÆC</p>
-              <p>Ç³¼Ó: {info.weather?.WSD ?? 'N/A'} m/s</p>
+              <h3>?? ï¿½ï¿½ï¿½ï¿½ {info.weatherError && <span style={{color:'#a33', fontSize:12, marginLeft:8}}>(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ïºï¿½ ï¿½ï¿½ï¿½ï¿½)</span>}</h3>
+              <p>ï¿½ï¿½ï¿½ï¿½: {getWeatherStatus(info.weather?.SKY, info.weather?.PTY) ?? 'N/A'}</p>
+              <p>ï¿½ï¿½ï¿½: {info.weather?.T1H ?? info.weather?.TMP ?? 'N/A'}ï¿½ï¿½C</p>
+              <p>Ç³ï¿½ï¿½: {info.weather?.WSD ?? 'N/A'} m/s</p>
             </div>
 
             <div className="card">
-              <h3>?? ÇØ¾ç Á¤º¸</h3>
-              <p>¼ö¿Â: {info.scuba?.water_temp ?? 'N/A'}¡ÆC</p>
-              <p>ÆÄ°í: {info.scuba?.wave_height ?? 'N/A'} m</p>
-              <p>À¯¼Ó: {info.scuba?.current_speed ?? 'N/A'} knots</p>
+              <h3>?? ï¿½Ø¾ï¿½ ï¿½ï¿½ï¿½ï¿½</h3>
+              <p>ï¿½ï¿½ï¿½ï¿½: {info.scuba?.water_temp ?? 'N/A'}ï¿½ï¿½C</p>
+              <p>ï¿½Ä°ï¿½: {info.scuba?.wave_height ?? 'N/A'} m</p>
+              <p>ï¿½ï¿½ï¿½ï¿½: {info.scuba?.current_speed ?? 'N/A'} knots</p>
             </div>
 
             <div className="card">
-              <h3>?? ¹°¶§ {info.nearestObs && <span style={{fontSize: '12px', fontWeight: 'normal', color: '#666'}}>({info.nearestObs.name})</span>}</h3>
+              <h3>?? ï¿½ï¿½ï¿½ï¿½ {info.nearestObs && <span style={{fontSize: '12px', fontWeight: 'normal', color: '#666'}}>({info.nearestObs.name})</span>}</h3>
               {info.tideError ? (
-                <p style={{color:'#a33'}}>Á¶¼® µ¥ÀÌÅÍ¸¦ ºÒ·¯¿Ã ¼ö ¾ø½À´Ï´Ù.</p>
+                <p style={{color:'#a33'}}>ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½Ò·ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.</p>
               ) : info.tide && info.tide.length > 0 ? (
                 <div style={{maxHeight:'400px', overflowY:'auto'}}>
                   {renderTideList(info.tide)}
                 </div>
-              ) : <p>¹°¶§ Á¤º¸°¡ ¾ø½À´Ï´Ù.</p>}
+              ) : <p>ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.</p>}
             </div>
           </div>
 
-          <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>ÃâÃ³: ¿ÀÇÂAPI ±â»óÃ»_´Ü±â¿¹º¸ / ÇØ¾ç¼ö»êºÎ ±¹¸³ÇØ¾çÁ¶»ç¿ø_½ºÅ²½ºÄí¹öÁö¼ö Á¶È¸ / ÇØ¾ç¼ö»êºÎ ±¹¸³ÇØ¾çÁ¶»ç¿ø_Á¶¼®¿¹º¸</p>
+          <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>ï¿½ï¿½Ã³: ï¿½ï¿½ï¿½ï¿½API ï¿½ï¿½ï¿½Ã»_ï¿½Ü±â¿¹ï¿½ï¿½ / ï¿½Ø¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½Å²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¸ / ï¿½Ø¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</p>
 
           <AdSense slot="6789012345" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
         </div>
@@ -648,21 +648,21 @@ const MapPage = () => {
 
       {!info && !loading && !error && marker && (
         <div style={{ marginTop: '30px', padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '8px', textAlign: 'center' }}>
-          <p style={{ fontSize: '14px', color: '#666' }}>¼±ÅÃÇÑ À§Ä¡ÀÇ µ¥ÀÌÅÍ¸¦ ÁØºñ Áß...</p>
+          <p style={{ fontSize: '14px', color: '#666' }}>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½Øºï¿½ ï¿½ï¿½...</p>
         </div>
       )}
 
       {!marker && (
         <div style={{ marginTop: '30px', padding: '20px', backgroundColor: '#e3f2fd', borderRadius: '8px', textAlign: 'center' }}>
-          <p style={{ fontSize: '14px', color: '#1976d2' }}>Áöµµ¸¦ Å¬¸¯ÇØ À§Ä¡¸¦ ¼±ÅÃÇØÁÖ¼¼¿ä!</p>
+          <p style={{ fontSize: '14px', color: '#1976d2' }}>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¼ï¿½ï¿½ï¿½!</p>
         </div>
       )}
 
       <div style={{ marginTop: '30px', textAlign: 'center' }}>
         <Link to="/weather" className="nav-button" style={{ marginRight: '10px' }}>
-          ?? ¹Ù´Ù³¯¾¾
+          ?? ï¿½Ù´Ù³ï¿½ï¿½ï¿½
         </Link>
-        <Link to="/" className="nav-button">?? È¨À¸·Î</Link>
+        <Link to="/" className="nav-button">?? È¨ï¿½ï¿½ï¿½ï¿½</Link>
       </div>
     </div>
   );
