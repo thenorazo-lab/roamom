@@ -543,7 +543,7 @@ const MapPage = () => {
             </div>
 
             <div className="card">
-              <h3>🌊 해양 정보 {info.scubaError && <span style={{color:'#a33', fontSize:12, marginLeft:8}}>(데이터 일부 없음)</span>}</h3>
+              <h3>🌊 해양 정보</h3>
               <p>수온: {info.scuba?.water_temp ?? 'N/A'}°C</p>
               <p>파고: {info.scuba?.wave_height ?? 'N/A'} m</p>
               <p>유속: {info.scuba?.current_speed ?? 'N/A'} knots</p>
@@ -558,6 +558,10 @@ const MapPage = () => {
               ) : <p>물때 정보가 없습니다.</p>}
             </div>
           </div>
+
+          <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>출처: 오픈API 기상청_단기예보 / 해양수산부 국립해양조사원_스킨스쿠버지수 조회 / 해양수산부 국립해양조사원_조석예보</p>
+
+          <AdSense slot="6789012345" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
         </div>
       )}
 
