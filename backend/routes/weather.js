@@ -231,10 +231,10 @@ router.get('/sea-info', async (req, res) => {
             timeout: 10000
         }));
 
-        // B. 조석 예보 (바다누리) - tideObs API 사용 (timeout 10초)
-        // tideObsPreTab는 샘플 데이터만 반환하므로 tideObs 사용
+        // B. 조석 예보 (바다누리) - tidePrTab API 사용 (예보 데이터, timeout 10초)
+        // tideObs는 실제 관측 데이터(과거), tidePrTab는 예보 데이터(미래)
         if (closestTideObs) {
-            promises.push(axios.get('http://www.khoa.go.kr/api/oceangrid/tideObs/search.do', {
+            promises.push(axios.get('http://www.khoa.go.kr/api/oceangrid/tidePrTab/search.do', {
                 params: {
                     ServiceKey: KHOA_API_KEY,
                     ObsCode: closestTideObs.code,
