@@ -245,8 +245,25 @@ const WeatherPage = () => {
     const filtered = extractHighLowTides(tideArr);
     if (!filtered.length) return <p style={{color:'#666'}}>고조/저조 정보가 없습니다.</p>;
     
-    const highTides = filtered.filter(t => t.hl_code === 'H');
-    const lowTides = filtered.filter(t => t.hl_code === 'L');
+    // 날짜별로 그룹핑
+    const groupedByDate = {};
+    filtered.forEach(item => {
+      const fullTime = item.tide_time || item.record_time;
+      const dateStr = fullTime ? fullTime.substring(0, 10) : '';
+      if (!dateStr) return;
+      
+      if (!groupedByDate[dateStr]) {
+        groupedByDate[dateStr] = { high: [], low: [] };
+      }
+      
+      if (item.hl_code === 'H') {
+        groupedByDate[dateStr].high.push(item);
+      } else if (item.hl_code === 'L') {
+        groupedByDate[dateStr].low.push(item);
+      }
+    });
+    
+    const sortedDates = Object.keys(groupedByDate).sort();
     
     const renderTideItem = (item) => {
       const change = calculateTideChange(tideArr, item);
@@ -259,21 +276,45 @@ const WeatherPage = () => {
         </div>
       );
     };
+    
+    const formatDateLabel = (dateStr) => {
+      const today = new Date();
+      const todayStr = today.toISOString().substring(0, 10);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().substring(0, 10);
+      
+      if (dateStr === todayStr) return `오늘 (${dateStr.substring(5).replace('-', '/')})`;
+      if (dateStr === tomorrowStr) return `내일 (${dateStr.substring(5).replace('-', '/')})`;
+      return dateStr.substring(5).replace('-', '/');
+    };
 
     return (
       <div style={{fontSize:'14px'}}>
-        {highTides.length > 0 && (
-          <div style={{marginBottom:'16px'}}>
-            <div style={{fontWeight:'bold', marginBottom:'8px', color:'#2196F3'}}>만조</div>
-            {highTides.map(renderTideItem)}
-          </div>
-        )}
-        {lowTides.length > 0 && (
-          <div>
-            <div style={{fontWeight:'bold', marginBottom:'8px', color:'#f44336'}}>간조</div>
-            {lowTides.map(renderTideItem)}
-          </div>
-        )}
+        {sortedDates.map(dateStr => {
+          const { high, low } = groupedByDate[dateStr];
+          return (
+            <div key={dateStr} style={{marginBottom:'20px', paddingBottom:'16px', borderBottom:'1px solid #eee'}}>
+              <div style={{fontWeight:'bold', fontSize:'15px', color:'#333', marginBottom:'12px'}}>
+                📅 {formatDateLabel(dateStr)}
+              </div>
+              
+              {high.length > 0 && (
+                <div style={{marginBottom:'12px'}}>
+                  <div style={{fontWeight:'bold', marginBottom:'8px', color:'#2196F3', fontSize:'13px'}}>▲ 만조</div>
+                  {high.map(renderTideItem)}
+                </div>
+              )}
+              
+              {low.length > 0 && (
+                <div>
+                  <div style={{fontWeight:'bold', marginBottom:'8px', color:'#f44336', fontSize:'13px'}}>▼ 간조</div>
+                  {low.map(renderTideItem)}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -437,8 +478,25 @@ const MapPage = () => {
     const filtered = extractHighLowTides(tideArr);
     if (!filtered.length) return <p style={{color:'#666'}}>고조/저조 정보가 없습니다.</p>;
     
-    const highTides = filtered.filter(t => t.hl_code === 'H');
-    const lowTides = filtered.filter(t => t.hl_code === 'L');
+    // 날짜별로 그룹핑
+    const groupedByDate = {};
+    filtered.forEach(item => {
+      const fullTime = item.tide_time || item.record_time;
+      const dateStr = fullTime ? fullTime.substring(0, 10) : '';
+      if (!dateStr) return;
+      
+      if (!groupedByDate[dateStr]) {
+        groupedByDate[dateStr] = { high: [], low: [] };
+      }
+      
+      if (item.hl_code === 'H') {
+        groupedByDate[dateStr].high.push(item);
+      } else if (item.hl_code === 'L') {
+        groupedByDate[dateStr].low.push(item);
+      }
+    });
+    
+    const sortedDates = Object.keys(groupedByDate).sort();
     
     const renderTideItem = (item) => {
       const change = calculateTideChange(tideArr, item);
@@ -451,21 +509,45 @@ const MapPage = () => {
         </div>
       );
     };
+    
+    const formatDateLabel = (dateStr) => {
+      const today = new Date();
+      const todayStr = today.toISOString().substring(0, 10);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().substring(0, 10);
+      
+      if (dateStr === todayStr) return `오늘 (${dateStr.substring(5).replace('-', '/')})`;
+      if (dateStr === tomorrowStr) return `내일 (${dateStr.substring(5).replace('-', '/')})`;
+      return dateStr.substring(5).replace('-', '/');
+    };
 
     return (
       <div style={{fontSize:'14px'}}>
-        {highTides.length > 0 && (
-          <div style={{marginBottom:'16px'}}>
-            <div style={{fontWeight:'bold', marginBottom:'8px', color:'#2196F3'}}>만조</div>
-            {highTides.map(renderTideItem)}
-          </div>
-        )}
-        {lowTides.length > 0 && (
-          <div>
-            <div style={{fontWeight:'bold', marginBottom:'8px', color:'#f44336'}}>간조</div>
-            {lowTides.map(renderTideItem)}
-          </div>
-        )}
+        {sortedDates.map(dateStr => {
+          const { high, low } = groupedByDate[dateStr];
+          return (
+            <div key={dateStr} style={{marginBottom:'20px', paddingBottom:'16px', borderBottom:'1px solid #eee'}}>
+              <div style={{fontWeight:'bold', fontSize:'15px', color:'#333', marginBottom:'12px'}}>
+                📅 {formatDateLabel(dateStr)}
+              </div>
+              
+              {high.length > 0 && (
+                <div style={{marginBottom:'12px'}}>
+                  <div style={{fontWeight:'bold', marginBottom:'8px', color:'#2196F3', fontSize:'13px'}}>▲ 만조</div>
+                  {high.map(renderTideItem)}
+                </div>
+              )}
+              
+              {low.length > 0 && (
+                <div>
+                  <div style={{fontWeight:'bold', marginBottom:'8px', color:'#f44336', fontSize:'13px'}}>▼ 간조</div>
+                  {low.map(renderTideItem)}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   };
