@@ -211,6 +211,7 @@ router.get('/sea-info', async (req, res) => {
         
         const { base_date, base_time, search_date } = getApiDateTime();
         console.log('[/api/sea-info] API DateTime:', { base_date, base_time, search_date });
+        console.log('[/api/sea-info] TIDE API will use Date:', search_date, 'for ObsCode:', closestTideObs?.code);
 
         // 2. API 병렬 호출 준비
         const promises = [];
@@ -342,6 +343,7 @@ router.get('/sea-info', async (req, res) => {
         let tide = [], tideError = null;
         if (tideResult.status === 'fulfilled' && tideResult.value?.data) {
             const response = tideResult.value.data;
+            console.log('[sea-info] Tide API raw response:', JSON.stringify(response).substring(0, 500));
             if (response.result?.data) {
                 // tideObsPreTab는 hl_code/tph_time/tph_level 를 반환 → 표준 필드로 정규화
                 const rawTide = response.result.data.map(e => {
