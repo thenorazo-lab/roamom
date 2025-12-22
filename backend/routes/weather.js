@@ -31,6 +31,13 @@ function getUltraBaseDateTime() {
     return { base_date, base_time };
 }
 
+// 헬퍼 함수: 기상청 API 결측값 필터링 (-999, -998.9 등)
+function isValidValue(val) {
+    if (!val) return false;
+    const num = parseFloat(val);
+    return !isNaN(num) && num > -900; // -900 이상만 유효한 값으로 간주
+}
+
 async function fetchUltraNowcast(nx, ny, apiKey) {
     try {
         const { base_date, base_time } = getUltraBaseDateTime();
@@ -42,7 +49,10 @@ async function fetchUltraNowcast(nx, ny, apiKey) {
             }
         });
         const items = resp.data?.response?.body?.items?.item || [];
-        const getVal = (cat) => items.find(i => i.category === cat)?.obsrValue;
+        const getVal = (cat) => {
+            const val = items.find(i => i.category === cat)?.obsrValue;
+            return isValidValue(val) ? val : undefined;
+        };
         return {
             T1H: getVal('T1H'),
             WSD: getVal('WSD')
@@ -75,7 +85,8 @@ async function fetchUltraForecast(nx, ny, apiKey) {
                 const diff = Math.abs(h - nowHour);
                 if (diff < bestDiff) { best = it; bestDiff = diff; }
             }
-            return best?.fcstValue;
+            const val = best?.fcstValue;
+            return isValidValue(val) ? val : undefined;
         };
         return {
             T1H: pickNearest('T1H'),
