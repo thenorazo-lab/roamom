@@ -373,6 +373,8 @@ router.get('/sea-info', async (req, res) => {
             if (parsedData) {
                 // 데이터 배열화 (단일 객체일 수 있음)
                 const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
+                console.log('[sea-info] Tide data array length:', dataArray.length);
+                console.log('[sea-info] First 3 items:', dataArray.slice(0, 3));
                 
                 // 새 API 형식: predcDt(날짜시간), predcTdlvVl(조위), extrSe(1=고조, 2=저조)
                 const rawTide = dataArray.map(e => {
