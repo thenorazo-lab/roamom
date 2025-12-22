@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>해루질가자 앱 아이콘 생성기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+        canvas {
+            border: 2px solid #333;
+            margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+        .info {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>해루질가자 앱 아이콘</h1>
+    <canvas id="iconCanvas" width="512" height="512"></canvas>
+    <button onclick="downloadIcon()">아이콘 다운로드 (512x512 PNG)</button>
+    <div class="info">
+        <p>✅ 512 x 512px PNG</p>
+        <p>✅ Play Store 업로드 가능</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('iconCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function drawIcon() {
+            // 배경 - 그라데이션 (바다 느낌)
+            const gradient = ctx.createLinearGradient(0, 0, 0, 512);
+            gradient.addColorStop(0, '#4FC3F7');  // 하늘색
+            gradient.addColorStop(1, '#0277BD');  // 진한 바다색
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 512, 512);
+
+            // 물결 효과 추가
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.beginPath();
+            for (let i = 0; i < 512; i += 2) {
+                const y = 200 + Math.sin(i * 0.05) * 20;
+                if (i === 0) ctx.moveTo(i, y);
+                else ctx.lineTo(i, y);
+            }
+            ctx.lineTo(512, 512);
+            ctx.lineTo(0, 512);
+            ctx.closePath();
+            ctx.fill();
+
+            // 두 번째 물결
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.beginPath();
+            for (let i = 0; i < 512; i += 2) {
+                const y = 300 + Math.sin(i * 0.04 + 1) * 25;
+                if (i === 0) ctx.moveTo(i, y);
+                else ctx.lineTo(i, y);
+            }
+            ctx.lineTo(512, 512);
+            ctx.lineTo(0, 512);
+            ctx.closePath();
+            ctx.fill();
+
+            // 텍스트 설정
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // 텍스트 그림자
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 3;
+            ctx.shadowOffsetY = 3;
+
+            // "해루질" - 위쪽
+            ctx.font = 'bold 100px Malgun Gothic, sans-serif';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText('해루질', 256, 200);
+
+            // "가자" - 아래쪽
+            ctx.font = 'bold 120px Malgun Gothic, sans-serif';
+            ctx.fillStyle = '#FFEB3B'; // 노란색 포인트
+            ctx.fillText('가자', 256, 320);
+
+            // 이모지 추가 (물결)
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.font = '60px Arial';
+            ctx.fillText('🌊', 256, 420);
+        }
+
+        function downloadIcon() {
+            const link = document.createElement('a');
+            link.download = 'roamom-icon-512x512.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // 페이지 로드 시 아이콘 그리기
+        drawIcon();
+    </script>
+</body>
+</html>

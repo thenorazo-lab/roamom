@@ -8,7 +8,7 @@ export default function PointsAdmin(){
   const [form, setForm] = useState({title:'',lat:'',lng:'',image:'',desc:'',url:''});
   const [uploading, setUploading] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const baseUrl = process.env.REACT_APP_API_URL || '/api';
+  const baseUrl = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL + '/api' : '/api';
 
   function isValidPoint(data){
     return data.title && !isNaN(parseFloat(data.lat)) && !isNaN(parseFloat(data.lng));
