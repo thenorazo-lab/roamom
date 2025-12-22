@@ -14,6 +14,7 @@ const { appendRecord } = require('../services/googleSheetsService');
 
 // .env 파일에서 API 키를 가져옵니다.
 const DATA_GO_KR_API_KEY = process.env.DATA_GO_KR_API_KEY;
+const DATA_GO_KR_NEW_API_KEY = process.env.DATA_GO_KR_NEW_API_KEY; // 공공데이터포털 조석예보 API 키
 const KHOA_API_KEY = process.env.KHOA_API_KEY;
 // Ultra Short-term Nowcast base date/time (KMA)
 function getUltraBaseDateTime() {
@@ -235,7 +236,7 @@ router.get('/sea-info', async (req, res) => {
         if (closestTideObs) {
             const tideApiUrl = 'http://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService';
             const tideParams = {
-                serviceKey: DATA_GO_KR_API_KEY,
+                serviceKey: DATA_GO_KR_NEW_API_KEY || DATA_GO_KR_API_KEY,
                 obsCode: closestTideObs.code,
                 date: tideSearchDate,
                 dataType: 'JSON'
