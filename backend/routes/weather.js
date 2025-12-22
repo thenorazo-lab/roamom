@@ -231,14 +231,14 @@ router.get('/sea-info', async (req, res) => {
             timeout: 10000
         }));
 
-        // B. 조석 예보 (바다누리) - tideObsFcst API 사용 (조석 예보, timeout 10초)
+        // B. 조석 예보 (공공데이터포털) - 고저조 예보 API 사용 (timeout 10초)
         if (closestTideObs) {
-            promises.push(axios.get('http://www.khoa.go.kr/api/oceangrid/tideObsFcst/search.do', {
+            promises.push(axios.get('http://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService', {
                 params: {
-                    ServiceKey: KHOA_API_KEY,
-                    ObsCode: closestTideObs.code,
-                    Date: tideSearchDate,
-                    ResultType: 'json'
+                    serviceKey: DATA_GO_KR_API_KEY,
+                    obsCode: closestTideObs.code,
+                    date: tideSearchDate,
+                    dataType: 'JSON'
                 },
                 timeout: 10000
             }));
