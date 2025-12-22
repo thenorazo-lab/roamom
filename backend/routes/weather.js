@@ -241,7 +241,7 @@ router.get('/sea-info', async (req, res) => {
                 serviceKey: DATA_GO_KR_NEW_API_KEY || DATA_GO_KR_API_KEY,
                 // obsCode 파라미터 제거 - API가 전체 데이터 반환
                 date: tideSearchDate,
-                dataType: 'JSON',
+                // dataType 파라미터 제거 - 이 API는 XML만 지원
                 numOfRows: 999 // 모든 관측소 데이터 요청
             };
             console.log('[/api/sea-info] Tide API request:', tideApiUrl, tideParams);
