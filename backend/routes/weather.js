@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const xml2js = require('xml2js');
 const {
     tideObservatories,
     scubaBeaches,
@@ -351,15 +352,37 @@ router.get('/sea-info', async (req, res) => {
         let tide = [], tideError = null;
         if (tideResult.status === 'fulfilled' && tideResult.value?.data) {
             const response = tideResult.value.data;
-            console.log('[sea-info] Tide API raw response:', JSON.stringify(response).substring(0, 500));
-            if (response.result?.data) {
-                // tideObsPreTab는 hl_code/tph_time/tph_level 를 반환 → 표준 필드로 정규화
-                const rawTide = response.result.data.map(e => {
-                    const hl = (e.hl_code === '고조' || e.hl_code === 'H') ? 'H'
-                              : (e.hl_code === '저조' || e.hl_code === 'L') ? 'L'
-                              : e.hl_code;
-                    const tide_time = e.tide_time || e.tph_time || e.record_time;
-                    const tide_level = e.tide_level || e.tph_level;
+            console.log('[sea-info] Tide API raw response:', typeof response === 'string' ? response.substring(0, 500) : JSON.stringify(response).substring(0, 500));
+            
+            // XML 응답을 JSON으로 파싱
+            let parsedData = null;
+            if (typeof response === 'string' && response.startsWith('<')) {
+                try {
+                    const parser = new xml2js.Parser({ explicitArray: false });
+                    const result = await parser.parseStringPromise(response);
+                    parsedData = result?.response?.body?.items?.item;
+                    console.log('[sea-info] Parsed XML tide data:', parsedData);
+                } catch (e) {
+                    console.error('[sea-info] XML parsing error:', e.message);
+                    tideError = 'XML 파싱 오류';
+                }
+            } else {
+                parsedData = response.result?.data;
+            }
+            
+            if (parsedData) {
+                // 데이터 배열화 (단일 객체일 수 있음)
+                const dataArray = Array.isArray(parsedData) ? parsedData : [parsedData];
+                
+                // 새 API 형식: predcDt(날짜시간), predcTdlvVl(조위), extrSe(1=고조, 2=저조)
+                const rawTide = dataArray.map(e => {
+                    const hl = (e.extrSe === '1' || e.extrSe === 1) ? 'H' 
+                             : (e.extrSe === '2' || e.extrSe === 2) ? 'L'
+                             : (e.hl_code === '고조' || e.hl_code === 'H') ? 'H'
+                             : (e.hl_code === '저조' || e.hl_code === 'L') ? 'L'
+                             : e.hl_code || 'O';
+                    const tide_time = e.predcDt || e.tide_time || e.tph_time || e.record_time;
+                    const tide_level = e.predcTdlvVl || e.tide_level || e.tph_level;
                     return { ...e, hl_code: hl, tide_time, tide_level };
                 });
 
