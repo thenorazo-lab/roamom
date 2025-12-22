@@ -54,12 +54,14 @@ export default function JapanWaves(){
         <p>해당 날짜의 이미지가 없습니다.</p>
       ) : (
         <div style={{maxWidth:800}}>
-          <div style={{position:'relative',height:420,display:'flex',alignItems:'center',justifyContent:'center'}}>
-            <button onClick={prev} style={{position:'absolute',left:0}}>◀</button>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
             <img src={images[idx].url} alt={images[idx].time} style={{maxHeight:380,maxWidth:'100%'}} crossOrigin="anonymous" referrerPolicy="no-referrer" onError={()=>{ setImages(buildPlaceholder(defaultDate)); setIdx(0); }} />
-            <button onClick={next} style={{position:'absolute',right:0}}>▶</button>
           </div>
-          <div style={{textAlign:'center', fontSize:12, color:'#666', marginTop:4}}>ICOM 일본기상청 데이터</div>
+          <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:12, marginTop:4}}>
+            <button onClick={prev} style={{padding:'8px 16px', cursor:'pointer', fontSize:18, border:'1px solid #ccc', borderRadius:4, background:'white'}}>◀</button>
+            <div style={{textAlign:'center', fontSize:12, color:'#666'}}>ICOM 일본기상청 데이터</div>
+            <button onClick={next} style={{padding:'8px 16px', cursor:'pointer', fontSize:18, border:'1px solid #ccc', borderRadius:4, background:'white'}}>▶</button>
+          </div>
           <div style={{textAlign:'center',marginTop:8}}>{images[idx].time}</div>
           <div style={{display:'flex',gap:8,overflowX:'auto',marginTop:12}}>
             {images.map((img,i)=> (
