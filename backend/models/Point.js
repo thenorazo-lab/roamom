@@ -42,9 +42,8 @@ const pointSchema = new mongoose.Schema({
 });
 
 // 업데이트 시 updatedAt 자동 갱신
-pointSchema.pre('save', function(next) {
+pointSchema.pre('save', function() {
   this.updatedAt = Date.now();
-  next();
 });
 
 module.exports = mongoose.model('Point', pointSchema);
