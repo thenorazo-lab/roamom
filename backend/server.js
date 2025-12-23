@@ -8,8 +8,13 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
 
+const connectDB = require('./config/db');
+
 const app = express();
 const port = process.env.PORT || 3002;
+
+// MongoDB 연결
+connectDB();
 
 // Security & middleware
 app.use(helmet());
