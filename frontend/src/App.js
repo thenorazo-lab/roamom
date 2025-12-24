@@ -23,6 +23,45 @@ const getSampleSeaInfo = () => ({
   recorded: false,
 });
 
+// 앱사용 가이드 페이지
+const AppGuidePage = () => (
+  <div className="container">
+    <h2 className="page-title">📱 앱사용 가이드</h2>
+    <div style={{maxWidth: '800px', margin: '20px auto', padding: '20px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', textAlign: 'left'}}>
+      <h2 style={{marginTop: 0, color: '#0077be'}}>🌊 해루질가자란?</h2>
+      <p>해루질가자는 바다를 사랑하는 해루질러들을 위한 종합 정보 플랫폼입니다. 실시간 바다 날씨, 조석 정보, 파고 예보, 그리고 전국의 해루질 포인트 정보를 한 곳에서 확인할 수 있습니다.</p>
+      
+      <h3 style={{color: '#0077be', marginTop: '20px'}}>✨ 주요 기능</h3>
+      <ul style={{lineHeight: '1.8'}}>
+        <li><strong>실시간 바다날씨:</strong> 현재 위치의 기온, 풍속, 파고, 수온, 조석 정보를 한눈에 확인</li>
+        <li><strong>일본 기상청 파고:</strong> 동해, 남해, 서해 주변 파고 예보 이미지 제공</li>
+        <li><strong>해루질 포인트:</strong> 전국의 추천 해루질 장소를 지도에서 탐색</li>
+        <li><strong>안전 가이드:</strong> 워킹 해루질, 스킨 해루질 가이드 제공</li>
+      </ul>
+      
+      <h3 style={{color: '#0077be', marginTop: '20px'}}>🎯 이렇게 활용하세요</h3>
+      <ol style={{lineHeight: '1.8'}}>
+        <li>먼저 <strong>바다날씨</strong>에서 오늘의 기상 상태를 확인하세요</li>
+        <li>조석 정보를 보고 간조 시간대를 체크하세요</li>
+        <li><strong>해루질 포인트</strong>에서 근처 추천 장소를 찾아보세요</li>
+        <li>파고가 걱정되면 <strong>일본 파고</strong>에서 예보를 확인하세요</li>
+      </ol>
+      
+      <h3 style={{color: '#0077be', marginTop: '20px'}}>💡 사용 팁</h3>
+      <ul style={{lineHeight: '1.8'}}>
+        <li>바다날씨 페이지에서 위치 권한을 허용하면 현재 위치의 날씨를 자동으로 확인할 수 있어요</li>
+        <li>지도 보기를 통해 원하는 위치를 직접 선택할 수 있어요</li>
+        <li>물때 정보는 가장 가까운 조석 관측소 데이터를 기준으로 제공됩니다</li>
+        <li>간조(▼) 시간대가 해루질하기 좋은 시간입니다</li>
+      </ul>
+    </div>
+    <AdSense slot="3456789012" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
+    <div style={{marginTop: '24px'}}>
+      <Link to="/" className="nav-button">🏠 홈으로</Link>
+    </div>
+  </div>
+);
+
 // 가이드 페이지
 const GuidePage = () => (
   <div className="container">
@@ -78,33 +117,12 @@ const HomePage = () => (
   <div className="container">
     <h1 className="main-title">해루질가자</h1>
     <p className="sub-title">바다날씨, 포인트, 일본 파고를 한 곳에서</p>
-    
-    <div style={{maxWidth: '800px', margin: '20px auto', padding: '20px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', textAlign: 'left'}}>
-      <h2 style={{marginTop: 0, color: '#0077be'}}>🌊 해루질가자란?</h2>
-      <p>해루질가자는 바다를 사랑하는 해루질러들을 위한 종합 정보 플랫폼입니다. 실시간 바다 날씨, 조석 정보, 파고 예보, 그리고 전국의 해루질 포인트 정보를 한 곳에서 확인할 수 있습니다.</p>
-      
-      <h3 style={{color: '#0077be', marginTop: '20px'}}>✨ 주요 기능</h3>
-      <ul style={{lineHeight: '1.8'}}>
-        <li><strong>실시간 바다날씨:</strong> 현재 위치의 기온, 풍속, 파고, 수온, 조석 정보를 한눈에 확인</li>
-        <li><strong>일본 기상청 파고:</strong> 동해, 남해, 서해 주변 파고 예보 이미지 제공</li>
-        <li><strong>해루질 포인트:</strong> 전국의 추천 해루질 장소를 지도에서 탐색</li>
-        <li><strong>안전 가이드:</strong> 워킹 해루질, 스킨 해루질 가이드 제공</li>
-      </ul>
-      
-      <h3 style={{color: '#0077be', marginTop: '20px'}}>🎯 이렇게 활용하세요</h3>
-      <ol style={{lineHeight: '1.8'}}>
-        <li>먼저 <strong>바다날씨</strong>에서 오늘의 기상 상태를 확인하세요</li>
-        <li>조석 정보를 보고 간조 시간대를 체크하세요</li>
-        <li><strong>해루질 포인트</strong>에서 근처 추천 장소를 찾아보세요</li>
-        <li>파고가 걱정되면 <strong>일본 파고</strong>에서 예보를 확인하세요</li>
-      </ol>
-    </div>
-    
     <div className="nav-buttons">
       <Link to="/weather" className="nav-button">☁️ 바다날씨</Link>
       <Link to="/jp-wave" className="nav-button">🌊 일본 기상청 파고</Link>
       <Link to="/points" className="nav-button">📍 해루질 포인트</Link>
       <Link to="/guide" className="nav-button">📖 해루질 가이드</Link>
+      <Link to="/app-guide" className="nav-button">📱 앱사용 가이드</Link>
       <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>⚙️ 포인트 관리자</Link>
     </div>
     <AdSense slot="1234567890" />
@@ -722,6 +740,7 @@ function App() {
           <Route path="/weather" element={<WeatherPage />} />
           <Route path="/jp-wave" element={<JapanWaves />} />
           <Route path="/guide" element={<GuidePage />} />
+          <Route path="/app-guide" element={<AppGuidePage />} />
           <Route path="/points" element={<PointsPage />} />
           <Route path="/points-admin" element={<PointsAdmin />} />
           <Route path="/map" element={<MapPage />} />
