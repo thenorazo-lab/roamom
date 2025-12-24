@@ -68,7 +68,7 @@ const GuidePage = () => (
     <h2 className="page-title">📖 해루질 가이드</h2>
     <div style={{maxWidth: '800px', textAlign: 'left', padding: '20px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)'}}>
       <h3>🌊 해루질이란?</h3>
-      <p>해루질은 바닷가에서 조개, 소라, 성게 등 해산물을 채취하는 전통적인 활동입니다.</p>
+      <p>해루질은 바닷가 해안에서 <strong><u>규정 된 도구</u></strong>를 가지고 <strong><u>허용 된 수산자원</u></strong>을 채취하는 활동입니다.</p>
       
       <h3>📍 안전한 해루질을 위한 팁</h3>
       <ul>
@@ -76,13 +76,6 @@ const GuidePage = () => (
         <li>파고가 낮은 날을 선택하세요</li>
         <li>수온과 기상 상태를 체크하세요</li>
         <li>안전 장비를 착용하세요</li>
-      </ul>
-      
-      <h3>🔍 이 앱 사용법</h3>
-      <ul>
-        <li><strong>바다날씨:</strong> 실시간 바다 기상 정보 확인</li>
-        <li><strong>일본 파고:</strong> 일본 주변 파고 예보 확인</li>
-        <li><strong>해루질 포인트:</strong> 추천 해루질 장소 탐색</li>
       </ul>
       
       <h3>🚶 워킹 해루질 가이드 모음</h3>

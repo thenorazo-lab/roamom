@@ -1,13 +1,14 @@
 {
   "name": "frontend",
   "homepage": ".",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "private": true,
   "proxy": "http://localhost:3002",
   "dependencies": {
     "@capacitor/android": "^8.0.0",
     "@capacitor/cli": "^8.0.0",
     "@capacitor/core": "^8.0.0",
+    "@capacitor/geolocation": "^8.0.0",
     "@capacitor/ios": "^8.0.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",

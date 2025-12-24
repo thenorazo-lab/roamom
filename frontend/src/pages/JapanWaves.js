@@ -53,7 +53,7 @@ export default function JapanWaves(){
       {images.length===0 ? (
         <p>해당 날짜의 이미지가 없습니다.</p>
       ) : (
-        <div style={{maxWidth:800}}>
+        <div style={{maxWidth:800, width:'100%'}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
             <img src={images[idx].url} alt={images[idx].time} style={{maxHeight:380,maxWidth:'100%'}} crossOrigin="anonymous" referrerPolicy="no-referrer" onError={()=>{ setImages(buildPlaceholder(defaultDate)); setIdx(0); }} />
           </div>
@@ -63,7 +63,7 @@ export default function JapanWaves(){
             <button onClick={next} style={{padding:'8px 16px', cursor:'pointer', fontSize:18, border:'1px solid #ccc', borderRadius:4, background:'white'}}>▶</button>
           </div>
           <div style={{textAlign:'center',marginTop:8}}>{images[idx].time}</div>
-          <div style={{display:'flex',gap:8,overflowX:'auto',marginTop:12}}>
+          <div style={{display:'flex',gap:8,overflowX:'auto',marginTop:12,width:'100%',boxSizing:'border-box',paddingBottom:8}}>
             {images.map((img,i)=> (
               <img
                 key={i}
@@ -71,7 +71,7 @@ export default function JapanWaves(){
                 alt={img.time}
                 crossOrigin="anonymous"
                 referrerPolicy="no-referrer"
-                style={{ width:120, height:80, objectFit:'cover', border: i===idx ? '3px solid #2b7' : '1px solid #ccc', cursor:'pointer' }}
+                style={{ width:120, height:80, objectFit:'cover', border: i===idx ? '3px solid #2b7' : '1px solid #ccc', cursor:'pointer', flexShrink:0 }}
                 onClick={()=>setIdx(i)}
               />
             ))}

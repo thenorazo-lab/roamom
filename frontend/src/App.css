@@ -25,6 +25,7 @@
     min-height: 100vh;
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     padding: 20px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
     box-sizing: border-box;
 }
 
