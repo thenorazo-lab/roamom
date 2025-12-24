@@ -78,6 +78,28 @@ const HomePage = () => (
   <div className="container">
     <h1 className="main-title">해루질가자</h1>
     <p className="sub-title">바다날씨, 포인트, 일본 파고를 한 곳에서</p>
+    
+    <div style={{maxWidth: '800px', margin: '20px auto', padding: '20px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', textAlign: 'left'}}>
+      <h2 style={{marginTop: 0, color: '#0077be'}}>🌊 해루질가자란?</h2>
+      <p>해루질가자는 바다를 사랑하는 해루질러들을 위한 종합 정보 플랫폼입니다. 실시간 바다 날씨, 조석 정보, 파고 예보, 그리고 전국의 해루질 포인트 정보를 한 곳에서 확인할 수 있습니다.</p>
+      
+      <h3 style={{color: '#0077be', marginTop: '20px'}}>✨ 주요 기능</h3>
+      <ul style={{lineHeight: '1.8'}}>
+        <li><strong>실시간 바다날씨:</strong> 현재 위치의 기온, 풍속, 파고, 수온, 조석 정보를 한눈에 확인</li>
+        <li><strong>일본 기상청 파고:</strong> 동해, 남해, 서해 주변 파고 예보 이미지 제공</li>
+        <li><strong>해루질 포인트:</strong> 전국의 추천 해루질 장소를 지도에서 탐색</li>
+        <li><strong>안전 가이드:</strong> 워킹 해루질, 스킨 해루질 가이드 제공</li>
+      </ul>
+      
+      <h3 style={{color: '#0077be', marginTop: '20px'}}>🎯 이렇게 활용하세요</h3>
+      <ol style={{lineHeight: '1.8'}}>
+        <li>먼저 <strong>바다날씨</strong>에서 오늘의 기상 상태를 확인하세요</li>
+        <li>조석 정보를 보고 간조 시간대를 체크하세요</li>
+        <li><strong>해루질 포인트</strong>에서 근처 추천 장소를 찾아보세요</li>
+        <li>파고가 걱정되면 <strong>일본 파고</strong>에서 예보를 확인하세요</li>
+      </ol>
+    </div>
+    
     <div className="nav-buttons">
       <Link to="/weather" className="nav-button">☁️ 바다날씨</Link>
       <Link to="/jp-wave" className="nav-button">🌊 일본 기상청 파고</Link>
@@ -318,9 +340,21 @@ const WeatherPage = () => {
   return (
     <div className="container">
       <h2 className="page-title">현재 위치 바다 날씨</h2>
-      {loading && <p>데이터를 불러오는 중입니다...</p>}
-      {error && <p className="error-message">오류: {error}</p>}
-      {data && (
+      {loading ? (
+        <div style={{textAlign: 'center', padding: '40px', color: '#666'}}>
+          <div style={{fontSize: '48px', marginBottom: '20px'}}>🌊</div>
+          <p>바다 정보를 불러오는 중...</p>
+        </div>
+      ) : error ? (
+        <div style={{textAlign: 'center', padding: '40px'}}>
+          <div style={{fontSize: '48px', marginBottom: '20px'}}>⚠️</div>
+          <p className="error-message">오류: {error}</p>
+          <p style={{fontSize: '14px', color: '#666', marginTop: '20px'}}>
+            위치 권한을 확인하거나 페이지를 새로고침해주세요.
+          </p>
+          <Link to="/" className="nav-button" style={{marginTop: '20px'}}>🏠 홈으로</Link>
+        </div>
+      ) : data && (
         <div>
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
             <h3>위치: {data.nearestObs?.name || '현재 위치'}</h3>
@@ -356,7 +390,8 @@ const WeatherPage = () => {
 
           <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>출처: 오픈API 기상청_단기예보 / 해양수산부 국립해양조사원_스킨스쿠버지수 조회 / 해양수산부 국립해양조사원_조석예보</p>
 
-          <AdSense slot="4567890123" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
+          {/* 데이터가 정상적으로 로드된 경우에만 광고 표시 */}
+          {!data.usingMockData && <AdSense slot="4567890123" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />}
 
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <Link to="/map" className="nav-button" style={{ backgroundColor: '#2196F3', marginRight: '10px' }}>
@@ -601,10 +636,19 @@ const MapPage = () => {
         onMapClick={handleMapClick} 
       />
 
-      {loading && <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '16px' }}>📍 데이터를 불러오는 중입니다...</p>}
-      {error && <p className="error-message" style={{ marginTop: '20px' }}>⚠️ {error}</p>}
+      {loading ? (
+        <div style={{textAlign: 'center', padding: '40px', color: '#666'}}>
+          <div style={{fontSize: '48px', marginBottom: '20px'}}>🌊</div>
+          <p>📍 선택한 위치의 바다 정보를 불러오는 중...</p>
+        </div>
+      ) : error ? (
+        <div style={{textAlign: 'center', padding: '40px'}}>
+          <div style={{fontSize: '48px', marginBottom: '20px'}}>⚠️</div>
+          <p className="error-message">{error}</p>
+        </div>
+      ) : null}
       
-      {info && (
+      {info && !loading && (
         <div style={{ marginTop: '30px' }}>
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: '20px'}}>
             <h3>📍 {info.nearestObs?.name || '선택된 위치'}</h3>
@@ -642,7 +686,8 @@ const MapPage = () => {
 
           <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>출처: 오픈API 기상청_단기예보 / 해양수산부 국립해양조사원_스킨스쿠버지수 조회 / 해양수산부 국립해양조사원_조석예보</p>
 
-          <AdSense slot="6789012345" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
+          {/* 실제 데이터가 로드된 경우에만 광고 표시 */}
+          {!info.usingMockData && <AdSense slot="6789012345" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />}
         </div>
       )}
 
