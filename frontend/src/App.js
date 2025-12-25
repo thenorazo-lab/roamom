@@ -1,7 +1,8 @@
 ﻿// frontend/src/App.js
 
 import React, { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { App as CapApp } from '@capacitor/app';
 import './App.css';
 import MapComponent from './components/MapComponent';
 import PointsAdmin from './pages/PointsAdmin';
@@ -26,7 +27,11 @@ const getSampleSeaInfo = () => ({
 // 앱사용 가이드 페이지
 const AppGuidePage = () => (
   <div className="container">
+    <AdSense slot="3456789012" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
     <h2 className="page-title">📱 앱사용 가이드</h2>
+    <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
+      <Link to="/" className="nav-button">🏠 홈으로</Link>
+    </div>
     <div style={{maxWidth: '800px', margin: '20px auto', padding: '20px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', textAlign: 'left'}}>
       <h2 style={{marginTop: 0, color: '#0077be'}}>🌊 해루질가자란?</h2>
       <p>해루질가자는 바다를 사랑하는 해루질러들을 위한 종합 정보 플랫폼입니다. 실시간 바다 날씨, 조석 정보, 파고 예보, 그리고 전국의 해루질 포인트 정보를 한 곳에서 확인할 수 있습니다.</p>
@@ -55,17 +60,17 @@ const AppGuidePage = () => (
         <li>간조(▼) 시간대가 해루질하기 좋은 시간입니다</li>
       </ul>
     </div>
-    <AdSense slot="3456789012" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
-    <div style={{marginTop: '24px'}}>
-      <Link to="/" className="nav-button">🏠 홈으로</Link>
-    </div>
   </div>
 );
 
 // 가이드 페이지
 const GuidePage = () => (
   <div className="container">
+    <AdSense slot="2345678901" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
     <h2 className="page-title">📖 해루질 가이드</h2>
+    <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
+      <Link to="/" className="nav-button">🏠 홈으로</Link>
+    </div>
     <div style={{maxWidth: '800px', textAlign: 'left', padding: '20px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)'}}>
       <h3>🌊 해루질이란?</h3>
       <p>해루질은 바닷가 해안에서 <strong><u>규정 된 도구</u></strong>를 가지고 <strong><u>허용 된 수산자원</u></strong>을 채취하는 활동입니다.</p>
@@ -98,16 +103,13 @@ const GuidePage = () => (
         </a>
       </p>
     </div>
-    <AdSense slot="2345678901" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
-    <div style={{marginTop: '24px'}}>
-      <Link to="/" className="nav-button">🏠 홈으로</Link>
-    </div>
   </div>
 );
 
 // 홈 화면
 const HomePage = () => (
   <div className="container">
+    <AdSense slot="1234567890" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
     <h1 className="main-title">해루질가자</h1>
     <p className="sub-title">바다날씨, 포인트, 일본 파고를 한 곳에서</p>
     <div className="nav-buttons">
@@ -118,7 +120,6 @@ const HomePage = () => (
       <Link to="/app-guide" className="nav-button">📱 앱사용 가이드</Link>
       <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>⚙️ 포인트 관리자</Link>
     </div>
-    <AdSense slot="1234567890" />
   </div>
 );
 
@@ -350,7 +351,14 @@ const WeatherPage = () => {
 
   return (
     <div className="container">
+      <AdSense slot="4567890123" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
       <h2 className="page-title">현재 위치 바다 날씨</h2>
+      <div style={{ marginTop: '10px', marginBottom: '20px', textAlign: 'center' }}>
+        <Link to="/map" className="nav-button" style={{ backgroundColor: '#2196F3', marginRight: '10px' }}>
+          🗺️ 지도 보기
+        </Link>
+        <Link to="/" className="nav-button">🏠 홈으로</Link>
+      </div>
       {loading ? (
         <div style={{textAlign: 'center', padding: '40px', color: '#666'}}>
           <div style={{fontSize: '48px', marginBottom: '20px'}}>🌊</div>
@@ -363,7 +371,6 @@ const WeatherPage = () => {
           <p style={{fontSize: '14px', color: '#666', marginTop: '20px'}}>
             위치 권한을 확인하거나 페이지를 새로고침해주세요.
           </p>
-          <Link to="/" className="nav-button" style={{marginTop: '20px'}}>🏠 홈으로</Link>
         </div>
       ) : data && (
         <div>
@@ -400,16 +407,6 @@ const WeatherPage = () => {
           </div>
 
           <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>출처: 오픈API 기상청_단기예보 / 해양수산부 국립해양조사원_스킨스쿠버지수 조회 / 해양수산부 국립해양조사원_조석예보</p>
-
-          {/* 데이터가 정상적으로 로드된 경우에만 광고 표시 */}
-          {!data.usingMockData && <AdSense slot="4567890123" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />}
-
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <Link to="/map" className="nav-button" style={{ backgroundColor: '#2196F3', marginRight: '10px' }}>
-              🗺️ 지도 보기
-            </Link>
-            <Link to="/" className="nav-button">🏠 홈으로</Link>
-          </div>
         </div>
       )}
     </div>
@@ -435,12 +432,14 @@ const PointsPage = () => {
 
   return (
     <div className="container">
+      <AdSense slot="5678901234" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
       <h2 className="page-title">📍 해루질 포인트</h2>
+      <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
+        <Link to="/" className="nav-button">🏠 홈으로</Link>
+      </div>
       <p>지도의 포인트를 눌러 정보를 확인하고 블로그 글을 읽어보세요.</p>
       <p style={{fontSize: '14px', color: '#666', marginTop: '8px'}}>공유하고 싶은 포인트를 thenorazo@gmail.com 로 제보해주세요!</p>
       <MapComponent center={[36.5, 127.5]} zoom={7} markers={points} onMapClick={() => {}} onMarkerClick={handleMarkerClick} />
-      <AdSense slot="5678901234" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
-      <Link to="/" className="nav-button" style={{marginTop: '20px'}}>🏠 홈으로</Link>
     </div>
   );
 };
@@ -635,17 +634,17 @@ const MapPage = () => {
 
   return (
     <div className="container">
+      <AdSense slot="6789012345" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
       <h2 className="page-title">지도에서 위치 선택</h2>
+      <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
+        <Link to="/weather" className="nav-button" style={{ backgroundColor: '#2196F3', marginRight: '10px' }}>
+          ⬅️ 바다날씨
+        </Link>
+        <Link to="/" className="nav-button">🏠 홈으로</Link>
+      </div>
       <p style={{ marginBottom: '20px', fontSize: '14px', color: '#666' }}>
         🗺️ 지도를 클릭해 핀을 꽂고 그 위치의 바다 날씨 정보를 확인하세요!
       </p>
-      
-      <MapComponent 
-        center={[36.5, 127.5]} 
-        zoom={7} 
-        markers={marker ? [{ id: 'sel', title: '선택 위치', lat: marker.lat, lng: marker.lng }] : []} 
-        onMapClick={handleMapClick} 
-      />
 
       {loading ? (
         <div style={{textAlign: 'center', padding: '40px', color: '#666'}}>
@@ -660,7 +659,7 @@ const MapPage = () => {
       ) : null}
       
       {info && !loading && (
-        <div style={{ marginTop: '30px' }}>
+        <div style={{ marginBottom: '30px' }}>
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: '20px'}}>
             <h3>📍 {info.nearestObs?.name || '선택된 위치'}</h3>
             <div style={{fontSize:12, color:'#666'}}>
@@ -696,30 +695,27 @@ const MapPage = () => {
           </div>
 
           <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>출처: 오픈API 기상청_단기예보 / 해양수산부 국립해양조사원_스킨스쿠버지수 조회 / 해양수산부 국립해양조사원_조석예보</p>
-
-          {/* 실제 데이터가 로드된 경우에만 광고 표시 */}
-          {!info.usingMockData && <AdSense slot="6789012345" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />}
         </div>
       )}
 
       {!info && !loading && !error && marker && (
-        <div style={{ marginTop: '30px', padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '8px', textAlign: 'center' }}>
+        <div style={{ marginBottom: '20px', padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '8px', textAlign: 'center' }}>
           <p style={{ fontSize: '14px', color: '#666' }}>선택한 위치의 데이터를 준비 중...</p>
         </div>
       )}
 
       {!marker && (
-        <div style={{ marginTop: '30px', padding: '20px', backgroundColor: '#e3f2fd', borderRadius: '8px', textAlign: 'center' }}>
+        <div style={{ marginBottom: '20px', padding: '20px', backgroundColor: '#e3f2fd', borderRadius: '8px', textAlign: 'center' }}>
           <p style={{ fontSize: '14px', color: '#1976d2' }}>지도를 클릭해 위치를 선택해주세요!</p>
         </div>
       )}
-
-      <div style={{ marginTop: '30px', textAlign: 'center' }}>
-        <Link to="/weather" className="nav-button" style={{ marginRight: '10px' }}>
-          ⬅️ 바다날씨
-        </Link>
-        <Link to="/" className="nav-button">🏠 홈으로</Link>
-      </div>
+      
+      <MapComponent 
+        center={[36.5, 127.5]} 
+        zoom={7} 
+        markers={marker ? [{ id: 'sel', title: '선택 위치', lat: marker.lat, lng: marker.lng }] : []} 
+        onMapClick={handleMapClick} 
+      />
     </div>
   );
 };
@@ -727,6 +723,7 @@ const MapPage = () => {
 function App() {
   return (
     <Router>
+      <BackButtonHandler />
       <div className="App">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -738,9 +735,63 @@ function App() {
           <Route path="/points-admin" element={<PointsAdmin />} />
           <Route path="/map" element={<MapPage />} />
         </Routes>
+        <BottomNav />
       </div>
     </Router>
   );
+}
+
+// 하단 메뉴바 컴포넌트
+function BottomNav() {
+  const location = useLocation();
+  
+  const navItems = [
+    { path: '/weather', icon: '☁️', label: '바다날씨' },
+    { path: '/jp-wave', icon: '🌊', label: '일본파고' },
+    { path: '/points', icon: '📍', label: '포인트' },
+    { path: '/guide', icon: '📖', label: '가이드' },
+  ];
+
+  return (
+    <nav className="bottom-nav">
+      {navItems.map((item) => (
+        <Link
+          key={item.path}
+          to={item.path}
+          className={`bottom-nav-item ${location.pathname === item.path ? 'active' : ''}`}
+        >
+          <div className="bottom-nav-icon">{item.icon}</div>
+          <div>{item.label}</div>
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+// 안드로이드 백버튼 핸들러
+function BackButtonHandler() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleBackButton = CapApp.addListener('backButton', () => {
+      // 홈페이지('/') 에서 뒤로가기 시 종료 확인
+      if (location.pathname === '/' || location.pathname === '') {
+        if (window.confirm('앱을 종료하시겠습니까?')) {
+          CapApp.exitApp();
+        }
+      } else {
+        // 다른 페이지에서는 뒤로가기
+        navigate(-1);
+      }
+    });
+
+    return () => {
+      handleBackButton.remove();
+    };
+  }, [navigate, location]);
+
+  return null;
 }
 
 export default App;

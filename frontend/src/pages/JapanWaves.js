@@ -49,7 +49,11 @@ export default function JapanWaves(){
 
   return (
     <div className="container">
+      <AdSense slot="3456789012" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
       <h2 className="page-title">일본 파고</h2>
+      <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
+        <Link to="/" className="nav-button">🏠 홈으로</Link>
+      </div>
       {images.length===0 ? (
         <p>해당 날짜의 이미지가 없습니다.</p>
       ) : (
@@ -78,10 +82,6 @@ export default function JapanWaves(){
           </div>
         </div>
       )}
-      <AdSense slot="3456789012" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
-      <div style={{textAlign:'center', marginTop:24}}>
-        <Link to="/" className="nav-button">🏠 홈으로</Link>
-      </div>
     </div>
   );
 }
