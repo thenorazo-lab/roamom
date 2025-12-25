@@ -67,7 +67,7 @@ export default function JapanWaves(){
             <button onClick={next} style={{padding:'8px 16px', cursor:'pointer', fontSize:18, border:'1px solid #ccc', borderRadius:4, background:'white'}}>▶</button>
           </div>
           <div style={{textAlign:'center',marginTop:8}}>{images[idx].time}</div>
-          <div style={{display:'flex',gap:8,overflowX:'auto',marginTop:12,width:'100%',boxSizing:'border-box',paddingBottom:8}}>
+          <div className="horizontal-scroll" style={{display:'flex',gap:8,overflowX:'auto',marginTop:12,width:'100%',boxSizing:'border-box',paddingBottom:8}}>
             {images.map((img,i)=> (
               <img
                 key={i}

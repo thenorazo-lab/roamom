@@ -399,7 +399,7 @@ const WeatherPage = () => {
               {data.tideError ? (
                 <div style={{color:'#a33'}}>조석 데이터를 불러오지 못했습니다.</div>
               ) : data.tide && data.tide.length > 0 ? (
-                <div style={{maxHeight:'400px', overflowY:'auto'}}>
+                <div className="tide-scroll" style={{maxHeight:'400px', overflowY:'auto'}}>
                   {renderTideList(data.tide)}
                 </div>
               ) : <p>물때 정보가 없습니다.</p>}
@@ -687,7 +687,7 @@ const MapPage = () => {
               {info.tideError ? (
                 <p style={{color:'#a33'}}>조석 데이터를 불러올 수 없습니다.</p>
               ) : info.tide && info.tide.length > 0 ? (
-                <div style={{maxHeight:'400px', overflowY:'auto'}}>
+                <div className="tide-scroll" style={{maxHeight:'400px', overflowY:'auto'}}>
                   {renderTideList(info.tide)}
                 </div>
               ) : <p>물때 정보가 없습니다.</p>}
