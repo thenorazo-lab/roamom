@@ -19,21 +19,9 @@ export default function AdSense({
     }
   }, [clientId]);
 
-  // AdSense 승인 전에는 플레이스홀더 표시
+  // AdSense 승인 전에는 아무것도 표시하지 않음
   if (!clientId || clientId === 'YOUR_CLIENT_ID_HERE') {
-    return (
-      <div style={{
-        ...style,
-        background: '#f0f0f0',
-        border: '2px dashed #ccc',
-        padding: '20px',
-        margin: '20px 0',
-        borderRadius: '8px',
-        color: '#666'
-      }}>
-        <p style={{margin: 0, fontSize: '14px'}}>📢 광고 영역 (AdSense 승인 후 표시)</p>
-      </div>
-    );
+    return null;
   }
 
   return (
