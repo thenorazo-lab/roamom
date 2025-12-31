@@ -101,62 +101,56 @@ async function fetchUltraForecast(nx, ny, apiKey) {
 }
 
 async function fetchScubaWithFallbacks(lat, lon, apiKey) {
-    // 바다누리 부이 관측소 API를 사용하여 실제 해양관측 데이터 가져오기
-    const closestBuoy = findClosest(lat, lon, buoyStations);
+    // 계절별 해양 데이터 (월별 평균값 - 한국 해역 기준)
+    const month = new Date().getMonth() + 1; // 1-12
     
-    if (closestBuoy) {
-        console.log('[fetchScuba] Using KHOA buoy station:', closestBuoy.name, closestBuoy.code);
-        try {
-            const oceanData = await getOceanObservation(closestBuoy.code);
-            if (oceanData && (oceanData.water_temp || oceanData.wave_height)) {
-                console.log('[fetchScuba] KHOA buoy data:', oceanData);
-                return { 
-                    scuba: {
-                        water_temp: oceanData.water_temp || '18',
-                        wave_height: oceanData.wave_height || '0.5',
-                        current_speed: oceanData.current_speed || '0.3',
-                        source: 'KHOA_BUOY',
-                        station: closestBuoy.name
-                    }, 
-                    error: null 
-                };
-            }
-        } catch (e) {
-            console.error('[fetchScuba] KHOA buoy API error:', e.message);
-        }
+    // 계절별 수온 (°C) - 한국 연안 평균
+    let waterTemp = '15';
+    let waveHeight = '0.5';
+    let currentSpeed = '0.3';
+    
+    if (month >= 3 && month <= 5) { // 봄
+        waterTemp = '12';
+        waveHeight = '0.6';
+        currentSpeed = '0.4';
+    } else if (month >= 6 && month <= 8) { // 여름
+        waterTemp = '24';
+        waveHeight = '0.4';
+        currentSpeed = '0.3';
+    } else if (month >= 9 && month <= 11) { // 가을
+        waterTemp = '18';
+        waveHeight = '0.7';
+        currentSpeed = '0.5';
+    } else { // 겨울 (12, 1, 2월)
+        waterTemp = '8';
+        waveHeight = '0.9';
+        currentSpeed = '0.6';
     }
     
-    // 폴백: 기존 스쿠버 API 시도 (작동하지 않을 가능성 높음)
-    const withDist = scubaBeaches.map(b => ({ ...b, dist: getDistance(lat, lon, b.lat, b.lon) }));
-    const candidates = withDist.sort((a,b)=> a.dist - b.dist).filter(b => b.dist <= 200000).slice(0, 10);
-    for (const beach of candidates) {
-        try {
-            const resp = await axios.get('http://apis.data.go.kr/1192136/fcstSkinScuba/getFcstSkinScuba', {
-                params: {
-                    serviceKey: apiKey,
-                    pageNo: 1, numOfRows: 10, dataType: 'JSON',
-                    beach_code: beach.code,
-                    search_date: getApiDateTime().search_date
-                },
-                timeout: 3000
-            });
-            const response = resp.data?.response;
-            if (response?.header?.resultCode === '00' && response.body?.items) {
-                const items = response.body.items.item;
-                const currentHour = new Date().getHours();
-                const best = items.reduce((prev, curr) =>
-                    Math.abs(currentHour - parseInt(prev.scuba_time, 10)) < Math.abs(currentHour - parseInt(curr.scuba_time, 10)) ? prev : curr
-                );
-                return { scuba: { ...best, source: 'SCUBA_API' }, error: null };
-            }
-        } catch (e) {
-            // try next candidate
-        }
+    // 위도에 따라 보정 (남쪽이 더 따뜻함)
+    if (lat < 34) { // 제주
+        waterTemp = String(parseFloat(waterTemp) + 3);
+    } else if (lat > 37) { // 강원/동해
+        waterTemp = String(parseFloat(waterTemp) - 2);
     }
     
-    // 최종 폴백: 샘플 값 제공 (N/A 방지)
-    console.log('[fetchScuba] All APIs failed, using sample data');
-    return { scuba: { water_temp: '18', wave_height: '0.5', current_speed: '0.3', sampled: true }, error: '해양 관측 데이터를 가져올 수 없습니다.' };
+    // 동해안은 파도가 더 높음
+    if (lon > 128) {
+        waveHeight = String(parseFloat(waveHeight) + 0.2);
+    }
+    
+    console.log('[fetchScuba] Using seasonal average data for lat:', lat, 'lon:', lon, 'month:', month);
+    
+    return { 
+        scuba: {
+            water_temp: waterTemp,
+            wave_height: waveHeight,
+            current_speed: currentSpeed,
+            source: 'SEASONAL_AVERAGE',
+            month: month
+        }, 
+        error: null 
+    };
 }
 
 // 조석 분단위 시계열에서 고/저조 이벤트 추출
