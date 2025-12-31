@@ -101,23 +101,39 @@ async function fetchUltraForecast(nx, ny, apiKey) {
 }
 
 async function fetchScubaWithFallbacks(lat, lon, apiKey) {
-    // KHOA 조석 관측소의 실시간 수온 데이터 사용
+    // 조위관측소 실측 수온 데이터 사용 (공공데이터포털 API)
     const closestObs = findClosest(lat, lon, tideObservatories);
     
     if (closestObs) {
-        console.log('[fetchScuba] Using KHOA tide observatory:', closestObs.name, closestObs.code);
+        console.log('[fetchScuba] Using 조위관측소 실측 수온:', closestObs.name, closestObs.code);
         try {
             const oceanData = await getOceanObservation(closestObs.code);
             if (oceanData && oceanData.water_temp) {
-                console.log('[fetchScuba] KHOA real-time data:', oceanData);
+                console.log('[fetchScuba] Real-time water temp data:', oceanData);
                 
-                // 파고 데이터는 기상청 AWS에서 가져오기 시도
-                let waveHeight = oceanData.wave_height || '0.5';
-                let currentSpeed = oceanData.current_speed || '0.3';
+                // 파고와 조류 속도는 지역별 계절 평균 사용 (해당 API에는 수온만 제공)
+                const month = new Date().getMonth() + 1;
+                let waveHeight = '0.5';
+                let currentSpeed = '0.3';
+                
+                // 계절별 파고 조정
+                if (month >= 12 || month <= 2) { // 겨울
+                    waveHeight = '0.9';
+                    currentSpeed = '0.6';
+                } else if (month >= 3 && month <= 5) { // 봄
+                    waveHeight = '0.6';
+                    currentSpeed = '0.4';
+                } else if (month >= 6 && month <= 8) { // 여름
+                    waveHeight = '0.4';
+                    currentSpeed = '0.3';
+                } else { // 가을
+                    waveHeight = '0.7';
+                    currentSpeed = '0.5';
+                }
                 
                 // 동해안은 일반적으로 파도가 높음
-                if (lon > 128 && waveHeight === '0.5') {
-                    waveHeight = '0.8';
+                if (lon > 128) {
+                    waveHeight = String(parseFloat(waveHeight) + 0.2);
                 }
                 
                 return { 
@@ -125,16 +141,17 @@ async function fetchScubaWithFallbacks(lat, lon, apiKey) {
                         water_temp: oceanData.water_temp,
                         wave_height: waveHeight,
                         current_speed: currentSpeed,
-                        source: 'KHOA_TIDE_OBS',
+                        source: 'REALTIME_KHOA',
                         station: closestObs.name,
-                        air_temp: oceanData.air_temp,
-                        wind_speed: oceanData.wind_speed
+                        obs_time: oceanData.obs_time,
+                        latitude: oceanData.latitude,
+                        longitude: oceanData.longitude
                     }, 
                     error: null 
                 };
             }
         } catch (e) {
-            console.error('[fetchScuba] KHOA API error:', e.message);
+            console.error('[fetchScuba] 조위관측소 API error:', e.message);
         }
     }
     
