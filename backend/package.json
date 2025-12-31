@@ -19,6 +19,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
+    "gcp-metadata": "^7.0.1",
     "google-spreadsheet": "^5.0.2",
     "googleapis": "^169.0.0",
     "helmet": "^8.1.0",
