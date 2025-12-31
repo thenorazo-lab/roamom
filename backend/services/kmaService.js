@@ -19,11 +19,11 @@ async function getVilageFcst({ nx, ny, base_date, base_time }) {
   return res.data?.response?.body?.items?.item || null;
 }
 
-// 바다누리 실시간 해양관측 데이터 (부이 관측소)
+// 바다누리 실시간 해양관측 데이터 (조석 관측소)
 async function getOceanObservation(obsCode) {
   try {
-    // 부이 관측소 API 사용
-    const url = 'http://www.khoa.go.kr/api/oceangrid/buObsRecent/search.do';
+    // 조석 관측소 최근 데이터 (수온 포함)
+    const url = 'http://www.khoa.go.kr/api/oceangrid/tideObsRecent/search.do';
     const res = await axios.get(url, { 
       params: {
         ServiceKey: KHOA_API_KEY,
@@ -34,11 +34,13 @@ async function getOceanObservation(obsCode) {
     });
 
     const data = res.data?.result?.data;
-    if (data) {
+    if (data && data.water_temp) {
       return {
-        water_temp: data.water_temp || data.Salinity,
-        wave_height: data.wave_height,
-        current_speed: data.current_speed
+        water_temp: data.water_temp,
+        wave_height: data.wave_height || '0.5', // 조석 관측소는 파고 없을 수 있음
+        current_speed: data.current_speed || '0.3',
+        air_temp: data.air_temp,
+        wind_speed: data.wind_speed
       };
     }
     return null;

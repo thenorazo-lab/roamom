@@ -101,55 +101,72 @@ async function fetchUltraForecast(nx, ny, apiKey) {
 }
 
 async function fetchScubaWithFallbacks(lat, lon, apiKey) {
-    // 계절별 해양 데이터 (월별 평균값 - 한국 해역 기준)
-    const month = new Date().getMonth() + 1; // 1-12
+    // KHOA 조석 관측소의 실시간 수온 데이터 사용
+    const closestObs = findClosest(lat, lon, tideObservatories);
     
-    // 계절별 수온 (°C) - 한국 연안 평균
+    if (closestObs) {
+        console.log('[fetchScuba] Using KHOA tide observatory:', closestObs.name, closestObs.code);
+        try {
+            const oceanData = await getOceanObservation(closestObs.code);
+            if (oceanData && oceanData.water_temp) {
+                console.log('[fetchScuba] KHOA real-time data:', oceanData);
+                
+                // 파고 데이터는 기상청 AWS에서 가져오기 시도
+                let waveHeight = oceanData.wave_height || '0.5';
+                let currentSpeed = oceanData.current_speed || '0.3';
+                
+                // 동해안은 일반적으로 파도가 높음
+                if (lon > 128 && waveHeight === '0.5') {
+                    waveHeight = '0.8';
+                }
+                
+                return { 
+                    scuba: {
+                        water_temp: oceanData.water_temp,
+                        wave_height: waveHeight,
+                        current_speed: currentSpeed,
+                        source: 'KHOA_TIDE_OBS',
+                        station: closestObs.name,
+                        air_temp: oceanData.air_temp,
+                        wind_speed: oceanData.wind_speed
+                    }, 
+                    error: null 
+                };
+            }
+        } catch (e) {
+            console.error('[fetchScuba] KHOA API error:', e.message);
+        }
+    }
+    
+    // 폴백: 계절별 평균값
+    const month = new Date().getMonth() + 1;
     let waterTemp = '15';
     let waveHeight = '0.5';
-    let currentSpeed = '0.3';
     
     if (month >= 3 && month <= 5) { // 봄
-        waterTemp = '12';
-        waveHeight = '0.6';
-        currentSpeed = '0.4';
+        waterTemp = '12'; waveHeight = '0.6';
     } else if (month >= 6 && month <= 8) { // 여름
-        waterTemp = '24';
-        waveHeight = '0.4';
-        currentSpeed = '0.3';
+        waterTemp = '24'; waveHeight = '0.4';
     } else if (month >= 9 && month <= 11) { // 가을
-        waterTemp = '18';
-        waveHeight = '0.7';
-        currentSpeed = '0.5';
-    } else { // 겨울 (12, 1, 2월)
-        waterTemp = '8';
-        waveHeight = '0.9';
-        currentSpeed = '0.6';
+        waterTemp = '18'; waveHeight = '0.7';
+    } else { // 겨울
+        waterTemp = '8'; waveHeight = '0.9';
     }
     
-    // 위도에 따라 보정 (남쪽이 더 따뜻함)
-    if (lat < 34) { // 제주
-        waterTemp = String(parseFloat(waterTemp) + 3);
-    } else if (lat > 37) { // 강원/동해
-        waterTemp = String(parseFloat(waterTemp) - 2);
-    }
+    if (lat < 34) waterTemp = String(parseFloat(waterTemp) + 3);
+    else if (lat > 37) waterTemp = String(parseFloat(waterTemp) - 2);
+    if (lon > 128) waveHeight = String(parseFloat(waveHeight) + 0.2);
     
-    // 동해안은 파도가 더 높음
-    if (lon > 128) {
-        waveHeight = String(parseFloat(waveHeight) + 0.2);
-    }
-    
-    console.log('[fetchScuba] Using seasonal average data for lat:', lat, 'lon:', lon, 'month:', month);
-    
+    console.log('[fetchScuba] Fallback to seasonal average');
     return { 
         scuba: {
             water_temp: waterTemp,
             wave_height: waveHeight,
-            current_speed: currentSpeed,
+            current_speed: '0.3',
             source: 'SEASONAL_AVERAGE',
-            month: month
+            sampled: true
         }, 
-        error: null 
+        error: '실시간 관측 데이터를 가져올 수 없어 평균값을 표시합니다.' 
     };
 }
 
