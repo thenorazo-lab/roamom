@@ -44,6 +44,7 @@ app.use('/api', require('./routes/points'));
 app.use('/api', require('./routes/uploads'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
+app.get('/api/version', (req, res) => res.json({ version: '1.3.0', versionCode: 16 }));
 
 app.listen(port, () => {
     console.log(`Backend server is running on http://localhost:${port}`);

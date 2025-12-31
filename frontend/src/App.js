@@ -3,11 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { App as CapApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import './App.css';
 import MapComponent from './components/MapComponent';
 import PointsAdmin from './pages/PointsAdmin';
 import JapanWaves from './pages/JapanWaves';
 import AdSense from './components/AdSense';
+import AdMobBanner from './components/AdMobBanner';
+import axios from 'axios';
 
 // 오프라인(file://) 전용 샘플 데이터
 const getSampleSeaInfo = () => ({
@@ -24,9 +27,14 @@ const getSampleSeaInfo = () => ({
   recorded: false,
 });
 
+// 현재 앱 버전
+const CURRENT_VERSION = '1.3.0';
+const CURRENT_VERSION_CODE = 16;
+
 // 앱사용 가이드 페이지
 const AppGuidePage = () => (
   <div className="container">
+    <AdMobBanner />
     <AdSense slot="3456789012" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
     <h2 className="page-title">📱 앱사용 가이드</h2>
     <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
@@ -66,6 +74,7 @@ const AppGuidePage = () => (
 // 가이드 페이지
 const GuidePage = () => (
   <div className="container">
+    <AdMobBanner />
     <AdSense slot="2345678901" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
     <h2 className="page-title">📖 해루질 가이드</h2>
     <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
@@ -109,6 +118,7 @@ const GuidePage = () => (
 // 홈 화면
 const HomePage = () => (
   <div className="container">
+    <AdMobBanner />
     <AdSense slot="1234567890" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
     <h1 className="main-title">해루질가자</h1>
     <p className="sub-title">바다날씨, 포인트, 일본 파고를 한 곳에서</p>
@@ -351,6 +361,7 @@ const WeatherPage = () => {
 
   return (
     <div className="container">
+      <AdMobBanner />
       <AdSense slot="4567890123" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
       <h2 className="page-title">현재 위치 바다 날씨</h2>
       <div style={{ marginTop: '10px', marginBottom: '20px', textAlign: 'center' }}>
@@ -376,7 +387,9 @@ const WeatherPage = () => {
         <div>
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
             <h3>위치: {data.nearestObs?.name || '현재 위치'}</h3>
-            <div style={{fontSize:12, color:'#666'}}>기록 상태: {data.recorded ? '기록됨' : '기록 실패/비활성'}{data.usingMockData ? ' (샘플 데이터 사용 중)' : ''}</div>
+            <div style={{fontSize:14, color: data.recorded ? '#2b7' : '#a33', fontWeight:'bold'}}>
+              기록: {data.recorded ? '⭕' : '❌'}
+            </div>
           </div>
 
           <div className="info-cards">
@@ -432,6 +445,7 @@ const PointsPage = () => {
 
   return (
     <div className="container">
+      <AdMobBanner />
       <AdSense slot="5678901234" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
       <h2 className="page-title">📍 해루질 포인트</h2>
       <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
@@ -634,6 +648,7 @@ const MapPage = () => {
 
   return (
     <div className="container">
+      <AdMobBanner />
       <AdSense slot="6789012345" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
       <h2 className="page-title">지도에서 위치 선택</h2>
       <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
@@ -724,6 +739,7 @@ function App() {
   return (
     <Router>
       <BackButtonHandler />
+      <VersionChecker />
       <div className="App">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -790,6 +806,38 @@ function BackButtonHandler() {
       handleBackButton.remove();
     };
   }, [navigate, location]);
+
+  return null;
+}
+
+// 버전 체크 컴포넌트
+function VersionChecker() {
+  useEffect(() => {
+    // 네이티브 앱에서만 실행
+    if (!Capacitor.isNativePlatform()) return;
+
+    const checkVersion = async () => {
+      try {
+        const API_BASE = process.env.NODE_ENV === 'production'
+          ? 'https://sea-weather-app.du.r.appspot.com'
+          : 'http://localhost:3002';
+        
+        const response = await axios.get(`${API_BASE}/api/version`);
+        const serverVersion = response.data.versionCode;
+        
+        if (serverVersion > CURRENT_VERSION_CODE) {
+          if (window.confirm(`새로운 버전이 있습니다!\n현재: ${CURRENT_VERSION}\n최신: ${response.data.version}\n\nPlay 스토어에서 업데이트하시겠습니까?`)) {
+            // Play 스토어로 이동
+            window.open('https://play.google.com/store/apps/details?id=com.harujil.app', '_system');
+          }
+        }
+      } catch (error) {
+        console.log('[버전 체크] 실패:', error.message);
+      }
+    };
+
+    checkVersion();
+  }, []);
 
   return null;
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import AdSense from '../components/AdSense';
+import AdMobBanner from '../components/AdMobBanner';
 
 export default function JapanWaves(){
   const defaultDate = new Date().toISOString().slice(0,10);
@@ -49,6 +50,7 @@ export default function JapanWaves(){
 
   return (
     <div className="container">
+      <AdMobBanner />
       <AdSense slot="3456789012" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
       <h2 className="page-title">일본 파고</h2>
       <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
