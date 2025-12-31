@@ -92,6 +92,21 @@ const scubaBeaches = [
     { "code": "402", "name": "중문", "lat": 33.2408, "lon": 126.4147 }
 ];
 
+// 해양 부이 관측소 목록 (KHOA)
+const buoyStations = [
+    { "code": "TW_0062", "name": "해운대해수욕장", "lat": 35.14897, "lon": 129.17017 },
+    { "code": "TW_0063", "name": "거제도", "lat": 34.76628, "lon": 128.90369 },
+    { "code": "TW_0064", "name": "거문도", "lat": 34.02842, "lon": 127.30564 },
+    { "code": "TW_0065", "name": "마라도", "lat": 33.08492, "lon": 126.2725 },
+    { "code": "TW_0066", "name": "외연도", "lat": 36.24542, "lon": 125.75219 },
+    { "code": "TW_0067", "name": "덕적도", "lat": 37.23483, "lon": 126.01439 },
+    { "code": "TW_0068", "name": "칠발도", "lat": 34.79361, "lon": 125.77611 },
+    { "code": "TW_0069", "name": "동해", "lat": 37.54611, "lon": 129.95139 },
+    { "code": "TW_0070", "name": "포항", "lat": 36.35, "lon": 129.78333 },
+    { "code": "TW_0071", "name": "울릉도", "lat": 37.45139, "lon": 131.10989 },
+    { "code": "TW_0072", "name": "울산", "lat": 35.34369, "lon": 129.84514 }
+];
+
 // 위도, 경도를 기상청 격자 좌표로 변환하는 함수
 function dfs_xy_conv(v1, v2) {
     const RE = 6371.00877; // 지구 반경(km)
@@ -196,5 +211,5 @@ const getApiDateTime = () => {
     };
 }
 
-module.exports = { tideObservatories, scubaBeaches, dfs_xy_conv, getDistance, findClosest, getApiDateTime };
+module.exports = { tideObservatories, scubaBeaches, buoyStations, dfs_xy_conv, getDistance, findClosest, getApiDateTime };
 

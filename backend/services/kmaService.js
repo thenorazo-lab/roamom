@@ -19,10 +19,11 @@ async function getVilageFcst({ nx, ny, base_date, base_time }) {
   return res.data?.response?.body?.items?.item || null;
 }
 
-// 바다누리 실시간 해양관측 데이터
+// 바다누리 실시간 해양관측 데이터 (부이 관측소)
 async function getOceanObservation(obsCode) {
   try {
-    const url = 'http://www.khoa.go.kr/api/oceangrid/obsWave/search.do';
+    // 부이 관측소 API 사용
+    const url = 'http://www.khoa.go.kr/api/oceangrid/buObsRecent/search.do';
     const res = await axios.get(url, { 
       params: {
         ServiceKey: KHOA_API_KEY,
@@ -33,12 +34,11 @@ async function getOceanObservation(obsCode) {
     });
 
     const data = res.data?.result?.data;
-    if (data && data.length > 0) {
-      const latest = data[0]; // 최신 데이터
+    if (data) {
       return {
-        water_temp: latest.water_temp || latest.wt,
-        wave_height: latest.wave_height || latest.wave_height,
-        current_speed: latest.current_speed || latest.current
+        water_temp: data.water_temp || data.Salinity,
+        wave_height: data.wave_height,
+        current_speed: data.current_speed
       };
     }
     return null;

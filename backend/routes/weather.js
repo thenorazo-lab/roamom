@@ -6,6 +6,7 @@ const xml2js = require('xml2js');
 const {
     tideObservatories,
     scubaBeaches,
+    buoyStations,
     dfs_xy_conv,
     findClosest,
     getApiDateTime,
@@ -100,28 +101,28 @@ async function fetchUltraForecast(nx, ny, apiKey) {
 }
 
 async function fetchScubaWithFallbacks(lat, lon, apiKey) {
-    // 바다누리 API를 사용하여 실제 해양관측 데이터 가져오기
-    // 가장 가까운 조석 관측소를 해양 관측소로 사용
-    const oceanObs = findClosest(lat, lon, tideObservatories);
+    // 바다누리 부이 관측소 API를 사용하여 실제 해양관측 데이터 가져오기
+    const closestBuoy = findClosest(lat, lon, buoyStations);
     
-    if (oceanObs) {
-        console.log('[fetchScuba] Using KHOA ocean observation for:', oceanObs.name, oceanObs.code);
+    if (closestBuoy) {
+        console.log('[fetchScuba] Using KHOA buoy station:', closestBuoy.name, closestBuoy.code);
         try {
-            const oceanData = await getOceanObservation(oceanObs.code);
+            const oceanData = await getOceanObservation(closestBuoy.code);
             if (oceanData && (oceanData.water_temp || oceanData.wave_height)) {
-                console.log('[fetchScuba] KHOA data:', oceanData);
+                console.log('[fetchScuba] KHOA buoy data:', oceanData);
                 return { 
                     scuba: {
                         water_temp: oceanData.water_temp || '18',
                         wave_height: oceanData.wave_height || '0.5',
                         current_speed: oceanData.current_speed || '0.3',
-                        source: 'KHOA'
+                        source: 'KHOA_BUOY',
+                        station: closestBuoy.name
                     }, 
                     error: null 
                 };
             }
         } catch (e) {
-            console.error('[fetchScuba] KHOA API error:', e.message);
+            console.error('[fetchScuba] KHOA buoy API error:', e.message);
         }
     }
     
