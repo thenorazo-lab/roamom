@@ -1,6 +1,7 @@
 // services/kmaService.js
 const axios = require('axios');
 const API_KEY = process.env.DATA_GO_KR_API_KEY;
+const KHOA_API_KEY = process.env.KHOA_API_KEY;
 
 async function getVilageFcst({ nx, ny, base_date, base_time }) {
   const url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst';
@@ -18,6 +19,36 @@ async function getVilageFcst({ nx, ny, base_date, base_time }) {
   return res.data?.response?.body?.items?.item || null;
 }
 
+// 바다누리 실시간 해양관측 데이터
+async function getOceanObservation(obsCode) {
+  try {
+    const url = 'http://www.khoa.go.kr/api/oceangrid/obsWave/search.do';
+    const res = await axios.get(url, { 
+      params: {
+        ServiceKey: KHOA_API_KEY,
+        ObsCode: obsCode,
+        ResultType: 'json'
+      },
+      timeout: 5000
+    });
+
+    const data = res.data?.result?.data;
+    if (data && data.length > 0) {
+      const latest = data[0]; // 최신 데이터
+      return {
+        water_temp: latest.water_temp || latest.wt,
+        wave_height: latest.wave_height || latest.wave_height,
+        current_speed: latest.current_speed || latest.current
+      };
+    }
+    return null;
+  } catch (e) {
+    console.error('[kmaService] getOceanObservation error:', e.message);
+    return null;
+  }
+}
+
 module.exports = {
-  getVilageFcst
+  getVilageFcst,
+  getOceanObservation
 };

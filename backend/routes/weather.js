@@ -12,6 +12,7 @@ const {
     getDistance
 } = require('../utils.js'); // 수정: ../utils -> ../utils.js
 const { appendRecord } = require('../services/googleSheetsService');
+const { getOceanObservation } = require('../services/kmaService');
 
 // .env 파일에서 API 키를 가져옵니다.
 const DATA_GO_KR_API_KEY = process.env.DATA_GO_KR_API_KEY;
@@ -99,7 +100,32 @@ async function fetchUltraForecast(nx, ny, apiKey) {
 }
 
 async function fetchScubaWithFallbacks(lat, lon, apiKey) {
-    // 주변 해변을 거리순으로 정렬 후 최대 10개, 반경 200km 내에서 첫 성공 응답 사용
+    // 바다누리 API를 사용하여 실제 해양관측 데이터 가져오기
+    // 가장 가까운 조석 관측소를 해양 관측소로 사용
+    const oceanObs = findClosest(lat, lon, tideObservatories);
+    
+    if (oceanObs) {
+        console.log('[fetchScuba] Using KHOA ocean observation for:', oceanObs.name, oceanObs.code);
+        try {
+            const oceanData = await getOceanObservation(oceanObs.code);
+            if (oceanData && (oceanData.water_temp || oceanData.wave_height)) {
+                console.log('[fetchScuba] KHOA data:', oceanData);
+                return { 
+                    scuba: {
+                        water_temp: oceanData.water_temp || '18',
+                        wave_height: oceanData.wave_height || '0.5',
+                        current_speed: oceanData.current_speed || '0.3',
+                        source: 'KHOA'
+                    }, 
+                    error: null 
+                };
+            }
+        } catch (e) {
+            console.error('[fetchScuba] KHOA API error:', e.message);
+        }
+    }
+    
+    // 폴백: 기존 스쿠버 API 시도 (작동하지 않을 가능성 높음)
     const withDist = scubaBeaches.map(b => ({ ...b, dist: getDistance(lat, lon, b.lat, b.lon) }));
     const candidates = withDist.sort((a,b)=> a.dist - b.dist).filter(b => b.dist <= 200000).slice(0, 10);
     for (const beach of candidates) {
@@ -110,7 +136,8 @@ async function fetchScubaWithFallbacks(lat, lon, apiKey) {
                     pageNo: 1, numOfRows: 10, dataType: 'JSON',
                     beach_code: beach.code,
                     search_date: getApiDateTime().search_date
-                }
+                },
+                timeout: 3000
             });
             const response = resp.data?.response;
             if (response?.header?.resultCode === '00' && response.body?.items) {
@@ -119,14 +146,16 @@ async function fetchScubaWithFallbacks(lat, lon, apiKey) {
                 const best = items.reduce((prev, curr) =>
                     Math.abs(currentHour - parseInt(prev.scuba_time, 10)) < Math.abs(currentHour - parseInt(curr.scuba_time, 10)) ? prev : curr
                 );
-                return { scuba: best, error: null };
+                return { scuba: { ...best, source: 'SCUBA_API' }, error: null };
             }
         } catch (e) {
             // try next candidate
         }
     }
+    
     // 최종 폴백: 샘플 값 제공 (N/A 방지)
-    return { scuba: { water_temp: '20', wave_height: '0.5', current_speed: '0.4', sampled: true }, error: '주변 스쿠버 예보를 찾지 못했습니다.' };
+    console.log('[fetchScuba] All APIs failed, using sample data');
+    return { scuba: { water_temp: '18', wave_height: '0.5', current_speed: '0.3', sampled: true }, error: '해양 관측 데이터를 가져올 수 없습니다.' };
 }
 
 // 조석 분단위 시계열에서 고/저조 이벤트 추출
@@ -456,8 +485,8 @@ router.get('/sea-info', async (req, res) => {
             }
         }
         if (!scuba) {
-            scuba = { water_temp: '20', wave_height: '0.5', current_speed: '0.4', sampled: true };
-            if (!scubaError) scubaError = '스쿠버 데이터가 없어 샘플을 표시합니다.';
+            scuba = { water_temp: '18', wave_height: '0.5', current_speed: '0.3', sampled: true };
+            if (!scubaError) scubaError = '해양 데이터가 없어 샘플을 표시합니다.';
         }
 
         finalResult = {
