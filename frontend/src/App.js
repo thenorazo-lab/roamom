@@ -666,8 +666,16 @@ const MapPage = () => {
       const url = `${apiUrl}/api/sea-info?lat=${latlng.lat}&lon=${latlng.lng}&_ts=${Date.now()}`;
       console.log('[MapPage] Fetching:', url);
       const controller = new AbortController();
-      const t = setTimeout(() => controller.abort(), 10000);
-      const res = await fetch(url, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' }, signal: controller.signal });
+      const t = setTimeout(() => {
+        console.log('[MapPage] Request timeout - aborting');
+        controller.abort();
+      }, 15000); // 15초로 증가
+      
+      const res = await fetch(url, { 
+        cache: 'no-store', 
+        headers: { 'Cache-Control': 'no-cache' }, 
+        signal: controller.signal 
+      });
       clearTimeout(t);
       console.log('[MapPage] Response status:', res.status);
       
@@ -685,13 +693,18 @@ const MapPage = () => {
       }
       const json = await res.json();
       console.log('[MapPage] Data received:', json);
-      console.log('[MapPage] Tide data specifically:', json.tide);
-      console.log('[MapPage] Tide times:', json.tide?.map(t => t.tide_time || t.record_time));
+      console.log('[MapPage] Buoy data:', json.buoy);
+      console.log('[MapPage] Tide data:', json.tide);
       console.log('[MapPage] nearestObs:', json.nearestObs);
       setInfo(json);
     } catch (e) {
-      console.error('[MapPage] Error:', e.message);
-      setError('데이터를 불러오지 못했습니다.\n' + e.message + '\n(F12 개발자도구 Console 탭에서 "[MapPage]" 로그 확인)');
+      if (e.name === 'AbortError') {
+        console.error('[MapPage] Request timed out (15s)');
+        setError('요청 시간이 초과되었습니다. 다시 시도해주세요.');
+      } else {
+        console.error('[MapPage] Error:', e.message, e);
+        setError('데이터를 불러오지 못했습니다: ' + e.message);
+      }
     } finally {
       setLoading(false);
     }

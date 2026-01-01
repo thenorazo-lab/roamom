@@ -618,27 +618,16 @@ router.get('/sea-info', async (req, res) => {
             delete weather.wsdFallback; // fallback 플래그 제거
         }
 
-        // 스쿠버: 주변 후보 순회로 성공값 우선 적용
-        let scuba = null, scubaError = null;
-        if (closestScubaBeach) {
-            const scubaRes = await fetchScubaWithFallbacks(parsedLat, parsedLon, DATA_GO_KR_API_KEY);
-            scuba = scubaRes.scuba;
-            scubaError = scubaRes.error;
-        } else {
-            scubaError = '근처 스쿠버 해변을 찾지 못했습니다.';
-        }
+        // 스쿠버 API는 더 이상 사용하지 않음 (부이 데이터로 대체)
+        let scuba = null, scubaError = '부이 데이터를 확인해주세요.';
 
-        // 최종 안전 보정: 그래도 기온/스쿠버가 비어 있으면 샘플로 채움
+        // 최종 안전 보정: 기온이 비어 있으면 샘플로 채움
         if (weather) {
             if (!weather.T1H && !weather.TMP) {
                 weather.T1H = '22';
                 weather.TMP = '22';
                 weather.sampled = true;
             }
-        }
-        if (!scuba) {
-            scuba = { water_temp: '18', wave_height: '0.5', current_speed: '0.3', sampled: true };
-            if (!scubaError) scubaError = '해양 데이터가 없어 샘플을 표시합니다.';
         }
 
         finalResult = {
