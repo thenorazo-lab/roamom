@@ -99,15 +99,19 @@ async function getBuoyObservation(obsCode) {
     if (items) {
       const latest = Array.isArray(items) ? items[0] : items;
       console.log(`[getBuoyObservation] Data found - wave_height: ${latest.wvhgt}, wind_speed: ${latest.wspd}, water_temp: ${latest.wtem}`);
+      
+      // 빈 문자열을 null로 변환하는 헬퍼 함수
+      const parseValue = (val) => (val && val !== '' ? val : null);
+      
       return {
         station_name: latest.obsvtrNm,
         obs_time: latest.obsrvnDt,
-        wave_height: latest.wvhgt || null,
-        current_speed: latest.crsp || null,
-        current_direction: latest.crdir || null,
-        water_temp: latest.wtem || null,
-        wind_speed: latest.wspd || null,
-        wind_direction: latest.wndrct || null
+        wave_height: parseValue(latest.wvhgt),
+        current_speed: parseValue(latest.crsp),
+        current_direction: parseValue(latest.crdir),
+        water_temp: parseValue(latest.wtem),
+        wind_speed: parseValue(latest.wspd),
+        wind_direction: parseValue(latest.wndrct)
       };
     }
     console.log('[getBuoyObservation] No items found in response');
