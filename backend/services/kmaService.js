@@ -64,16 +64,14 @@ async function getOceanObservation(obsCode) {
 // 해양관측부이 최신 관측데이터 (파고, 유속, 유향 등)
 async function getBuoyObservation(obsCode) {
   try {
-    const today = new Date();
-    const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
     const url = 'https://apis.data.go.kr/1192136/twRecent/GetTWRecentApiService';
-    console.log(`[getBuoyObservation] Fetching buoy ${obsCode} for date ${dateStr}`);
+    console.log(`[getBuoyObservation] Fetching buoy ${obsCode} (latest data)`);
     
     const res = await axios.get(url, {
       params: {
         serviceKey: API_KEY, // DATA_GO_KR_API_KEY 사용
         obsCode: obsCode,
-        reqDate: dateStr, // reqDate 파라미터 사용 (명세 확인)
+        // reqDate 생략 - API가 자동으로 최신 데이터 반환
         numOfRows: 1,
         type: 'xml' // 응답 타입 명시
       },
