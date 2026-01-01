@@ -573,34 +573,31 @@ router.get('/sea-info', async (req, res) => {
         const { buoyStations } = require('../utils.js');
         const { getBuoyObservation } = require('../services/kmaService');
         
-        // 거리순으로 정렬된 부이 목록 (최대 3개)
+        // 거리순으로 정렬된 부이 목록 (최대 10개로 증가)
         const sortedBuoys = buoyStations
             .map(b => ({
                 ...b,
                 distance: Math.sqrt(Math.pow(b.lat - parsedLat, 2) + Math.pow(b.lon - parsedLon, 2))
             }))
             .sort((a, b) => a.distance - b.distance)
-            .slice(0, 3);
+            .slice(0, 10); // 3개 → 10개로 증가
         
         console.log('[sea-info] Nearest buoys:', sortedBuoys.map(b => `${b.name}(${b.code}) dist=${b.distance.toFixed(3)}`).join(', '));
         
         let buoy = null, buoyError = null;
         
-        // 부이 데이터 가져오기
+        // 부이 데이터 가져오기 (데이터가 있는 부이를 찾을 때까지)
         for (const buoyStation of sortedBuoys) {
             try {
                 console.log(`[sea-info] Trying buoy ${buoyStation.code} (${buoyStation.name})`);
                 const buoyData = await getBuoyObservation(buoyStation.code);
-                console.log(`[sea-info] Buoy ${buoyStation.code} response:`, buoyData ? 'OK' : 'null');
                 
                 if (buoyData) {
                     buoy = buoyData;
                     console.log('[sea-info] ✅ Buoy data found:', buoyStation.name);
-                    // 풍속 데이터가 있으면 우선 선택
-                    if (buoyData.wind_speed) {
-                        console.log('[sea-info] ✅ Buoy has wind_speed:', buoyData.wind_speed, 'm/s');
-                        break;
-                    }
+                    break; // 데이터 찾으면 바로 종료
+                } else {
+                    console.log('[sea-info] ⚠️ Buoy returned null, trying next');
                 }
             } catch (e) {
                 console.error('[sea-info] ❌ Buoy fetch error:', buoyStation.code, e.message);
