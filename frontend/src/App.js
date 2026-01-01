@@ -431,7 +431,9 @@ const WeatherPage = () => {
                 <>
                   <div style={{fontWeight:'bold', color:'#0077be', marginBottom:4}}>실시간 부이 관측</div>
                   <p>수온: {data.buoy.water_temp ?? 'N/A'}°C</p>
-                  <p>파고: {data.buoy.wave_height ?? 'N/A'} m</p>
+                  {data.buoy.wave_height && (
+                    <p>파고: {data.buoy.wave_height} m</p>
+                  )}
                   <p>유속: {data.buoy.current_speed ? knotsToMS(data.buoy.current_speed) : 'N/A'} m/s</p>
                   <p>유향: {data.buoy.current_direction ? (
                     <span>{data.buoy.current_direction}°{getDirectionArrow(data.buoy.current_direction)}</span>
@@ -470,7 +472,7 @@ const WeatherPage = () => {
             </div>
           </div>
 
-          <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>출처: 오픈API 기상청_단기예보 / 해양수산부 국립해양조사원_스킨스쿠버지수 조회 / 해양수산부 국립해양조사원_조석예보</p>
+          <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>출처: 오픈API 기상청_단기예보 / 해양수산부 국립해양조사원_해양관측부이 최신 관측데이터 / 해양수산부 국립해양조사원_조석예보</p>
         </div>
       )}
     </div>
@@ -760,7 +762,9 @@ const MapPage = () => {
                 <>
                   <div style={{fontWeight:'bold', color:'#0077be', marginBottom:4}}>실시간 부이 관측</div>
                   <p>수온: {info.buoy.water_temp ?? 'N/A'}°C</p>
-                  <p>파고: {info.buoy.wave_height ?? 'N/A'} m</p>
+                  {info.buoy.wave_height && (
+                    <p>파고: {info.buoy.wave_height} m</p>
+                  )}
                   <p>유속: {info.buoy.current_speed ? knotsToMS(info.buoy.current_speed) : 'N/A'} m/s</p>
                   <p>유향: {info.buoy.current_direction ? (
                     <span>{info.buoy.current_direction}°{getDirectionArrow(info.buoy.current_direction)}</span>
@@ -799,7 +803,7 @@ const MapPage = () => {
             </div>
           </div>
 
-          <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>출처: 오픈API 기상청_단기예보 / 해양수산부 국립해양조사원_스킨스쿠버지수 조회 / 해양수산부 국립해양조사원_조석예보</p>
+          <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>출처: 오픈API 기상청_단기예보 / 해양수산부 국립해양조사원_해양관측부이 최신 관측데이터 / 해양수산부 국립해양조사원_조석예보</p>
         </div>
       )}
 
