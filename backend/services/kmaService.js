@@ -65,16 +65,16 @@ async function getOceanObservation(obsCode) {
 async function getBuoyObservation(obsCode) {
   try {
     const today = new Date();
+    today.setDate(today.getDate() - 1); // 하루 전 데이터 사용
     const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
     const url = 'https://apis.data.go.kr/1192136/twRecent/GetTWRecentApiService';
     console.log(`[getBuoyObservation] Fetching buoy ${obsCode} for date ${dateStr}`);
     
     const res = await axios.get(url, {
       params: {
-        serviceKey: API_KEY, // DATA_GO_KR_API_KEY 사용
+        serviceKey: KHOA_API_KEY, // 부이 API는 KHOA_API_KEY 사용
         obsCode: obsCode,
-        resultType: 'json',
-        reqDate: dateStr,
+        date: dateStr, // reqDate 대신 date 사용
         numOfRows: 1
       },
       timeout: 5000
