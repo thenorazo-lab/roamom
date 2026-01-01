@@ -61,7 +61,61 @@ async function getOceanObservation(obsCode) {
   }
 }
 
+// 해양관측부이 최신 관측데이터 (파고, 유속, 유향 등)
+async function getBuoyObservation(obsCode) {
+  try {
+    const today = new Date();
+    const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
+    const url = 'https://apis.data.go.kr/1192136/twRecent/GetTWRecentApiService';
+    const res = await axios.get(url, {
+      params: {
+        serviceKey: API_KEY, // DATA_GO_KR_API_KEY 사용
+        obsCode: obsCode,
+        resultType: 'json',
+        reqDate: dateStr,
+        numOfRows: 1
+      },
+      timeout: 5000
+    });
+    
+    let items = null;
+    
+    // XML 응답 처리 (API가 JSON을 무시하고 XML을 반환하는 경우)
+    if (typeof res.data === 'string' && res.data.startsWith('<')) {
+      const xml2js = require('xml2js');
+      const parser = new xml2js.Parser({ explicitArray: false });
+      const parsed = await parser.parseStringPromise(res.data);
+      items = parsed?.response?.body?.items?.item;
+    } else {
+      // JSON 응답 처리
+      items = res.data?.response?.body?.items?.item;
+    }
+    
+    if (items) {
+      const latest = Array.isArray(items) ? items[0] : items;
+      return {
+        station_name: latest.obsvtrNm,
+        obs_time: latest.obsrvnDt,
+        wave_height: latest.wvhgt || null,
+        current_speed: latest.crsp || null,
+        current_direction: latest.crdir || null,
+        water_temp: latest.wtem || null,
+        wind_speed: latest.wspd || null,
+        wind_direction: latest.wndrct || null
+      };
+    }
+    return null;
+  } catch (e) {
+    console.error('[kmaService] getBuoyObservation error:', e.message);
+    if (e.response) {
+      console.error('[kmaService] API response:', e.response.status, e.response.data);
+    }
+    return null;
+  }
+}
+
 module.exports = {
   getVilageFcst,
-  getOceanObservation
+  getOceanObservation,
+  getBuoyObservation
 };

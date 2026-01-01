@@ -133,6 +133,30 @@ const HomePage = () => (
   </div>
 );
 
+// 방향을 화살표로 표시하는 유틸리티 함수
+const getDirectionArrow = (degrees) => {
+  if (!degrees && degrees !== 0) return null;
+  const angle = parseFloat(degrees);
+  if (isNaN(angle)) return null;
+  return (
+    <span style={{
+      display: 'inline-block',
+      transform: `rotate(${angle}deg)`,
+      fontSize: '20px',
+      marginLeft: '4px',
+      verticalAlign: 'middle'
+    }}>↑</span>
+  );
+};
+
+// 노트를 m/s로 변환하는 함수
+const knotsToMS = (knots) => {
+  if (!knots && knots !== 0) return null;
+  const value = parseFloat(knots);
+  if (isNaN(value)) return null;
+  return (value * 0.514444).toFixed(2);
+};
+
 // 바다날씨 페이지
 const WeatherPage = () => {
   const [data, setData] = useState(null);
@@ -402,9 +426,36 @@ const WeatherPage = () => {
 
             <div className="card">
               <h3>🌊 해양 정보</h3>
-              <p>수온: {data.scuba?.water_temp ?? 'N/A'}°C</p>
-              <p>파고: {data.scuba?.wave_height ?? 'N/A'} m</p>
-              <p>유속: {data.scuba?.current_speed ?? 'N/A'} knots</p>
+              {/* 부이 실시간 데이터 우선 표시 */}
+              {data.buoy ? (
+                <>
+                  <div style={{fontWeight:'bold', color:'#0077be', marginBottom:4}}>실시간 부이 관측</div>
+                  <p>수온: {data.buoy.water_temp ?? 'N/A'}°C</p>
+                  <p>파고: {data.buoy.wave_height ?? 'N/A'} m</p>
+                  <p>유속: {data.buoy.current_speed ? knotsToMS(data.buoy.current_speed) : 'N/A'} m/s</p>
+                  <p>유향: {data.buoy.current_direction ? (
+                    <span>{data.buoy.current_direction}°{getDirectionArrow(data.buoy.current_direction)}</span>
+                  ) : 'N/A'}</p>
+                  {data.buoy.wind_speed && (
+                    <p>풍속: {data.buoy.wind_speed} m/s</p>
+                  )}
+                  {data.buoy.wind_direction && (
+                    <p>풍향: {data.buoy.wind_direction}°{getDirectionArrow(data.buoy.wind_direction)}</p>
+                  )}
+                  {data.buoy.station_name && (
+                    <div style={{fontSize:12, color:'#888'}}>관측소: {data.buoy.station_name}</div>
+                  )}
+                </>
+              ) : data.buoyError ? (
+                <div style={{color:'#a33', fontSize:13, marginBottom:4}}>부이 실시간 데이터를 불러올 수 없습니다.</div>
+              ) : (
+                <>
+                  <div style={{fontWeight:'bold', color:'#888', marginBottom:4}}>스쿠버 예측치(대체)</div>
+                  <p>수온: {data.scuba?.water_temp ?? 'N/A'}°C</p>
+                  <p>파고: {data.scuba?.wave_height ?? 'N/A'} m</p>
+                  <p>유속: {data.scuba?.current_speed ? knotsToMS(data.scuba.current_speed) : 'N/A'} m/s</p>
+                </>
+              )}
             </div>
 
             <div className="card">
@@ -692,9 +743,35 @@ const MapPage = () => {
 
             <div className="card">
               <h3>🌊 해양 정보</h3>
-              <p>수온: {info.scuba?.water_temp ?? 'N/A'}°C</p>
-              <p>파고: {info.scuba?.wave_height ?? 'N/A'} m</p>
-              <p>유속: {info.scuba?.current_speed ?? 'N/A'} knots</p>
+              {info.buoy ? (
+                <>
+                  <div style={{fontWeight:'bold', color:'#0077be', marginBottom:4}}>실시간 부이 관측</div>
+                  <p>수온: {info.buoy.water_temp ?? 'N/A'}°C</p>
+                  <p>파고: {info.buoy.wave_height ?? 'N/A'} m</p>
+                  <p>유속: {info.buoy.current_speed ? knotsToMS(info.buoy.current_speed) : 'N/A'} m/s</p>
+                  <p>유향: {info.buoy.current_direction ? (
+                    <span>{info.buoy.current_direction}°{getDirectionArrow(info.buoy.current_direction)}</span>
+                  ) : 'N/A'}</p>
+                  {info.buoy.wind_speed && (
+                    <p>풍속: {info.buoy.wind_speed} m/s</p>
+                  )}
+                  {info.buoy.wind_direction && (
+                    <p>풍향: {info.buoy.wind_direction}°{getDirectionArrow(info.buoy.wind_direction)}</p>
+                  )}
+                  {info.buoy.station_name && (
+                    <div style={{fontSize:12, color:'#888'}}>관측소: {info.buoy.station_name}</div>
+                  )}
+                </>
+              ) : info.buoyError ? (
+                <div style={{color:'#a33', fontSize:13, marginBottom:4}}>부이 실시간 데이터를 불러올 수 없습니다.</div>
+              ) : (
+                <>
+                  <div style={{fontWeight:'bold', color:'#888', marginBottom:4}}>스쿠버 예측치(대체)</div>
+                  <p>수온: {info.scuba?.water_temp ?? 'N/A'}°C</p>
+                  <p>파고: {info.scuba?.wave_height ?? 'N/A'} m</p>
+                  <p>유속: {info.scuba?.current_speed ? knotsToMS(info.scuba.current_speed) : 'N/A'} m/s</p>
+                </>
+              )}
             </div>
 
             <div className="card">
@@ -790,20 +867,28 @@ function BackButtonHandler() {
   const location = useLocation();
 
   useEffect(() => {
-    const handleBackButton = CapApp.addListener('backButton', () => {
-      // 홈페이지('/') 에서 뒤로가기 시 종료 확인
-      if (location.pathname === '/' || location.pathname === '') {
-        if (window.confirm('앱을 종료하시겠습니까?')) {
-          CapApp.exitApp();
+    let listener;
+    
+    const setupListener = async () => {
+      listener = await CapApp.addListener('backButton', () => {
+        // 홈페이지('/') 에서 뒤로가기 시 종료 확인
+        if (location.pathname === '/' || location.pathname === '') {
+          if (window.confirm('앱을 종료하시겠습니까?')) {
+            CapApp.exitApp();
+          }
+        } else {
+          // 다른 페이지에서는 뒤로가기
+          navigate(-1);
         }
-      } else {
-        // 다른 페이지에서는 뒤로가기
-        navigate(-1);
-      }
-    });
+      });
+    };
+
+    setupListener();
 
     return () => {
-      handleBackButton.remove();
+      if (listener && typeof listener.remove === 'function') {
+        listener.remove();
+      }
     };
   }, [navigate, location]);
 

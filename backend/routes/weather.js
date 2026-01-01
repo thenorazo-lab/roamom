@@ -100,6 +100,47 @@ async function fetchUltraForecast(nx, ny, apiKey) {
     }
 }
 
+// 주변 그리드를 순회하면서 풍속 데이터를 찾는 함수
+async function fetchWindSpeedFromNearbyGrids(baseNx, baseNy, apiKey, maxRadius = 1) {
+    console.log(`[fetchWindSpeed] Searching nearby grids for WSD, base: (${baseNx}, ${baseNy})`);
+    
+    // 현재 위치부터 시작
+    const tryGrids = [[baseNx, baseNy]];
+    
+    // 주변 그리드 좌표 생성 (반경 1만 검색하여 속도 향상)
+    for (let radius = 1; radius <= maxRadius; radius++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+            for (let dy = -radius; dy <= radius; dy++) {
+                if (Math.abs(dx) === radius || Math.abs(dy) === radius) {
+                    tryGrids.push([baseNx + dx, baseNy + dy]);
+                }
+            }
+        }
+    }
+    
+    // 각 그리드에서 데이터 시도
+    for (const [nx, ny] of tryGrids) {
+        try {
+            const ncst = await fetchUltraNowcast(nx, ny, apiKey);
+            if (ncst?.WSD) {
+                console.log(`[fetchWindSpeed] Found WSD at grid (${nx}, ${ny}): ${ncst.WSD}`);
+                return { ...ncst, gridOffset: [nx - baseNx, ny - baseNy] };
+            }
+            
+            const fcst = await fetchUltraForecast(nx, ny, apiKey);
+            if (fcst?.WSD) {
+                console.log(`[fetchWindSpeed] Found WSD at grid (${nx}, ${ny}): ${fcst.WSD}`);
+                return { ...fcst, gridOffset: [nx - baseNx, ny - baseNy] };
+            }
+        } catch (e) {
+            // 계속 시도
+        }
+    }
+    
+    console.log('[fetchWindSpeed] No WSD data found in nearby grids');
+    return null;
+}
+
 async function fetchScubaWithFallbacks(lat, lon, apiKey) {
     // 조위관측소 실측 수온 데이터 사용 (공공데이터포털 API)
     const closestObs = findClosest(lat, lon, tideObservatories);
@@ -384,6 +425,18 @@ router.get('/sea-info', async (req, res) => {
                         if (!weather.TMP && ultraFcst.T1H != null) weather.TMP = ultraFcst.T1H;
                     }
                 }
+                // WSD가 아직도 없으면 주변 그리드 검색
+                if (!weather.WSD) {
+                    console.log('[sea-info] WSD not found, searching nearby grids...');
+                    const nearbyData = await fetchWindSpeedFromNearbyGrids(grid.x, grid.y, DATA_GO_KR_API_KEY);
+                    if (nearbyData?.WSD) {
+                        weather.WSD = nearbyData.WSD;
+                        console.log('[sea-info] WSD found from nearby grid:', nearbyData.WSD);
+                    } else {
+                        weather.WSD = '3.0'; // 최종 폴백
+                        weather.sampled = true;
+                    }
+                }
                 // TMP가 비어 있고 T1H가 있으면 TMP에 채움
                 if (!weather.TMP && weather.T1H != null) weather.TMP = weather.T1H;
                 // 최종 보정: 그래도 없으면 샘플값으로 채워 N/A 회피
@@ -392,7 +445,7 @@ router.get('/sea-info', async (req, res) => {
                     weather.TMP = '22';
                     weather.sampled = true;
                 }
-                console.log('[sea-info] Parsed weather:', weather, 'ultraNcst:', ultraNcst);
+                console.log('[sea-info] Parsed weather:', weather);
             } else {
                 // resultCode가 00이 아닌 경우 (예: 03=데이터 없음)
                 weatherError = `[${response.header.resultCode}] ${response.header.resultMsg}`;
@@ -400,13 +453,20 @@ router.get('/sea-info', async (req, res) => {
                 const ultraNcst = await fetchUltraNowcast(grid.x, grid.y, DATA_GO_KR_API_KEY);
                 const ultraFcst = await fetchUltraForecast(grid.x, grid.y, DATA_GO_KR_API_KEY);
                 
+                let wsd = ultraNcst?.WSD || ultraFcst?.WSD;
+                // WSD가 없으면 주변 그리드 검색
+                if (!wsd) {
+                    const nearbyData = await fetchWindSpeedFromNearbyGrids(grid.x, grid.y, DATA_GO_KR_API_KEY);
+                    wsd = nearbyData?.WSD || '3.0';
+                }
+                
                 if (ultraNcst || ultraFcst) {
                     weather = {
                         T1H: ultraNcst?.T1H || ultraFcst?.T1H || '22',
                         TMP: ultraNcst?.T1H || ultraFcst?.T1H || '22',
                         SKY: ultraNcst?.SKY || ultraFcst?.SKY || '1',
                         PTY: ultraNcst?.PTY || ultraFcst?.PTY || '0',
-                        WSD: ultraNcst?.WSD || ultraFcst?.WSD,
+                        WSD: wsd,
                         sampled: !(ultraNcst || ultraFcst)
                     };
                     console.log('[sea-info] Recovered with Ultra API after main API error:', weather);
@@ -420,19 +480,32 @@ router.get('/sea-info', async (req, res) => {
             const ultraNcst = await fetchUltraNowcast(grid.x, grid.y, DATA_GO_KR_API_KEY);
             const ultraFcst = await fetchUltraForecast(grid.x, grid.y, DATA_GO_KR_API_KEY);
             
+            let wsd = ultraNcst?.WSD || ultraFcst?.WSD;
+            let wsdFallback = false; // WSD가 fallback 값인지 추적
+            // WSD가 없으면 주변 그리드 검색
+            if (!wsd) {
+                const nearbyData = await fetchWindSpeedFromNearbyGrids(grid.x, grid.y, DATA_GO_KR_API_KEY);
+                wsd = nearbyData?.WSD;
+                if (!wsd) {
+                    wsd = '3.0';
+                    wsdFallback = true; // fallback 사용 표시
+                }
+            }
+            
             if (ultraNcst || ultraFcst) {
                 weather = {
                     T1H: ultraNcst?.T1H || ultraFcst?.T1H || '22',
                     TMP: ultraNcst?.T1H || ultraFcst?.T1H || '22',
                     SKY: ultraNcst?.SKY || ultraFcst?.SKY || '1',
                     PTY: ultraNcst?.PTY || ultraFcst?.PTY || '0',
-                    WSD: ultraNcst?.WSD || ultraFcst?.WSD,
+                    WSD: wsd,
+                    wsdFallback: wsdFallback,
                     sampled: !(ultraNcst || ultraFcst)
                 };
                 console.log('[sea-info] Recovered with Ultra API:', weather);
             } else {
-                // 완전 실패 시 샘플 데이터
-                weather = { T1H: '22', TMP: '22', SKY: '1', PTY: '0', sampled: true };
+                // 완전 실패 시에도 주변 그리드에서 WSD 검색 시도
+                weather = { T1H: '22', TMP: '22', SKY: '1', PTY: '0', WSD: wsd, wsdFallback: wsdFallback, sampled: true };
             }
         }
 
@@ -495,6 +568,56 @@ router.get('/sea-info', async (req, res) => {
             console.log('[sea-info] Tide API failed:', tideResult.status, tideResult.reason?.message);
         }
 
+
+        // 해양관측부이: 가장 가까운 부이 관측소의 실시간 파고/유속/유향 포함
+        const { buoyStations } = require('../utils.js');
+        const { getBuoyObservation } = require('../services/kmaService');
+        
+        // 거리순으로 정렬된 부이 목록 (최대 3개)
+        const sortedBuoys = buoyStations
+            .map(b => ({
+                ...b,
+                distance: Math.sqrt(Math.pow(b.lat - parsedLat, 2) + Math.pow(b.lon - parsedLon, 2))
+            }))
+            .sort((a, b) => a.distance - b.distance)
+            .slice(0, 3);
+        
+        console.log('[sea-info] Nearest buoys:', sortedBuoys.map(b => `${b.name}(${b.code})`).join(', '));
+        
+        let buoy = null, buoyError = null;
+        
+        // 풍속 데이터가 있는 부이를 찾을 때까지 시도
+        for (const buoyStation of sortedBuoys) {
+            try {
+                console.log('[sea-info] Trying buoy:', buoyStation.code, buoyStation.name);
+                const buoyData = await getBuoyObservation(buoyStation.code);
+                if (buoyData) {
+                    buoy = buoyData;
+                    // 풍속 데이터가 있으면 성공
+                    if (buoyData.wind_speed) {
+                        console.log('[sea-info] Buoy with wind_speed found:', buoyStation.name, buoyData.wind_speed, 'm/s');
+                        break;
+                    } else {
+                        console.log('[sea-info] Buoy has no wind_speed, trying next:', buoyStation.name);
+                    }
+                }
+            } catch (e) {
+                console.log('[sea-info] Buoy fetch failed:', buoyStation.code, e.message);
+            }
+        }
+        
+        if (!buoy) {
+            buoyError = '근처 부이 관측소의 데이터를 가져올 수 없습니다.';
+        }
+        
+        // 날씨 API에서 풍속을 못 받았거나 fallback 값일 때 부이 데이터의 풍속 우선 사용
+        if (weather && buoy?.wind_speed && (!weather.WSD || weather.wsdFallback)) {
+            console.log('[sea-info] Using wind speed from buoy (fallback or missing):', buoy.wind_speed);
+            weather.WSD = buoy.wind_speed;
+            weather.buoyWindSpeed = true; // 부이 풍속 사용 표시
+            delete weather.wsdFallback; // fallback 플래그 제거
+        }
+
         // 스쿠버: 주변 후보 순회로 성공값 우선 적용
         let scuba = null, scubaError = null;
         if (closestScubaBeach) {
@@ -522,6 +645,7 @@ router.get('/sea-info', async (req, res) => {
             nearestObs: closestTideObs,
             weather, weatherError,
             scuba, scubaError,
+            buoy, buoyError,
             tide, tideError,
             usingMockData: false,
         };
@@ -544,6 +668,8 @@ router.get('/sea-info', async (req, res) => {
             safeWeather.TMP = '22';
             safeWeather.sampled = true;
         }
+        // wsdFallback 플래그는 내부 사용만, 클라이언트에 전송하지 않음
+        delete safeWeather.wsdFallback;
         res.json({ ...finalResult, weather: safeWeather, recorded: sheetStatus });
 
     } catch (error) {
