@@ -11,13 +11,15 @@ async function testBuoy() {
   console.log('DATA_GO_KR_API_KEY:', process.env.DATA_GO_KR_API_KEY ? '설정됨' : '없음');
   
   try {
-    // 케이스: TW_ 형식의 obsCode 사용
-    console.log('\n[테스트] TW_0066 (외연도)');
+    // 명세대로: reqDate 파라미터 사용
+    console.log('\n[테스트] reqDate 파라미터 사용 (API 명세)');
     let res = await axios.get('https://apis.data.go.kr/1192136/twRecent/GetTWRecentApiService', {
       params: {
         serviceKey: process.env.DATA_GO_KR_API_KEY,
-        obsCode: 'TW_0066',
-        numOfRows: 1
+        obsCode: 'TW_0062', // 해운대해수욕장
+        reqDate: dateStr,
+        numOfRows: 1,
+        type: 'xml'
       },
       timeout: 10000
     });

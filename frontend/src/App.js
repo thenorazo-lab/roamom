@@ -426,19 +426,8 @@ const WeatherPage = () => {
 
             <div className="card">
               <h3>🌊 해양 정보</h3>
-              {/* 조위관측소 실시간 데이터 우선 표시 */}
-              {data.oceanData ? (
-                <>
-                  <div style={{fontWeight:'bold', color:'#0077be', marginBottom:4}}>실시간 조위관측소</div>
-                  <p>수온: {data.oceanData.water_temp ?? 'N/A'}°C</p>
-                  {data.oceanData.obs_time && (
-                    <div style={{fontSize:12, color:'#888'}}>관측시간: {data.oceanData.obs_time}</div>
-                  )}
-                  {data.oceanData.station_name && (
-                    <div style={{fontSize:12, color:'#888'}}>관측소: {data.oceanData.station_name}</div>
-                  )}
-                </>
-              ) : data.buoy ? (
+              {/* 부이 실시간 데이터 우선 표시 */}
+              {data.buoy ? (
                 <>
                   <div style={{fontWeight:'bold', color:'#0077be', marginBottom:4}}>실시간 부이 관측</div>
                   <p>수온: {data.buoy.water_temp ?? 'N/A'}°C</p>
@@ -767,18 +756,7 @@ const MapPage = () => {
 
             <div className="card">
               <h3>🌊 해양 정보</h3>
-              {info.oceanData ? (
-                <>
-                  <div style={{fontWeight:'bold', color:'#0077be', marginBottom:4}}>실시간 조위관측소</div>
-                  <p>수온: {info.oceanData.water_temp ?? 'N/A'}°C</p>
-                  {info.oceanData.obs_time && (
-                    <div style={{fontSize:12, color:'#888'}}>관측시간: {info.oceanData.obs_time}</div>
-                  )}
-                  {info.oceanData.station_name && (
-                    <div style={{fontSize:12, color:'#888'}}>관측소: {info.oceanData.station_name}</div>
-                  )}
-                </>
-              ) : info.buoy ? (
+              {info.buoy ? (
                 <>
                   <div style={{fontWeight:'bold', color:'#0077be', marginBottom:4}}>실시간 부이 관측</div>
                   <p>수온: {info.buoy.water_temp ?? 'N/A'}°C</p>

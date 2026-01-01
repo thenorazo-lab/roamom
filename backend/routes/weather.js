@@ -569,35 +569,61 @@ router.get('/sea-info', async (req, res) => {
         }
 
 
-        // 해양 정보: 조위관측소 실측 데이터 사용 (부이 API 대체)
-        const { getOceanObservation } = require('../services/kmaService');
+        // 해양관측부이: 가장 가까운 부이 관측소의 실시간 파고/유속/유향/풍속 포함
+        const { buoyStations } = require('../utils.js');
+        const { getBuoyObservation } = require('../services/kmaService');
         
-        let oceanData = null, oceanError = null;
+        // 거리순으로 정렬된 부이 목록 (최대 3개)
+        const sortedBuoys = buoyStations
+            .map(b => ({
+                ...b,
+                distance: Math.sqrt(Math.pow(b.lat - parsedLat, 2) + Math.pow(b.lon - parsedLon, 2))
+            }))
+            .sort((a, b) => a.distance - b.distance)
+            .slice(0, 3);
         
-        if (closestTideObs) {
+        console.log('[sea-info] Nearest buoys:', sortedBuoys.map(b => `${b.name}(${b.code}) dist=${b.distance.toFixed(3)}`).join(', '));
+        
+        let buoy = null, buoyError = null;
+        
+        // 부이 데이터 가져오기
+        for (const buoyStation of sortedBuoys) {
             try {
-                console.log(`[sea-info] Fetching ocean data from tide observatory: ${closestTideObs.name} (${closestTideObs.code})`);
-                oceanData = await getOceanObservation(closestTideObs.code);
+                console.log(`[sea-info] Trying buoy ${buoyStation.code} (${buoyStation.name})`);
+                const buoyData = await getBuoyObservation(buoyStation.code);
+                console.log(`[sea-info] Buoy ${buoyStation.code} response:`, buoyData ? 'OK' : 'null');
                 
-                if (oceanData && oceanData.water_temp) {
-                    console.log('[sea-info] ✅ Ocean data from tide observatory:', oceanData);
-                } else {
-                    console.log('[sea-info] ⚠️ No ocean data available from tide observatory');
-                    oceanError = '해양 관측 데이터를 가져올 수 없습니다.';
+                if (buoyData) {
+                    buoy = buoyData;
+                    console.log('[sea-info] ✅ Buoy data found:', buoyStation.name);
+                    // 풍속 데이터가 있으면 우선 선택
+                    if (buoyData.wind_speed) {
+                        console.log('[sea-info] ✅ Buoy has wind_speed:', buoyData.wind_speed, 'm/s');
+                        break;
+                    }
                 }
             } catch (e) {
-                console.error('[sea-info] ❌ Ocean data fetch error:', e.message);
-                oceanError = '해양 데이터 조회 중 오류가 발생했습니다.';
+                console.error('[sea-info] ❌ Buoy fetch error:', buoyStation.code, e.message);
             }
-        } else {
-            oceanError = '근처 조위관측소를 찾을 수 없습니다.';
         }
         
-        // 부이 데이터는 더 이상 사용하지 않음 (API 오류로 인해 제거)
-        let buoy = null, buoyError = '조위관측소 데이터를 확인해주세요.';
+        if (!buoy) {
+            buoyError = '근처 부이 관측소의 데이터를 가져올 수 없습니다.';
+            console.log('[sea-info] ❌ No buoy data available');
+        } else {
+            console.log('[sea-info] ✅ Final buoy data selected:', buoy.station_name);
+        }
+        
+        // 날씨 API에서 풍속을 못 받았거나 fallback 값일 때 부이 데이터의 풍속 우선 사용
+        if (weather && buoy?.wind_speed && (!weather.WSD || weather.wsdFallback)) {
+            console.log('[sea-info] Using wind speed from buoy:', buoy.wind_speed);
+            weather.WSD = buoy.wind_speed;
+            weather.buoyWindSpeed = true;
+            delete weather.wsdFallback;
+        }
 
         // 스쿠버 API는 더 이상 사용하지 않음 (부이 데이터로 대체)
-        let scuba = null, scubaError = '조위관측소 데이터를 확인해주세요.';
+        let scuba = null, scubaError = '부이 데이터를 확인해주세요.';
 
         // 최종 안전 보정: 기온이 비어 있으면 샘플로 채움
         if (weather) {
@@ -612,7 +638,6 @@ router.get('/sea-info', async (req, res) => {
             nearestObs: closestTideObs,
             weather, weatherError,
             scuba, scubaError,
-            oceanData, oceanError, // 조위관측소 해양 데이터 추가
             buoy, buoyError,
             tide, tideError,
             usingMockData: false,
