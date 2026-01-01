@@ -582,32 +582,42 @@ router.get('/sea-info', async (req, res) => {
             .sort((a, b) => a.distance - b.distance)
             .slice(0, 3);
         
-        console.log('[sea-info] Nearest buoys:', sortedBuoys.map(b => `${b.name}(${b.code})`).join(', '));
+        console.log('[sea-info] Nearest buoys:', sortedBuoys.map(b => `${b.name}(${b.code}) dist=${b.distance.toFixed(3)}`).join(', '));
         
         let buoy = null, buoyError = null;
         
         // 풍속 데이터가 있는 부이를 찾을 때까지 시도
         for (const buoyStation of sortedBuoys) {
             try {
-                console.log('[sea-info] Trying buoy:', buoyStation.code, buoyStation.name);
+                console.log(`[sea-info] Trying buoy ${buoyStation.code} (${buoyStation.name}), distance: ${buoyStation.distance.toFixed(3)}`);
                 const buoyData = await getBuoyObservation(buoyStation.code);
+                console.log(`[sea-info] Buoy ${buoyStation.code} response:`, buoyData ? JSON.stringify(buoyData) : 'null');
+                
                 if (buoyData) {
-                    buoy = buoyData;
-                    // 풍속 데이터가 있으면 성공
+                    // 풍속이 없어도 부이 데이터가 있으면 일단 저장
+                    if (!buoy) buoy = buoyData;
+                    
+                    // 풍속 데이터가 있으면 우선 선택하고 종료
                     if (buoyData.wind_speed) {
-                        console.log('[sea-info] Buoy with wind_speed found:', buoyStation.name, buoyData.wind_speed, 'm/s');
+                        console.log('[sea-info] ✅ Buoy with wind_speed found:', buoyStation.name, buoyData.wind_speed, 'm/s');
+                        buoy = buoyData;
                         break;
                     } else {
-                        console.log('[sea-info] Buoy has no wind_speed, trying next:', buoyStation.name);
+                        console.log('[sea-info] ⚠️ Buoy has no wind_speed, continuing search:', buoyStation.name);
                     }
+                } else {
+                    console.log('[sea-info] ❌ Buoy returned null:', buoyStation.code);
                 }
             } catch (e) {
-                console.log('[sea-info] Buoy fetch failed:', buoyStation.code, e.message);
+                console.error('[sea-info] ❌ Buoy fetch exception:', buoyStation.code, e.message);
             }
         }
         
         if (!buoy) {
             buoyError = '근처 부이 관측소의 데이터를 가져올 수 없습니다.';
+            console.log('[sea-info] ❌ No buoy data available from any station');
+        } else {
+            console.log('[sea-info] ✅ Final buoy data selected:', buoy.station_name);
         }
         
         // 날씨 API에서 풍속을 못 받았거나 fallback 값일 때 부이 데이터의 풍속 우선 사용

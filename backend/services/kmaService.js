@@ -67,6 +67,8 @@ async function getBuoyObservation(obsCode) {
     const today = new Date();
     const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
     const url = 'https://apis.data.go.kr/1192136/twRecent/GetTWRecentApiService';
+    console.log(`[getBuoyObservation] Fetching buoy ${obsCode} for date ${dateStr}`);
+    
     const res = await axios.get(url, {
       params: {
         serviceKey: API_KEY, // DATA_GO_KR_API_KEY 사용
@@ -78,21 +80,27 @@ async function getBuoyObservation(obsCode) {
       timeout: 5000
     });
     
+    console.log(`[getBuoyObservation] Response status: ${res.status}, type: ${typeof res.data}`);
+    
     let items = null;
     
     // XML 응답 처리 (API가 JSON을 무시하고 XML을 반환하는 경우)
     if (typeof res.data === 'string' && res.data.startsWith('<')) {
+      console.log('[getBuoyObservation] Parsing XML response');
       const xml2js = require('xml2js');
       const parser = new xml2js.Parser({ explicitArray: false });
       const parsed = await parser.parseStringPromise(res.data);
+      console.log('[getBuoyObservation] XML parsed, resultCode:', parsed?.response?.header?.resultCode);
       items = parsed?.response?.body?.items?.item;
     } else {
       // JSON 응답 처리
+      console.log('[getBuoyObservation] Processing JSON response, resultCode:', res.data?.response?.header?.resultCode);
       items = res.data?.response?.body?.items?.item;
     }
     
     if (items) {
       const latest = Array.isArray(items) ? items[0] : items;
+      console.log(`[getBuoyObservation] Data found - wave_height: ${latest.wvhgt}, wind_speed: ${latest.wspd}, water_temp: ${latest.wtem}`);
       return {
         station_name: latest.obsvtrNm,
         obs_time: latest.obsrvnDt,
@@ -104,9 +112,10 @@ async function getBuoyObservation(obsCode) {
         wind_direction: latest.wndrct || null
       };
     }
+    console.log('[getBuoyObservation] No items found in response');
     return null;
   } catch (e) {
-    console.error('[kmaService] getBuoyObservation error:', e.message);
+    console.error('[getBuoyObservation] Error:', obsCode, e.message, e.response?.status);
     if (e.response) {
       console.error('[kmaService] API response:', e.response.status, e.response.data);
     }
