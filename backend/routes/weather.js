@@ -19,6 +19,43 @@ const { getOceanObservation } = require('../services/kmaService');
 const DATA_GO_KR_API_KEY = process.env.DATA_GO_KR_API_KEY;
 const DATA_GO_KR_NEW_API_KEY = process.env.DATA_GO_KR_NEW_API_KEY; // 공공데이터포털 조석예보 API 키
 const KHOA_API_KEY = process.env.KHOA_API_KEY;
+
+// 메모리 캐시 (간단한 구현)
+const cache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5분
+
+function getCacheKey(lat, lng) {
+    // 소수점 3자리로 반올림하여 캐시 키 생성 (약 100m 정확도)
+    return `${lat.toFixed(3)}_${lng.toFixed(3)}`;
+}
+
+function getCache(lat, lng) {
+    const key = getCacheKey(lat, lng);
+    const cached = cache.get(key);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        console.log(`[Cache] HIT for ${key}`);
+        return cached.data;
+    }
+    if (cached) {
+        cache.delete(key); // 만료된 캐시 삭제
+    }
+    console.log(`[Cache] MISS for ${key}`);
+    return null;
+}
+
+function setCache(lat, lng, data) {
+    const key = getCacheKey(lat, lng);
+    cache.set(key, { data, timestamp: Date.now() });
+    console.log(`[Cache] SET for ${key}, total cache size: ${cache.size}`);
+    
+    // 캐시 크기 제한 (100개 초과 시 오래된 것부터 삭제)
+    if (cache.size > 100) {
+        const firstKey = cache.keys().next().value;
+        cache.delete(firstKey);
+        console.log(`[Cache] Evicted oldest entry: ${firstKey}`);
+    }
+}
+
 // Ultra Short-term Nowcast base date/time (KMA)
 function getUltraBaseDateTime() {
     const d = new Date();
@@ -298,6 +335,12 @@ router.get('/sea-info', async (req, res) => {
     if (isNaN(parsedLat) || isNaN(parsedLon) || parsedLat < -90 || parsedLat > 90 || parsedLon < -180 || parsedLon > 180) {
         console.error('[/api/sea-info] Invalid coordinates:', { lat, lon, parsedLat, parsedLon });
         return res.status(400).json({ error: '유효하지 않은 좌표입니다: ' + lat + ', ' + lon });
+    }
+
+    // 캐시 확인
+    const cachedData = getCache(parsedLat, parsedLon);
+    if (cachedData) {
+        return res.json({ ...cachedData, cached: true });
     }
 
     let sheetStatus = false;
@@ -671,7 +714,13 @@ router.get('/sea-info', async (req, res) => {
         }
         // wsdFallback 플래그는 내부 사용만, 클라이언트에 전송하지 않음
         delete safeWeather.wsdFallback;
-        res.json({ ...finalResult, weather: safeWeather, recorded: sheetStatus });
+        
+        const responseData = { ...finalResult, weather: safeWeather, recorded: sheetStatus };
+        
+        // 캐시에 저장
+        setCache(parsedLat, parsedLon, responseData);
+        
+        res.json(responseData);
 
     } catch (error) {
         console.error('[/api/sea-info] Unhandled error:', error.message);
