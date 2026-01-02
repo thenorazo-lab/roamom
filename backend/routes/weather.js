@@ -309,11 +309,12 @@ function extractHighLowFromTideSeries(series) {
 }
 
 router.get('/sea-info', async (req, res) => {
-    const { lat, lon, useSample, locationName, pointId } = req.query;
+    const { lat, lon, lng, useSample, locationName, pointId } = req.query;
+    const longitude = lon || lng; // lon과 lng 둘 다 지원
 
     // 샘플 데이터 요청 처리 (디버깅용) 또는 기본값으로 샘플 데이터 사용
-    if (useSample === 'true' || !lat || !lon) {
-        console.log('[Server] Using sample data for /sea-info (useSample=' + useSample + ' lat=' + lat + ' lon=' + lon + ')');
+    if (useSample === 'true' || !lat || !longitude) {
+        console.log('[Server] Using sample data for /sea-info (useSample=' + useSample + ' lat=' + lat + ' lon=' + longitude + ')');
         const sampleData = {
             nearestObs: { name: '부산 (샘플 데이터)' },
             weather: { T1H: '22', SKY: '1', PTY: '0', WSD: '3.5' },
@@ -331,10 +332,10 @@ router.get('/sea-info', async (req, res) => {
 
     // 입력 검증
     const parsedLat = parseFloat(lat);
-    const parsedLon = parseFloat(lon);
+    const parsedLon = parseFloat(longitude);
     if (isNaN(parsedLat) || isNaN(parsedLon) || parsedLat < -90 || parsedLat > 90 || parsedLon < -180 || parsedLon > 180) {
-        console.error('[/api/sea-info] Invalid coordinates:', { lat, lon, parsedLat, parsedLon });
-        return res.status(400).json({ error: '유효하지 않은 좌표입니다: ' + lat + ', ' + lon });
+        console.error('[/api/sea-info] Invalid coordinates:', { lat, lon: longitude, parsedLat, parsedLon });
+        return res.status(400).json({ error: '유효하지 않은 좌표입니다: ' + lat + ', ' + longitude });
     }
 
     // 캐시 확인
