@@ -190,7 +190,7 @@ const WeatherPage = () => {
       try {
         const params = new URLSearchParams();
         params.set('lat', lat);
-        params.set('lon', lon);
+        params.set('lng', lon);
         if (useSampleFallback) params.set('useSample', 'true');
         if (new URLSearchParams(window.location.search).get('sample') === 'true') params.set('useSample', 'true');
         params.set('_ts', Date.now()); // cache bust to avoid 304
@@ -665,7 +665,7 @@ const MapPage = () => {
     setInfo(null);
     try {
       const apiUrl = process.env.REACT_APP_API_URL || '';
-      const url = `${apiUrl}/api/sea-info?lat=${latlng.lat}&lon=${latlng.lng}&_ts=${Date.now()}`;
+      const url = `${apiUrl}/api/sea-info?lat=${latlng.lat}&lng=${latlng.lng}&_ts=${Date.now()}`;
       console.log('[MapPage] Fetching:', url);
       const controller = new AbortController();
       const t = setTimeout(() => {
