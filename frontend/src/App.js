@@ -418,8 +418,8 @@ const WeatherPage = () => {
 
           <div className="info-cards">
             <div className="card">
-              <h3>☀️ 날씨 {data.weatherError && <span style={{color:'#a33', fontSize:12, marginLeft:8}}>(데이터 일부 없음)</span>}</h3>
-              <p>상태: {getWeatherStatus(data.weather?.SKY, data.weather?.PTY) ?? '정보 없음'}</p>
+              <h3>☀️ 날씨 {data.weatherError && <span style={{color:'#a33', fontSize:12, marginLeft:8}}>({data.weatherError})</span>}</h3>
+              <p>상태: {getWeatherStatus(data.weather?.SKY, data.weather?.PTY) ?? 'N/A'}</p>
               <p>기온: {data.weather?.T1H ?? data.weather?.TMP ?? 'N/A'}°C</p>
               <p>풍속: {data.weather?.WSD ?? 'N/A'} m/s</p>
             </div>
@@ -750,7 +750,7 @@ const MapPage = () => {
 
           <div className="info-cards">
             <div className="card">
-              <h3>☀️ 날씨 {info.weatherError && <span style={{color:'#a33', fontSize:12, marginLeft:8}}>(데이터 일부 없음)</span>}</h3>
+              <h3>☀️ 날씨 {info.weatherError && <span style={{color:'#a33', fontSize:12, marginLeft:8}}>({info.weatherError})</span>}</h3>
               <p>상태: {getWeatherStatus(info.weather?.SKY, info.weather?.PTY) ?? 'N/A'}</p>
               <p>기온: {info.weather?.T1H ?? info.weather?.TMP ?? 'N/A'}°C</p>
               <p>풍속: {info.weather?.WSD ?? 'N/A'} m/s</p>

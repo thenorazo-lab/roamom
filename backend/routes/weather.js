@@ -474,7 +474,14 @@ router.get('/sea-info', async (req, res) => {
                 }
             }
         } else {
-            weatherError = weatherResult.reason?.message || '기상청 API 연결 실패';
+            // 429 에러(요청 한도 초과) 체크
+            const statusCode = weatherResult.reason?.response?.status;
+            if (statusCode === 429) {
+                weatherError = 'API 요청 한도 초과 (조금 뒤 다시 시도해주세요)';
+            } else {
+                weatherError = weatherResult.reason?.message || '기상청 API 연결 실패';
+            }
+            
             // API 실패 시에도 Ultra API로 최소한의 데이터 확보 시도
             console.log('[sea-info] Main weather API failed, trying Ultra APIs');
             const ultraNcst = await fetchUltraNowcast(grid.x, grid.y, DATA_GO_KR_API_KEY);
@@ -494,8 +501,8 @@ router.get('/sea-info', async (req, res) => {
             
             if (ultraNcst || ultraFcst) {
                 weather = {
-                    T1H: ultraNcst?.T1H || ultraFcst?.T1H || '22',
-                    TMP: ultraNcst?.T1H || ultraFcst?.T1H || '22',
+                    T1H: ultraNcst?.T1H || ultraFcst?.T1H,
+                    TMP: ultraNcst?.T1H || ultraFcst?.T1H,
                     SKY: ultraNcst?.SKY || ultraFcst?.SKY || '1',
                     PTY: ultraNcst?.PTY || ultraFcst?.PTY || '0',
                     WSD: wsd,
@@ -503,9 +510,13 @@ router.get('/sea-info', async (req, res) => {
                     sampled: !(ultraNcst || ultraFcst)
                 };
                 console.log('[sea-info] Recovered with Ultra API:', weather);
+                // Ultra API로 복구했으면 에러 제거
+                if (weather.T1H || weather.TMP) {
+                    weatherError = null;
+                }
             } else {
-                // 완전 실패 시에도 주변 그리드에서 WSD 검색 시도
-                weather = { T1H: '22', TMP: '22', SKY: '1', PTY: '0', WSD: wsd, wsdFallback: wsdFallback, sampled: true };
+                // 완전 실패 시 - 데이터 없이 에러만 반환
+                weather = { SKY: '1', PTY: '0', WSD: wsd, wsdFallback: wsdFallback };
             }
         }
 
