@@ -2,12 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import AdSense from '../components/AdSense';
-import AdMobBanner from '../components/AdMobBanner';
+
+const API_BASE_URL = 'https://able-tide-481608-m5.du.r.appspot.com';
 
 export default function JapanWaves(){
   const defaultDate = new Date().toISOString().slice(0,10);
   const [idx, setIdx] = useState(0);
-  const apiUrl = process.env.REACT_APP_API_URL || '';
 
   function buildPlaceholder(dateStr){
     const d = dateStr || new Date().toISOString().slice(0,10);
@@ -27,12 +27,12 @@ export default function JapanWaves(){
 
   const fetchImages = useCallback(async () => {
     try{
-      const res = await axios.get(`${apiUrl}/api/japan-waves?date=${defaultDate}`);
+      const res = await axios.get(`${API_BASE_URL}/api/japan-waves?date=${defaultDate}`);
       const imgs = res.data?.images || [];
       // 상대 경로를 절대 경로로 변환
       const imgsWithAbsoluteUrls = imgs.map(img => ({
         ...img,
-        url: img.url.startsWith('http') ? img.url : `${apiUrl}${img.url}`
+        url: img.url.startsWith('http') ? img.url : `${API_BASE_URL}${img.url}`
       }));
       setImages(imgsWithAbsoluteUrls.length > 0 ? imgsWithAbsoluteUrls : buildPlaceholder(defaultDate));
       setIdx(0);
@@ -40,7 +40,7 @@ export default function JapanWaves(){
       setImages(buildPlaceholder(defaultDate));
       setIdx(0);
     }
-  }, [apiUrl, defaultDate]);
+  }, [defaultDate]);
 
   // 처음 진입 시 오늘 날짜로 자동 로드
   useEffect(()=>{ fetchImages(); },[fetchImages]);
@@ -50,7 +50,6 @@ export default function JapanWaves(){
 
   return (
     <div className="container">
-      <AdMobBanner />
       <AdSense slot="3456789012" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
       <h2 className="page-title">일본 파고</h2>
       <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>

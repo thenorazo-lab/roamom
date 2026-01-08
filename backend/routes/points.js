@@ -11,7 +11,11 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '756400';
 
 // MongoDB 사용 가능 여부 확인
 const useDB = () => {
-  return process.env.MONGODB_URI && require('mongoose').connection.readyState === 1;
+  const hasURI = !!process.env.MONGODB_URI;
+  const readyState = require('mongoose').connection.readyState;
+  const result = hasURI && readyState === 1;
+  console.log(`[useDB] URI: ${hasURI}, ReadyState: ${readyState}, Result: ${result}`);
+  return result;
 };
 
 // JSON 파일 읽기 (fallback)
@@ -24,9 +28,45 @@ function readPoints() {
   }
 }
 
-// JSON 파일 쓰기 (fallback)
+// JSON 파일 쓰기 (fallback) - 백업 포함
 function writePoints(points) {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const backupDir = path.join(__dirname, '..', 'data', 'backups');
+  
+  // 로컬 환경에서만 백업 생성 (App Engine은 읽기 전용 파일시스템)
+  if (process.env.NODE_ENV !== 'production' && !process.env.GAE_ENV) {
+    // 백업 디렉토리 생성
+    if (!fs.existsSync(backupDir)) {
+      fs.mkdirSync(backupDir, { recursive: true });
+    }
+    
+    // 기존 파일 백업
+    if (fs.existsSync(DATA_FILE)) {
+      try {
+        const backupFile = path.join(backupDir, `points-${timestamp}.json`);
+        fs.copyFileSync(DATA_FILE, backupFile);
+        console.log(`✅ 백업 생성: ${backupFile}`);
+      } catch (backupError) {
+        console.warn('⚠️  백업 생성 실패 (무시됨):', backupError.message);
+      }
+    }
+    
+    // 오래된 백업 정리 (30개 이상 시 오래된 것 삭제)
+    try {
+      const backups = fs.readdirSync(backupDir).filter(f => f.startsWith('points-')).sort();
+      if (backups.length > 30) {
+        backups.slice(0, backups.length - 30).forEach(f => {
+          fs.unlinkSync(path.join(backupDir, f));
+        });
+      }
+    } catch (e) {
+      console.error('백업 정리 실패:', e.message);
+    }
+  }
+  
+  // 새 데이터 저장
   fs.writeFileSync(DATA_FILE, JSON.stringify(points, null, 2), 'utf8');
+  console.log(`✅ 포인트 저장 완료: ${points.length}개 - ${new Date().toISOString()}`);
 }
 
 // simple admin auth middleware
@@ -80,6 +120,7 @@ router.post('/points', express.json(), requireAdmin, async (req, res) => {
       const p = { id, title, lat: parseFloat(lat), lng: parseFloat(lng), image: image || '', desc: desc || '', url: url || '' };
       points.push(p);
       writePoints(points);
+      console.log(`✅ 포인트 추가됨: ${title} (ID: ${id})`);
       return res.json(p);
     }
   } catch (error) {
@@ -120,6 +161,7 @@ router.put('/points/:id', express.json(), requireAdmin, async (req, res) => {
       p.url = url ?? p.url;
       points[idx] = p;
       writePoints(points);
+      console.log(`✅ 포인트 수정됨: ${p.title} (ID: ${id})`);
       return res.json(p);
     }
   } catch (error) {
@@ -143,6 +185,7 @@ router.delete('/points/:id', requireAdmin, async (req, res) => {
       points = points.filter(p => p.id !== id);
       if (points.length === before) return res.status(404).json({ error: 'Not found' });
       writePoints(points);
+      console.log(`✅ 포인트 삭제됨: ID ${id}`);
       return res.json({ ok: true });
     }
   } catch (error) {

@@ -13,6 +13,9 @@
     width: 100vw;
     height: 100vh;
     overflow: auto;
+    /* 상단 배너 광고 공간 확보 (약 60px) */
+    padding-top: 60px;
+    box-sizing: border-box;
 }
 
 /* --- 레이아웃 --- */
@@ -22,7 +25,7 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    min-height: 100vh;
+    min-height: calc(100vh - 60px);
     background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     padding: 20px;
     padding-bottom: calc(80px + env(safe-area-inset-bottom));

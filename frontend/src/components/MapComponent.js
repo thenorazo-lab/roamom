@@ -46,6 +46,7 @@ export default function MapComponent({ center = [36, 128], zoom = 7, markers = [
           <Marker key={m.id || `${m.lat}-${m.lng}`} position={[m.lat, m.lng]} eventHandlers={{ 
             click: ()=>{ 
               fetch('/api/points/click',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ pointId: m.id })}).catch(()=>{});
+              if (onMarkerClick) onMarkerClick(m);
             }
           }}>
             <Popup>

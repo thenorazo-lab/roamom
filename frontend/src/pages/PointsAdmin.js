@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = 'https://able-tide-481608-m5.du.r.appspot.com';
+
 export default function PointsAdmin(){
   const [password, setPassword] = useState('');
   const [authed, setAuthed] = useState(false);
@@ -8,16 +10,15 @@ export default function PointsAdmin(){
   const [form, setForm] = useState({title:'',lat:'',lng:'',image:'',desc:'',url:''});
   const [uploading, setUploading] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const baseUrl = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL + '/api' : '/api';
 
   function isValidPoint(data){
     return data.title && !isNaN(parseFloat(data.lat)) && !isNaN(parseFloat(data.lng));
   }
 
   const fetchPoints = useCallback(async () => {
-    const res = await axios.get(baseUrl + '/points');
+    const res = await axios.get(`${API_BASE_URL}/api/points`);
     setPoints(res.data);
-  }, [baseUrl]);
+  }, []);
 
   useEffect(()=>{ fetchPoints(); },[fetchPoints]);
 
@@ -26,8 +27,8 @@ export default function PointsAdmin(){
   async function doAuth(){
     // simple: try to create a temp point and delete it to validate
     try {
-      const r = await axios.post(baseUrl + '/points', { title:'auth-test', lat:0, lng:0 }, { headers: authHeaders() });
-      await axios.delete(baseUrl + '/points/' + r.data.id, { headers: authHeaders() });
+      const r = await axios.post(`${API_BASE_URL}/api/points`, { title:'auth-test', lat:0, lng:0 }, { headers: authHeaders() });
+      await axios.delete(`${API_BASE_URL}/api/points/${r.data.id}`, { headers: authHeaders() });
       setAuthed(true);
       fetchPoints();
     } catch(e){
@@ -43,14 +44,20 @@ export default function PointsAdmin(){
         const fd = new FormData();
         fd.append('image', form._file);
         setUploading(true);
-        const up = await axios.post(baseUrl + '/upload-image', fd, { headers: { 'Content-Type': 'multipart/form-data', ...authHeaders() } });
+        const up = await axios.post(`${API_BASE_URL}/api/upload-image`, fd, { headers: { 'Content-Type': 'multipart/form-data', ...authHeaders() } });
         form.image = up.data.url;
         setUploading(false);
       }
-      await axios.post(baseUrl + '/points', { title: form.title, lat: form.lat, lng: form.lng, image: form.image, desc: form.desc, url: form.url }, { headers: authHeaders() });
+      const response = await axios.post(`${API_BASE_URL}/api/points`, { title: form.title, lat: form.lat, lng: form.lng, image: form.image, desc: form.desc, url: form.url }, { headers: authHeaders() });
+      console.log('✅ 포인트 저장 성공:', response.data);
+      alert(`✅ "${form.title}" 포인트가 서버에 저장되었습니다!`);
       setForm({title:'',lat:'',lng:'',image:'',desc:'',url:'', _file: null});
-      fetchPoints();
-    }catch(e){ setUploading(false); alert('생성 실패'); }
+      await fetchPoints();
+    }catch(e){ 
+      console.error('❌ 생성 실패:', e);
+      setUploading(false); 
+      alert('❌ 생성 실패: ' + (e.response?.data?.error || e.message)); 
+    }
   }
 
   async function enableEdit(p){
@@ -60,10 +67,31 @@ export default function PointsAdmin(){
 
   async function updatePoint(p){
     if(!isValidPoint(form)){ alert('제목, 위도, 경도는 필수입니다.'); return; }
-    try{ await axios.put(baseUrl + '/points/' + p.id, form, { headers: authHeaders() }); setEditingId(null); setForm({title:'',lat:'',lng:'',image:'',desc:'',url:''}); fetchPoints(); }catch(e){ alert('수정 실패'); }
+    try{ 
+      const response = await axios.put(`${API_BASE_URL}/api/points/${p.id}`, form, { headers: authHeaders() }); 
+      console.log('✅ 포인트 수정 성공:', response.data);
+      alert(`✅ "${form.title}" 포인트가 수정되었습니다!`);
+      setEditingId(null); 
+      setForm({title:'',lat:'',lng:'',image:'',desc:'',url:''}); 
+      await fetchPoints(); 
+    }catch(e){ 
+      console.error('❌ 수정 실패:', e);
+      alert('❌ 수정 실패: ' + (e.response?.data?.error || e.message)); 
+    }
   }
 
-  async function deletePoint(p){ if(!window.confirm('정말 삭제?')) return; try{ await axios.delete(baseUrl + '/points/' + p.id, { headers: authHeaders() }); fetchPoints(); }catch(e){ alert('삭제 실패'); } }
+  async function deletePoint(p){ 
+    if(!window.confirm(`"${p.title}" 포인트를 정말 삭제하시겠습니까?`)) return; 
+    try{ 
+      await axios.delete(`${API_BASE_URL}/api/points/${p.id}`, { headers: authHeaders() }); 
+      console.log('✅ 포인트 삭제 성공:', p.id);
+      alert(`✅ "${p.title}" 포인트가 삭제되었습니다.`);
+      await fetchPoints(); 
+    }catch(e){ 
+      console.error('❌ 삭제 실패:', e);
+      alert('❌ 삭제 실패: ' + (e.response?.data?.error || e.message)); 
+    } 
+  }
 
   return (
     <div style={{padding:20}}>

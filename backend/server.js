@@ -10,11 +10,13 @@ require('dotenv').config();
 
 const connectDB = require('./config/db');
 
-const app = express();
-const port = process.env.PORT || 3002;
+// 서버 시작 함수
+async function startServer() {
+  // MongoDB 연결 (비동기 대기)
+  await connectDB();
 
-// MongoDB 연결
-connectDB();
+  const app = express();
+  const port = process.env.PORT || 3002;
 
 // Security & middleware
 app.use(helmet());
@@ -46,13 +48,20 @@ app.use('/api', require('./routes/uploads'));
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.get('/api/version', (req, res) => res.json({ version: '1.3.1', versionCode: 17 }));
 
-app.listen(port, () => {
-    console.log(`Backend server is running on http://localhost:${port}`);
-});
+  app.listen(port, () => {
+      console.log(`Backend server is running on http://localhost:${port}`);
+  });
 
-process.on('uncaughtException', (err) => {
-    console.error('UNCAUGHT EXCEPTION', err);
-});
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('UNHANDLED REJECTION at:', promise, 'reason:', reason);
+  process.on('uncaughtException', (err) => {
+      console.error('UNCAUGHT EXCEPTION', err);
+  });
+  process.on('unhandledRejection', (reason, promise) => {
+      console.error('UNHANDLED REJECTION at:', promise, 'reason:', reason);
+  });
+}
+
+// 서버 시작
+startServer().catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });

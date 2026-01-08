@@ -42,10 +42,7 @@ export default function AdMobBanner({ adUnitId = 'ca-app-pub-1120357008550196/75
 
       showBanner();
 
-      // 컴포넌트 언마운트 시 배너 숨기기
-      return () => {
-        AdMob.hideBanner().catch(err => console.error('AdMob hide banner failed:', err));
-      };
+      // hideBanner를 제거하여 페이지 전환 시에도 광고가 계속 표시되도록 함
     }
   }, [isInitialized, adUnitId]);
 

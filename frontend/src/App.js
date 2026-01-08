@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
+import { AdMob } from '@capacitor-community/admob';
 import './App.css';
 import MapComponent from './components/MapComponent';
 import PointsAdmin from './pages/PointsAdmin';
@@ -11,6 +13,9 @@ import JapanWaves from './pages/JapanWaves';
 import AdSense from './components/AdSense';
 import AdMobBanner from './components/AdMobBanner';
 import axios from 'axios';
+
+// API URL 상수 정의
+const API_BASE_URL = 'https://able-tide-481608-m5.du.r.appspot.com';
 
 // 오프라인(file://) 전용 샘플 데이터
 const getSampleSeaInfo = () => ({
@@ -28,13 +33,12 @@ const getSampleSeaInfo = () => ({
 });
 
 // 현재 앱 버전
-const CURRENT_VERSION = '1.3.0';
-const CURRENT_VERSION_CODE = 16;
+const CURRENT_VERSION = '1.5.0';
+const CURRENT_VERSION_CODE = 19;
 
 // 앱사용 가이드 페이지
 const AppGuidePage = () => (
   <div className="container">
-    <AdMobBanner />
     <AdSense slot="3456789012" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
     <h2 className="page-title">📱 앱사용 가이드</h2>
     <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
@@ -74,7 +78,6 @@ const AppGuidePage = () => (
 // 가이드 페이지
 const GuidePage = () => (
   <div className="container">
-    <AdMobBanner />
     <AdSense slot="2345678901" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
     <h2 className="page-title">📖 해루질 가이드</h2>
     <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
@@ -116,22 +119,27 @@ const GuidePage = () => (
 );
 
 // 홈 화면
-const HomePage = () => (
-  <div className="container">
-    <AdMobBanner />
-    <AdSense slot="1234567890" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
-    <h1 className="main-title">해루질가자</h1>
-    <p className="sub-title">바다날씨, 포인트, 일본 파고를 한 곳에서</p>
-    <div className="nav-buttons">
-      <Link to="/weather" className="nav-button">☁️ 바다날씨</Link>
-      <Link to="/jp-wave" className="nav-button">🌊 일본 기상청 파고</Link>
-      <Link to="/points" className="nav-button">📍 해루질 포인트</Link>
-      <Link to="/guide" className="nav-button">📖 해루질 가이드</Link>
-      <Link to="/app-guide" className="nav-button">📱 앱사용 가이드</Link>
-      <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>⚙️ 포인트 관리자</Link>
+const HomePage = () => {
+  const isWeb = Capacitor.getPlatform() === 'web';
+  
+  return (
+    <div className="container">
+      <AdSense slot="1234567890" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
+      <h1 className="main-title">해루질가자</h1>
+      <p className="sub-title">바다날씨, 포인트, 일본 파고를 한 곳에서</p>
+      <div className="nav-buttons">
+        <Link to="/weather" className="nav-button">☁️ 바다날씨</Link>
+        <Link to="/jp-wave" className="nav-button">🌊 일본 기상청 파고</Link>
+        <Link to="/points" className="nav-button">📍 해루질 포인트</Link>
+        <Link to="/guide" className="nav-button">📖 해루질 가이드</Link>
+        <Link to="/app-guide" className="nav-button">📱 앱사용 가이드</Link>
+        {isWeb && (
+          <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>⚙️ 포인트 관리자</Link>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // 방향을 화살표로 표시하는 유틸리티 함수
 const getDirectionArrow = (degrees) => {
@@ -171,8 +179,6 @@ const WeatherPage = () => {
       return;
     }
 
-    const apiUrl = process.env.REACT_APP_API_URL || '';
-
     const fetchWithTimeout = async (url, opts = {}, timeoutMs = 8000) => {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeoutMs);
@@ -195,7 +201,7 @@ const WeatherPage = () => {
         if (new URLSearchParams(window.location.search).get('sample') === 'true') params.set('useSample', 'true');
         params.set('_ts', Date.now()); // cache bust to avoid 304
 
-        const url = `${apiUrl}/api/sea-info?${params.toString()}`;
+        const url = `${API_BASE_URL}/api/sea-info?${params.toString()}`;
         const response = await fetchWithTimeout(url, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } }, 10000);
         if (!response.ok) {
           const errorText = await response.text();
@@ -385,7 +391,6 @@ const WeatherPage = () => {
 
   return (
     <div className="container">
-      <AdMobBanner />
       <AdSense slot="4567890123" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
       <h2 className="page-title">현재 위치 바다 날씨</h2>
       <div style={{ marginTop: '10px', marginBottom: '20px', textAlign: 'center' }}>
@@ -481,32 +486,142 @@ const WeatherPage = () => {
 
 const PointsPage = () => {
   const [points, setPoints] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+  const [selectedPoint, setSelectedPoint] = React.useState(null);
 
   React.useEffect(() => {
-    const apiUrl = process.env.REACT_APP_API_URL || '';
-    fetch(`${apiUrl}/api/points`)
-      .then(r => r.json())
-      .then(setPoints)
-      .catch(() => setPoints([]));
+    fetch(`${API_BASE_URL}/api/points`)
+      .then(r => {
+        if (!r.ok) throw new Error('Failed to fetch points');
+        return r.json();
+      })
+      .then(data => {
+        setPoints(data || []);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('[PointsPage] Error:', err);
+        setError(err.message);
+        setPoints([]);
+        setLoading(false);
+      });
   }, []);
 
   const handleMarkerClick = (marker) => {
-    if (marker.url) {
-      window.open(marker.url, '_blank', 'noopener,noreferrer');
+    setSelectedPoint(marker);
+  };
+
+  const closeModal = () => {
+    setSelectedPoint(null);
+  };
+
+  const openBlog = async () => {
+    if (selectedPoint?.url) {
+      // 앱 내 브라우저로 열기 (애드몹 광고 노출 유지)
+      if (Capacitor.isNativePlatform()) {
+        await Browser.open({ url: selectedPoint.url });
+      } else {
+        // 웹에서는 새 창으로
+        window.open(selectedPoint.url, '_blank', 'noopener,noreferrer');
+      }
     }
   };
 
   return (
     <div className="container">
-      <AdMobBanner />
       <AdSense slot="5678901234" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
       <h2 className="page-title">📍 해루질 포인트</h2>
       <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
         <Link to="/" className="nav-button">🏠 홈으로</Link>
       </div>
-      <p>지도의 포인트를 눌러 정보를 확인하고 블로그 글을 읽어보세요.</p>
-      <p style={{fontSize: '14px', color: '#666', marginTop: '8px'}}>공유하고 싶은 포인트를 thenorazo@gmail.com 로 제보해주세요!</p>
-      <MapComponent center={[36.5, 127.5]} zoom={7} markers={points} onMapClick={() => {}} onMarkerClick={handleMarkerClick} />
+      {loading ? (
+        <p style={{textAlign: 'center', padding: '40px'}}>포인트 정보를 불러오는 중...</p>
+      ) : error ? (
+        <p style={{textAlign: 'center', padding: '40px', color: '#a33'}}>오류: {error}</p>
+      ) : (
+        <>
+          <p>지도의 포인트를 눌러 정보를 확인하고 블로그 글을 읽어보세요.</p>
+          <p style={{fontSize: '14px', color: '#666', marginTop: '8px'}}>공유하고 싶은 포인트를 thenorazo@gmail.com 로 제보해주세요!</p>
+          <MapComponent center={[36.5, 127.5]} zoom={7} markers={points} onMapClick={() => {}} onMarkerClick={handleMarkerClick} />
+          
+          {selectedPoint && (
+            <div style={{
+              marginTop: '20px',
+              padding: '20px',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: '2px solid #0077be'
+            }}>
+              <div style={{marginBottom: '16px'}}>
+                <h3 style={{margin: 0, marginBottom: '12px', color: '#0077be'}}>📍 {selectedPoint.title}</h3>
+                <button onClick={closeModal} style={{
+                  float: 'right',
+                  marginTop: '-40px',
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#999'
+                }}>×</button>
+              </div>
+              
+              {selectedPoint.image && (
+                <img src={selectedPoint.image} alt={selectedPoint.title} style={{
+                  width: '100%',
+                  borderRadius: '8px',
+                  marginBottom: '16px',
+                  maxHeight: '300px',
+                  objectFit: 'cover'
+                }} />
+              )}
+              
+              <div style={{marginBottom: '16px'}}>
+                <p style={{margin: '8px 0', color: '#666', fontSize: '14px'}}>
+                  <strong>📌 위치:</strong> {selectedPoint.lat.toFixed(4)}, {selectedPoint.lng.toFixed(4)}
+                </p>
+                {selectedPoint.desc && (
+                  <p style={{margin: '12px 0', lineHeight: '1.6', color: '#333'}}>
+                    <strong>📝 설명:</strong><br/>
+                    {selectedPoint.desc}
+                  </p>
+                )}
+              </div>
+              
+              <div style={{display: 'flex', gap: '10px', marginTop: '20px'}}>
+                {selectedPoint.url && (
+                  <button onClick={openBlog} style={{
+                    flex: 1,
+                    padding: '14px',
+                    backgroundColor: '#0077be',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 4px rgba(0,119,190,0.3)'
+                  }}>
+                    📖 블로그 보러가기
+                  </button>
+                )}
+                <button onClick={closeModal} style={{
+                  padding: '14px 20px',
+                  backgroundColor: '#f0f0f0',
+                  color: '#666',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  cursor: 'pointer'
+                }}>
+                  닫기
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };
@@ -664,8 +779,7 @@ const MapPage = () => {
     setError(null);
     setInfo(null);
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || '';
-      const url = `${apiUrl}/api/sea-info?lat=${latlng.lat}&lng=${latlng.lng}&_ts=${Date.now()}`;
+      const url = `${API_BASE_URL}/api/sea-info?lat=${latlng.lat}&lng=${latlng.lng}&_ts=${Date.now()}`;
       console.log('[MapPage] Fetching:', url);
       const controller = new AbortController();
       const t = setTimeout(() => {
@@ -714,7 +828,6 @@ const MapPage = () => {
 
   return (
     <div className="container">
-      <AdMobBanner />
       <AdSense slot="6789012345" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
       <h2 className="page-title">지도에서 위치 선택</h2>
       <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
@@ -834,6 +947,8 @@ function App() {
     <Router>
       <BackButtonHandler />
       <VersionChecker />
+      <InterstitialAdManager />
+      <AdMobBanner />
       <div className="App">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -908,6 +1023,86 @@ function BackButtonHandler() {
       }
     };
   }, [navigate, location]);
+
+  return null;
+}
+
+// 전면 광고 관리 컴포넌트
+function InterstitialAdManager() {
+  const location = useLocation();
+  const [pageVisitCount, setPageVisitCount] = useState(0);
+  const [isAdLoaded, setIsAdLoaded] = useState(false);
+  const [isShowingAd, setIsShowingAd] = useState(false); // 광고 표시 중 플래그
+  const prevPathRef = React.useRef(location.pathname); // 이전 경로 저장
+
+  // AdMob 초기화 및 전면 광고 준비 (한 번만 실행)
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const initializeAds = async () => {
+      try {
+        console.log('[전면광고] 초기화 시작...');
+        await AdMob.prepareInterstitial({
+          adId: 'ca-app-pub-1120357008550196/6769636401',
+        });
+        setIsAdLoaded(true);
+        console.log('[전면광고] ✅ 로드 완료');
+      } catch (error) {
+        console.error('[전면광고] ❌ 로드 실패:', error);
+      }
+    };
+
+    initializeAds();
+  }, []); // 빈 배열 - 한 번만 실행
+
+  // 페이지 이동 감지 및 광고 표시
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    
+    // 같은 페이지면 무시 (무한 루프 방지)
+    if (prevPathRef.current === location.pathname) {
+      return;
+    }
+    
+    prevPathRef.current = location.pathname;
+    const newCount = pageVisitCount + 1;
+    setPageVisitCount(newCount);
+    console.log('[전면광고] 📍 페이지 이동:', location.pathname, '/ 카운트:', newCount);
+
+    // 10번째 페이지 이동마다 광고 표시 (광고 표시 중이 아닐 때만)
+    if (newCount >= 10 && newCount % 10 === 0 && isAdLoaded && !isShowingAd) {
+      const showAd = async () => {
+        setIsShowingAd(true); // 광고 표시 시작
+        setIsAdLoaded(false); // 중복 표시 방지
+        
+        try {
+          console.log('[전면광고] 🎬 표시 시작:', newCount, '번째');
+          await AdMob.showInterstitial();
+          console.log('[전면광고] ✅ 표시 완료');
+        } catch (error) {
+          console.error('[전면광고] ❌ 표시 실패:', error);
+        } finally {
+          setIsShowingAd(false); // 광고 표시 종료
+          
+          // 다음 광고 미리 로드 (3초 후)
+          setTimeout(async () => {
+            try {
+              console.log('[전면광고] 🔄 다음 광고 로드 중...');
+              await AdMob.prepareInterstitial({
+                adId: 'ca-app-pub-1120357008550196/6769636401',
+              });
+              setIsAdLoaded(true);
+              console.log('[전면광고] ✅ 다음 광고 로드 완료');
+            } catch (error) {
+              console.error('[전면광고] ❌ 다음 광고 로드 실패:', error);
+            }
+          }, 3000);
+        }
+      };
+
+      showAd();
+    }
+  }, [location.pathname]); // pathname만 감지
 
   return null;
 }
