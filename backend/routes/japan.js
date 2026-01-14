@@ -60,9 +60,10 @@ router.get('/japan-waves', async (req, res) => {
     if (date) {
       iso = date;
     } else {
-      // KST 기준 오늘 날짜를 UTC 오차 없이 반환
-      const kstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
-      iso = kstNow.getFullYear() + '-' + String(kstNow.getMonth() + 1).padStart(2, '0') + '-' + String(kstNow.getDate()).padStart(2, '0');
+      // KST 기준 오늘 날짜를 안전하게 파싱
+      const kstString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' });
+      const kstDate = new Date(kstString);
+      iso = kstDate.getFullYear() + '-' + String(kstDate.getMonth() + 1).padStart(2, '0') + '-' + String(kstDate.getDate()).padStart(2, '0');
     }
     const { yyyymmdd } = fmtDateParts(iso);
 
