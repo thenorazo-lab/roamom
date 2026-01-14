@@ -23,7 +23,8 @@ const IMOCWX_STATIC_SUFFIX = process.env.IMOCWX_STATIC_SUFFIX || '.png?2000a';
 function fmtDateParts(dateStr) {
   let d;
   if (!dateStr) {
-    d = new Date();
+    // 한국 시간대로 오늘 날짜 생성
+    d = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
   } else if (/^\d{8}$/.test(dateStr)) {
     // YYYYMMDD 형식
     const yyyy = dateStr.slice(0, 4);
@@ -55,7 +56,14 @@ function buildUrlFromTemplate(tpl, yyyymmdd, hhmm) {
 router.get('/japan-waves', async (req, res) => {
   try {
     const { date } = req.query; // YYYY-MM-DD
-    const iso = date || new Date().toISOString().slice(0,10);
+    let iso;
+    if (date) {
+      iso = date;
+    } else {
+      // KST 기준 오늘 날짜 YYYY-MM-DD
+      const kstDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+      iso = kstDate.getFullYear() + '-' + String(kstDate.getMonth() + 1).padStart(2, '0') + '-' + String(kstDate.getDate()).padStart(2, '0');
+    }
     const { yyyymmdd } = fmtDateParts(iso);
 
     let images = [];
@@ -71,11 +79,12 @@ router.get('/japan-waves', async (req, res) => {
         slots.push({ idx: timeIdx, hour, dayOffset });
       }
       images = slots.map(slot => {
-        const labelDate = new Date(iso);
-        labelDate.setDate(labelDate.getDate() + slot.dayOffset);
-        const yyyy = labelDate.getFullYear();
-        const mm = String(labelDate.getMonth() + 1).padStart(2, '0');
-        const dd = String(labelDate.getDate()).padStart(2, '0');
+        // 한국 시간대 기준으로 날짜 계산
+        const baseDate = new Date(iso + 'T00:00:00+09:00'); // 한국 시간대 명시
+        baseDate.setDate(baseDate.getDate() + slot.dayOffset);
+        const yyyy = baseDate.getFullYear();
+        const mm = String(baseDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(baseDate.getDate()).padStart(2, '0');
         const label = `${yyyy}-${mm}-${dd} ${String(slot.hour).padStart(2, '0')}:00`;
         const file = String(slot.idx).padStart(2, '0');
         return {
@@ -126,11 +135,12 @@ router.get('/japan-waves', async (req, res) => {
                 return false; // break
               }
             });
-            const labelDate = new Date(iso);
-            labelDate.setDate(labelDate.getDate() + slot.dayOffset);
-            const yyyy = labelDate.getFullYear();
-            const mm = String(labelDate.getMonth() + 1).padStart(2, '0');
-            const dd = String(labelDate.getDate()).padStart(2, '0');
+            // 한국 시간대 기준으로 날짜 계산
+            const baseDate = new Date(iso + 'T00:00:00+09:00'); // 한국 시간대 명시
+            baseDate.setDate(baseDate.getDate() + slot.dayOffset);
+            const yyyy = baseDate.getFullYear();
+            const mm = String(baseDate.getMonth() + 1).padStart(2, '0');
+            const dd = String(baseDate.getDate()).padStart(2, '0');
             const label = `${yyyy}-${mm}-${dd} ${String(slot.hour).padStart(2, '0')}:00`;
             if (imgUrl) results.push({ time: label, url: imgUrl });
           } catch (slotErr) {
