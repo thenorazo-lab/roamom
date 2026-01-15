@@ -6,11 +6,14 @@ import AdSense from '../components/AdSense';
 const API_BASE_URL = 'https://able-tide-481608-m5.du.r.appspot.com';
 
 export default function JapanWaves(){
-  const defaultDate = new Date().toISOString().slice(0,10);
+  // KST 기준 오늘 날짜 생성 (UTC 오차 방지)
+  const kstString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' });
+  const kstDate = new Date(kstString);
+  const defaultDate = kstDate.getFullYear() + '-' + String(kstDate.getMonth() + 1).padStart(2, '0') + '-' + String(kstDate.getDate()).padStart(2, '0');
   const [idx, setIdx] = useState(0);
 
   function buildPlaceholder(dateStr){
-    const d = dateStr || new Date().toISOString().slice(0,10);
+    const d = dateStr || defaultDate;
     const yyyymmdd = d.replace(/-/g,'');
     const hours = [0,3,6,9,12,15,18,21];
     return hours.map(h => {
