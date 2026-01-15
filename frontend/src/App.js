@@ -15,7 +15,7 @@ import AdMobBanner from './components/AdMobBanner';
 import axios from 'axios';
 
 // API URL 상수 정의
-const API_BASE_URL = 'https://able-tide-481608-m5.du.r.appspot.com';
+const API_BASE_URL = 'https://roamom-backend.onrender.com';
 
 // 오프라인(file://) 전용 샘플 데이터
 const getSampleSeaInfo = () => ({
