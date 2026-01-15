@@ -145,10 +145,10 @@ const HomePage = () => {
       <div className="nav-buttons">
         <Link to="/weather" className="nav-button">☁️ 바다날씨</Link>
         <Link to="/jp-wave" className="nav-button">🌊 일본 기상청 파고</Link>
-        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-          <Link to="/points" className="nav-button">📍 해루질 포인트</Link>
-          {adInfo.points && <span style={{fontSize: '0.7rem', color: '#666', marginTop: '2px'}}>{adInfo.points}</span>}
-        </div>
+        <Link to="/points" className="nav-button" style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+          📍 해루질 포인트
+          {adInfo.points && <span style={{fontSize: '0.6rem', color: '#666', marginTop: '2px'}}>{adInfo.points}</span>}
+        </Link>
         <Link to="/guide" className="nav-button">📖 해루질 가이드</Link>
         <Link to="/app-guide" className="nav-button">📱 앱사용 가이드</Link>
         {isWeb && (

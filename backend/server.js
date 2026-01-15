@@ -53,7 +53,7 @@ app.use('/api', require('./routes/uploads'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.get('/api/version', (req, res) => res.json({ version: '1.3.1', versionCode: 17 }));
-app.get('/api/ad-info', (req, res) => res.json({ points: '전면광고포함' }));
+app.get('/api/ad-info', (req, res) => res.json({ points: '해루질포인트 페이지만 전면광고포함' }));
 
   app.listen(port, () => {
       console.log(`Backend server is running on http://localhost:${port}`);
