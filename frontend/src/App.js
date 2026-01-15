@@ -126,7 +126,9 @@ const HomePage = () => {
   useEffect(() => {
     const fetchAdInfo = async () => {
       try {
+        console.log('Fetching ad info from:', `${API_BASE_URL}/api/ad-info`);
         const res = await axios.get(`${API_BASE_URL}/api/ad-info`);
+        console.log('Ad info response:', res.data);
         setAdInfo(res.data || {});
       } catch (e) {
         console.warn('Failed to fetch ad info:', e.message);
