@@ -97,19 +97,8 @@ router.get('/japan-waves', async (req, res) => {
       });
     } else if (process.env.JAPAN_WAVE_SOURCE === 'imocwx') {
       try {
-        // User-provided mapping for IMOCWX: Area=1, Time=0..8
-        // Time=0..8: 03,06,09,12,15,18,21, next-day 00, next-day 03
-        const slots = [
-          { idx: 0, hour: 3, dayOffset: 0 },
-          { idx: 1, hour: 6, dayOffset: 0 },
-          { idx: 2, hour: 9, dayOffset: 0 },
-          { idx: 3, hour: 12, dayOffset: 0 },
-          { idx: 4, hour: 15, dayOffset: 0 },
-          { idx: 5, hour: 18, dayOffset: 0 },
-          { idx: 6, hour: 21, dayOffset: 0 },
-          { idx: 7, hour: 0, dayOffset: 1 },
-          { idx: 8, hour: 3, dayOffset: 1 },
-        ];
+        // Time=0 to 24 파싱: 각 페이지에서 이미지와 날짜/시간 텍스트 직접 추출
+        const slots = Array.from({ length: 25 }, (_, i) => ({ idx: i }));
 
         const abs = (src) => new URL(src, 'https://www.imocwx.com').toString();
         const results = [];
@@ -125,27 +114,39 @@ router.get('/japan-waves', async (req, res) => {
               timeout: 10000
             });
             const $ = cheerio.load(resp.data);
-            // Heuristic: pick the largest/primary image on page
+            // 이미지 추출
             let imgUrl = '';
             $('img').each((_, el) => {
               const src = $(el).attr('src') || '';
               if (!src) return;
               const full = abs(src);
               if (/(\.png|\.jpg|\.jpeg|\.gif)$/i.test(full)) {
-                imgUrl = full; // pick first match
-                return false; // break
+                imgUrl = full;
+                return false;
               }
             });
-            // 한국 시간대 기준으로 날짜 계산
-            const baseDate = new Date(iso + 'T00:00:00+09:00'); // 한국 시간대 명시
-            baseDate.setDate(baseDate.getDate() + slot.dayOffset);
-            const yyyy = baseDate.getFullYear();
-            const mm = String(baseDate.getMonth() + 1).padStart(2, '0');
-            const dd = String(baseDate.getDate()).padStart(2, '0');
-            const label = `${yyyy}-${mm}-${dd} ${String(slot.hour).padStart(2, '0')}:00`;
-            if (imgUrl) results.push({ time: label, url: imgUrl });
+            // 날짜/시간 텍스트 파싱 (페이지에서 추출 시도)
+            let timeLabel = '';
+            // 예: 페이지에 "2026-01-15 03:00" 같은 텍스트가 있다고 가정, 실제 구조에 맞게 조정
+            const textContent = $('body').text();
+            const dateTimeMatch = textContent.match(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/);
+            if (dateTimeMatch) {
+              timeLabel = dateTimeMatch[1];
+            } else {
+              // 텍스트가 없으면 계산된 라벨 사용 (fallback)
+              const baseDate = new Date(iso + 'T00:00:00+09:00');
+              const totalHours = 3 + (slot.idx * 3);
+              const dayOffset = Math.floor(totalHours / 24);
+              const hour = totalHours % 24;
+              baseDate.setDate(baseDate.getDate() + dayOffset);
+              const yyyy = baseDate.getFullYear();
+              const mm = String(baseDate.getMonth() + 1).padStart(2, '0');
+              const dd = String(baseDate.getDate()).padStart(2, '0');
+              timeLabel = `${yyyy}-${mm}-${dd} ${String(hour).padStart(2, '0')}:00`;
+            }
+            if (imgUrl) results.push({ time: timeLabel, url: imgUrl });
           } catch (slotErr) {
-            // skip failed slot, fallback later
+            // skip failed slot
           }
         }
         images = results;
