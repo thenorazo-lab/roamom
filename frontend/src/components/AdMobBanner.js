@@ -1,5 +1,5 @@
 // components/AdMobBanner.js
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AdMob, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
 import { Capacitor } from '@capacitor/core';
 

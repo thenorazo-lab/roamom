@@ -43,7 +43,7 @@ export default function JapanWaves(){
       setImages(buildPlaceholder(defaultDate));
       setIdx(0);
     }
-  }, [defaultDate]);
+  }, [defaultDate, buildPlaceholder]);
 
   // 처음 진입 시 오늘 날짜로 자동 로드
   useEffect(()=>{ fetchImages(); },[fetchImages]);
