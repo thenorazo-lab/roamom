@@ -12,7 +12,7 @@ export default function JapanWaves(){
   const defaultDate = kstDate.getFullYear() + '-' + String(kstDate.getMonth() + 1).padStart(2, '0') + '-' + String(kstDate.getDate()).padStart(2, '0');
   const [idx, setIdx] = useState(0);
 
-  function buildPlaceholder(dateStr){
+  const buildPlaceholder = useCallback((dateStr) => {
     const d = dateStr || defaultDate;
     const yyyymmdd = d.replace(/-/g,'');
     const hours = [0,3,6,9,12,15,18,21];
@@ -24,7 +24,7 @@ export default function JapanWaves(){
         url: `https://placehold.co/800x380?text=Wave+${yyyymmdd}+${hhmm}`
       };
     });
-  }
+  }, [defaultDate]);
 
   const [images, setImages] = useState(buildPlaceholder(defaultDate));
 
