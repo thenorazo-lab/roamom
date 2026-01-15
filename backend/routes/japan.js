@@ -127,22 +127,31 @@ router.get('/japan-waves', async (req, res) => {
             });
             // 날짜/시간 텍스트 파싱 (페이지에서 추출 시도)
             let timeLabel = '';
-            // 예: 페이지에 "2026-01-15 03:00" 같은 텍스트가 있다고 가정, 실제 구조에 맞게 조정
+            // 페이지 텍스트에서 날짜/시간 패턴 찾기 (YYYY-MM-DD HH:MM)
             const textContent = $('body').text();
             const dateTimeMatch = textContent.match(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/);
             if (dateTimeMatch) {
               timeLabel = dateTimeMatch[1];
             } else {
-              // 텍스트가 없으면 계산된 라벨 사용 (fallback)
-              const baseDate = new Date(iso + 'T00:00:00+09:00');
-              const totalHours = 3 + (slot.idx * 3);
-              const dayOffset = Math.floor(totalHours / 24);
-              const hour = totalHours % 24;
-              baseDate.setDate(baseDate.getDate() + dayOffset);
-              const yyyy = baseDate.getFullYear();
-              const mm = String(baseDate.getMonth() + 1).padStart(2, '0');
-              const dd = String(baseDate.getDate()).padStart(2, '0');
-              timeLabel = `${yyyy}-${mm}-${dd} ${String(hour).padStart(2, '0')}:00`;
+              // 추가 패턴 시도: 다른 형식 (MM/DD/YYYY HH:MM 등)
+              const altMatch = textContent.match(/(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2})/);
+              if (altMatch) {
+                // MM/DD/YYYY를 YYYY-MM-DD로 변환
+                const [_, dateStr, timeStr] = altMatch[0].match(/(\d{2}\/\d{2}\/\d{4}) (\d{2}:\d{2})/);
+                const [mm, dd, yyyy] = dateStr.split('/');
+                timeLabel = `${yyyy}-${mm}-${dd} ${timeStr}`;
+              } else {
+                // 텍스트가 없으면 계산된 라벨 사용 (fallback: Time=0부터 21시 시작)
+                const baseDate = new Date(iso + 'T00:00:00+09:00');
+                const totalHours = 21 + (slot.idx * 3); // Time=0: 21시 시작
+                const dayOffset = Math.floor(totalHours / 24);
+                const hour = totalHours % 24;
+                baseDate.setDate(baseDate.getDate() + dayOffset);
+                const yyyy = baseDate.getFullYear();
+                const mm = String(baseDate.getMonth() + 1).padStart(2, '0');
+                const dd = String(baseDate.getDate()).padStart(2, '0');
+                timeLabel = `${yyyy}-${mm}-${dd} ${String(hour).padStart(2, '0')}:00`;
+              }
             }
             if (imgUrl) results.push({ time: timeLabel, url: imgUrl });
           } catch (slotErr) {
