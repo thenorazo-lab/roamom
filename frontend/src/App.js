@@ -28,7 +28,7 @@ const getSampleSeaInfo = () => ({
     { hl_code: 'H', tide_time: '2025-01-01 19:35:00', tide_level: '450' },
     { hl_code: 'L', tide_time: '2025-01-02 00:43:00', tide_level: '16' },
   ],
-  usingMockData: true,
+  // ...existing code...
   recorded: false,
 });
 
@@ -136,6 +136,10 @@ const HomePage = () => {
         {isWeb && (
           <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>⚙️ 포인트 관리자</Link>
         )}
+      </div>
+      {/* 안내 문구 추가 */}
+      <div style={{textAlign:'center', marginTop:'10px', color:'#888', fontSize:'13px'}}>
+        ※ 포인트 페이지만 전면광고 포함
       </div>
     </div>
   );
