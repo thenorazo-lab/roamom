@@ -98,7 +98,12 @@ router.get('/japan-waves', async (req, res) => {
           // cheerio로 HTML 파싱하여 텍스트 추출
           const $ = cheerio.load(resp.data);
           const bodyText = $('body').text();
-          rawText = 'Test: ' + bodyText.substring(0, 100); // 디버그용
+          const match = bodyText.match(/南日本.*更新/);
+          if (match) {
+            rawText = match[0].replace(/\s+/g, ' ').trim();
+          } else {
+            rawText = 'No match: ' + bodyText.substring(0, 100);
+          }
         } catch (e) {
           // 크롤링 실패 시 rawText는 빈 값
         }
