@@ -84,9 +84,10 @@ router.get('/japan-waves', async (req, res) => {
             },
             timeout: 10000
           });
-          // 전체 HTML에서 정규식으로 날짜/시간 텍스트 추출
-          const html = resp.data;
-          const match = html.match(/南日本.*更新/);
+          // cheerio로 HTML 파싱하여 날짜/시간 텍스트 추출
+          const $ = cheerio.load(resp.data);
+          const bodyText = $('body').text();
+          const match = bodyText.match(/南日本.*更新/);
           if (match) {
             rawText = match[0].replace(/\s+/g, ' ').trim();
           }
