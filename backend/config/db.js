@@ -23,7 +23,11 @@ const connectDB = async () => {
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       bufferCommands: false,
-      bufferMaxEntries: 0
+      bufferMaxEntries: 0,
+      maxPoolSize: 10,
+      minPoolSize: 5,
+      maxIdleTimeMS: 30000,
+      heartbeatFrequencyMS: 10000
     });
 
     isConnected = true;
