@@ -95,8 +95,21 @@ router.get('/japan-waves', async (req, res) => {
             },
             timeout: 10000
           });
-          // 임시로 하드코딩
-          rawText = '南日本 沿岸波浪予想（気象庁提供） 2026年1月16日(金)3時(JST) 更新';
+        try {
+          const url = `https://www.imocwx.com/cwm.php?Area=${IMOCWX_AREA}&Time=${slot.idx}`;
+          // Puppeteer로 브라우저 실행하여 동적 콘텐츠 추출
+          const browser = await puppeteer.launch({ headless: true });
+          const page = await browser.newPage();
+          await page.goto(url, { waitUntil: 'networkidle2' });
+          const bodyText = await page.evaluate(() => document.body.innerText);
+          await browser.close();
+          const match = bodyText.match(/南日本.*更新/);
+          if (match) {
+            rawText = match[0].replace(/\s+/g, ' ').trim();
+          }
+        } catch (e) {
+          // 크롤링 실패 시 rawText는 빈 값
+        }
         } catch (e) {
           // 크롤링 실패 시 rawText는 빈 값
         }

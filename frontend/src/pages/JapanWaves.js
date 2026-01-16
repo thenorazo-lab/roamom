@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import AdSense from '../components/AdSense';
 
-const API_BASE_URL = 'https://able-tide-481608-m5.du.r.appspot.com';
+const API_BASE_URL = 'http://localhost:3002';
 
 export default function JapanWaves(){
   const defaultDate = new Date().toISOString().slice(0,10);
