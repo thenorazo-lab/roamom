@@ -31,7 +31,7 @@ export default function DeveloperInquiryPage() {
   return (
     <div className="container">
       <AdSense slot="3456789012" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
-      <h2 className="page-title">👨‍💻 개발자 문의</h2>
+      <h2 className="page-title">� 포인트 제보&개발자 문의</h2>
       <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
         <Link to="/" className="nav-button">🏠 홈으로</Link>
       </div>

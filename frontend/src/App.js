@@ -139,7 +139,7 @@ const HomePage = () => {
         </div>
         <Link to="/guide" className="nav-button">📖 해루질 가이드</Link>
         <Link to="/app-guide" className="nav-button">📱 앱사용 가이드</Link>
-        <Link to="/developer-inquiry" className="nav-button">👨‍💻 개발자 문의</Link>
+        <Link to="/developer-inquiry" className="nav-button">� 포인트 제보&개발자 문의</Link>
         {isWeb && (
           <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>⚙️ 포인트 관리자</Link>
         )}
@@ -549,7 +549,7 @@ const PointsPage = () => {
       ) : (
         <>
           <p>지도의 포인트를 눌러 정보를 확인하고 블로그 글을 읽어보세요.</p>
-          <p style={{fontSize: '14px', color: '#666', marginTop: '8px'}}>공유하고 싶은 포인트를 thenorazo@gmail.com 로 제보해주세요!</p>
+          <p style={{fontSize: '14px', color: '#666', marginTop: '8px'}}>공유하고 싶은 포인트를 제보해주세요!</p>
           <MapComponent center={[36.5, 127.5]} zoom={7} markers={points} onMapClick={() => {}} onMarkerClick={handleMarkerClick} />
           
           {selectedPoint && (
