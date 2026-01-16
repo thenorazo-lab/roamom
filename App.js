@@ -13,53 +13,53 @@ const getSampleSeaInfo = () => ({
   nearestObs: { name: '���� ������' },
   weather: { T1H: '20', TMP: '20', SKY: '1', PTY: '0', WSD: '3.2', sampled: true },
   scuba: { water_temp: '20', wave_height: '0.5', current_speed: '0.4', sampled: true },
-  tide: [
-    { hl_code: 'H', tide_time: '2025-01-01 07:02:00', tide_level: '420' },
-    { hl_code: 'L', tide_time: '2025-01-01 13:20:00', tide_level: '40' },
-    { hl_code: 'H', tide_time: '2025-01-01 19:35:00', tide_level: '450' },
-    { hl_code: 'L', tide_time: '2025-01-02 00:43:00', tide_level: '16' },
-  ],
-  usingMockData: true,
-  recorded: false,
-});
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    
+    // 같은 페이지면 무시 (무한 루프 방지)
+    if (prevPathRef.current === location.pathname) {
+      return;
+    }
+    
+    prevPathRef.current = location.pathname;
+    const newCount = pageVisitCount + 1;
+    setPageVisitCount(newCount);
+    console.log('[전면광고] 📍 페이지 이동:', location.pathname, '/ 카운트:', newCount);
 
-// ���̵� ������
-const GuidePage = () => (
-  <div className="container">
-    <h2 className="page-title">?? �ط��� ���̵�</h2>
-    <div style={{maxWidth: '800px', textAlign: 'left', padding: '20px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)'}}>
-      <h3>?? �ط����̶�?</h3>
-      <p>�ط����� �ٴ尡���� ����, �Ҷ�, ���� �� �ػ깰�� ä���ϴ� �������� Ȱ���Դϴ�.</p>
-      
-      <h3>?? ������ �ط����� ���� ��</h3>
-      <ul>
-        <li>���� �ð��� Ȯ���ϼ���</li>
-        <li>�İ��� ���� ���� �����ϼ���</li>
-        <li>���°� ��� ���¸� üũ�ϼ���</li>
-        <li>���� ��� �����ϼ���</li>
-      </ul>
-      
-      <h3>?? �� �� ����</h3>
-      <ul>
-        <li><strong>�ٴٳ���:</strong> �ǽð� �ٴ� ��� ���� Ȯ��</li>
-        <li><strong>�Ϻ� �İ�:</strong> �Ϻ� �ֺ� �İ� ���� Ȯ��</li>
-        <li><strong>�ط��� ����Ʈ:</strong> ��õ �ط��� ��� Ž��</li>
-      </ul>
-      
-      <h3>?? ��ŷ �ط��� ���̵� ����</h3>
-      <p>
-        <a href="https://roafather.tistory.com/entry/%EC%9B%8C%ED%82%B9%ED%95%B4%EB%A3%A8%EC%A7%88-%EA%B0%80%EC%9D%B4%EB%93%9C" 
-           target="_blank" 
-           rel="noopener noreferrer" 
-           style={{color:'#0077be', fontSize:'1.1rem', fontWeight:'600', textDecoration:'underline'}}>
-          �� ��ŷ �ط��� ���̵� ��������
-        </a>
-      </p>
-      
-      <h3>?? ��Ų �ط��� ���̵� ����</h3>
-      <p>
-        <a href="https://roafather.tistory.com/entry/%EC%8A%A4%ED%82%A8-%ED%95%B4%EB%A3%A8%EC%A7%88-%EA%B0%80%EC%9D%B4%EB%93%9C" 
-           target="_blank" 
+    // 10번째 페이지 이동마다 광고 표시 (광고 표시 중이 아닐 때만)
+    if (newCount >= 10 && newCount % 10 === 0 && isAdLoaded && !isShowingAd) {
+      const showAd = async () => {
+        setIsShowingAd(true); // 광고 표시 시작
+        setIsAdLoaded(false); // 중복 표시 방지
+        
+        try {
+          console.log('[전면광고] 🎬 표시 시작:', newCount, '번째');
+          await AdMob.showInterstitial();
+          console.log('[전면광고] ✅ 표시 완료');
+        } catch (error) {
+          console.error('[전면광고] ❌ 표시 실패:', error);
+        } finally {
+          setIsShowingAd(false); // 광고 표시 종료
+          
+          // 다음 광고 미리 로드 (3초 후)
+          setTimeout(async () => {
+            try {
+              console.log('[전면광고] 🔄 다음 광고 로드 중...');
+              await AdMob.prepareInterstitial({
+                adId: 'ca-app-pub-1120357008550196/6769636401',
+              });
+              setIsAdLoaded(true);
+              console.log('[전면광고] ✅ 다음 광고 로드 완료');
+            } catch (error) {
+              console.error('[전면광고] ❌ 다음 광고 로드 실패:', error);
+            }
+          }, 3000);
+        }
+      };
+
+      showAd();
+    }
+  }, [location.pathname, isAdLoaded, isShowingAd, pageVisitCount]); // 의존성 배열 추가
            rel="noopener noreferrer" 
            style={{color:'#0077be', fontSize:'1.1rem', fontWeight:'600', textDecoration:'underline'}}>
           �� ��Ų �ط��� ���̵� ��������
