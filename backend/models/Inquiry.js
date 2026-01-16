@@ -6,18 +6,6 @@ const inquirySchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  title: {
-    type: String,
-    required: true
-  },
-  lat: {
-    type: Number,
-    required: true
-  },
-  lng: {
-    type: Number,
-    required: true
-  },
   desc: {
     type: String,
     required: true

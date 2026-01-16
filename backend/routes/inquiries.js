@@ -10,20 +10,14 @@ console.log('[Routes] Inquiries router loaded');
 router.post('/inquiry', async (req, res) => {
   console.log('POST /api/inquiry called');
   try {
-    const { email, title, lat, lng, desc } = req.body;
-    console.log('Received:', { email, title, lat, lng, desc });
-    if (!email || !title || lat === undefined || lng === undefined || !desc) {
-      return res.status(400).json({ error: 'All fields are required' });
+    const { email, desc } = req.body;
+    console.log('Received:', { email, desc });
+    if (!email || !desc) {
+      return res.status(400).json({ error: 'Email and desc are required' });
     }
-
-    // 고유 ID 생성
-    const id = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     const inquiry = new Inquiry({
       email,
-      title,
-      lat,
-      lng,
       desc
     });
 

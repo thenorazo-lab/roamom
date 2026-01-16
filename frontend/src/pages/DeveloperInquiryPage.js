@@ -7,26 +7,20 @@ const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 export default function DeveloperInquiryPage() {
   const [email, setEmail] = useState('');
-  const [title, setTitle] = useState('');
-  const [lat, setLat] = useState('');
-  const [lng, setLng] = useState('');
   const [desc, setDesc] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !title || !lat || !lng || !desc) {
-      alert('모든 필드를 입력해 주세요.');
+    if (!email || !desc) {
+      alert('이메일과 설명을 모두 입력해 주세요.');
       return;
     }
     setLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/api/inquiry`, { email, title, lat: parseFloat(lat), lng: parseFloat(lng), desc });
+      await axios.post(`${API_BASE_URL}/api/inquiry`, { email, desc });
       alert('포인트 제보가 성공적으로 전송되었습니다.');
       setEmail('');
-      setTitle('');
-      setLat('');
-      setLng('');
       setDesc('');
     } catch (error) {
       alert('전송에 실패했습니다: ' + (error.response?.data?.error || error.message));
@@ -58,49 +52,12 @@ export default function DeveloperInquiryPage() {
             />
           </div>
           <div style={{marginBottom: '15px'}}>
-            <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>포인트 제목:</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              style={{width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '16px'}}
-              placeholder="포인트 제목"
-              required
-            />
-          </div>
-          <div style={{marginBottom: '15px', display: 'flex', gap: '10px'}}>
-            <div style={{flex: 1}}>
-              <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>위도 (Latitude):</label>
-              <input
-                type="number"
-                step="any"
-                value={lat}
-                onChange={(e) => setLat(e.target.value)}
-                style={{width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '16px'}}
-                placeholder="예: 35.1234"
-                required
-              />
-            </div>
-            <div style={{flex: 1}}>
-              <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>경도 (Longitude):</label>
-              <input
-                type="number"
-                step="any"
-                value={lng}
-                onChange={(e) => setLng(e.target.value)}
-                style={{width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '16px'}}
-                placeholder="예: 129.5678"
-                required
-              />
-            </div>
-          </div>
-          <div style={{marginBottom: '15px'}}>
-            <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>설명:</label>
+            <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>포인트 제보 내용:</label>
             <textarea
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
-              style={{width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '16px', minHeight: '100px', resize: 'vertical'}}
-              placeholder="포인트 설명"
+              style={{width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '16px', minHeight: '150px', resize: 'vertical'}}
+              placeholder="포인트 제보 내용을 입력해 주세요..."
               required
             />
           </div>
