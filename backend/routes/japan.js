@@ -86,7 +86,7 @@ router.get('/japan-waves', async (req, res) => {
           });
           // 전체 HTML에서 정규식으로 날짜/시간 텍스트 추출
           const html = resp.data;
-          const match = html.match(/南日本\s*沿岸波浪予想（気象庁提供）\s*\d{4}年\d{1,2}月\d{1,2}日\(.+?\)\d{1,2}時\(JST\)\s*更新/);
+          const match = html.match(/南日本.*更新/);
           if (match) {
             rawText = match[0].replace(/\s+/g, ' ').trim();
           }
