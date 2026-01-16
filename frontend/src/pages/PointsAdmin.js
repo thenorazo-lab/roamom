@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = 'https://able-tide-481608-m5.du.r.appspot.com';
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 export default function PointsAdmin(){
   const [password, setPassword] = useState('');

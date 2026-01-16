@@ -240,6 +240,7 @@ router.get('/japan-waves/image', async (req, res) => {
         'Referer': 'https://www.imocwx.com/'
       }
     });
+    console.log('[image proxy] fetched', target, 'size:', resp.data.length);
     const contentType = resp.headers['content-type'] || 'image/png';
     res.setHeader('Content-Type', contentType);
     res.setHeader('Cache-Control', 'public, max-age=3600');

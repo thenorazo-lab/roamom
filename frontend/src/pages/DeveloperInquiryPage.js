@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import AdSense from '../components/AdSense';
 
-const API_BASE_URL = 'https://able-tide-481608-m5.du.r.appspot.com';
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 export default function DeveloperInquiryPage() {
   const [email, setEmail] = useState('');
