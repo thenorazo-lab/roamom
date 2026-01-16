@@ -179,12 +179,15 @@ export default function PointsAdmin(){
             ))}
           </ul>
 
-          <h3>개발자 문의 목록</h3>
+          <h3>포인트 제보 목록</h3>
           <ul>
             {inquiries.map(inq => (
               <li key={inq._id} style={{marginBottom:10, border:'1px solid #ccc', padding:10}}>
                 <strong>Email:</strong> {inq.email} <br />
-                <strong>메시지:</strong> {inq.message} <br />
+                <strong>제목:</strong> {inq.title} <br />
+                <strong>위도:</strong> {inq.lat} <br />
+                <strong>경도:</strong> {inq.lng} <br />
+                <strong>설명:</strong> {inq.desc} <br />
                 <strong>시간:</strong> {new Date(inq.createdAt).toLocaleString('ko-KR')} <br />
                 <button onClick={()=>deleteInquiry(inq._id)}>삭제</button>
               </li>

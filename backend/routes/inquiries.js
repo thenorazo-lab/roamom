@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Point = require('../models/Point');
+const Inquiry = require('../models/Inquiry');
 console.log('[Routes] Inquiries router loaded');
 
 // 포인트 제보 저장
@@ -18,17 +19,16 @@ router.post('/inquiry', async (req, res) => {
     // 고유 ID 생성
     const id = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    const point = new Point({
-      id,
+    const inquiry = new Inquiry({
+      email,
       title,
       lat,
       lng,
-      desc,
-      email
+      desc
     });
 
-    await point.save();
-    console.log('Point saved');
+    await inquiry.save();
+    console.log('Inquiry saved');
 
     res.json({ success: true });
   } catch (error) {
