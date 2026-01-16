@@ -85,14 +85,21 @@ router.get('/japan-waves', async (req, res) => {
             },
             timeout: 10000
           });
-          // HTML에서 직접 정규식으로 텍스트 추출
-          const html = resp.data;
-          const match = html.match(/南日本.*更新/);
+        try {
+          const url = `https://www.imocwx.com/cwm.php?Area=${IMOCWX_AREA}&Time=${slot.idx}`;
+          // Puppeteer로 브라우저 실행하여 동적 콘텐츠 추출
+          const browser = await puppeteer.launch({ headless: true });
+          const page = await browser.newPage();
+          await page.goto(url, { waitUntil: 'networkidle2' });
+          const bodyText = await page.evaluate(() => document.body.innerText);
+          await browser.close();
+          const match = bodyText.match(/南日本.*更新/);
           if (match) {
             rawText = match[0].replace(/\s+/g, ' ').trim();
-          } else {
-            rawText = 'No match found in HTML';
           }
+        } catch (e) {
+          // 크롤링 실패 시 rawText는 빈 값
+        }
         } catch (e) {
           rawText = 'Error: ' + e.message;
         }
