@@ -55,21 +55,32 @@ export default function JapanWaves(){
   function next(){ setIdx(i => (i + 1) % images.length); }
 
   // 이미지 원본 텍스트에서 날짜/시간을 그대로 파싱, 한자만 한글로 변환
-  function formatJpWaveTime(rawText) {
-    // 예시: '南日本 沿岸波浪予想（気象庁提供） 2026年1月16日(金)3時(JST) 更新'
-    // 날짜/시간 부분만 추출: 2026年1月16日(金)3時(JST)
-    if (!rawText) return '';
-    const match = rawText.match(/\d{4}年\d{1,2}月\d{1,2}日\(.+?\)\d{1,2}時\(JST\)/);
-    if (!match) return '';
-    let txt = match[0];
-    // 한자 → 한글 치환
-    txt = txt.replace(/年/g, '년').replace(/月/g, '월').replace(/日/g, '일');
-    txt = txt.replace(/時/g, '시');
-    // 요일 치환
-    txt = txt.replace(/\(日\)/g, '(일)').replace(/\(月\)/g, '(월)').replace(/\(火\)/g, '(화)');
-    txt = txt.replace(/\(水\)/g, '(수)').replace(/\(木\)/g, '(목)').replace(/\(金\)/g, '(금)');
-    txt = txt.replace(/\(土\)/g, '(토)');
-    return txt;
+  function formatJpWaveTime(rawText, timeStr) {
+    // rawText가 있으면 사용, 없으면 timeStr 사용
+    if (rawText) {
+      const match = rawText.match(/\d{4}年\d{1,2}月\d{1,2}日\(.+?\)\d{1,2}時\(JST\)/);
+      if (match) {
+        let txt = match[0];
+        txt = txt.replace(/年/g, '년').replace(/月/g, '월').replace(/日/g, '일');
+        txt = txt.replace(/時/g, '시');
+        txt = txt.replace(/\(日\)/g, '(일)').replace(/\(月\)/g, '(월)').replace(/\(火\)/g, '(화)');
+        txt = txt.replace(/\(水\)/g, '(수)').replace(/\(木\)/g, '(목)').replace(/\(金\)/g, '(금)');
+        txt = txt.replace(/\(土\)/g, '(토)');
+        return txt;
+      }
+    }
+    // rawText가 없으면 timeStr에서 변환
+    if (timeStr) {
+      const d = new Date(timeStr);
+      const year = d.getFullYear();
+      const month = d.getMonth() + 1;
+      const day = d.getDate();
+      const hour = d.getHours();
+      const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+      const weekday = weekdays[d.getDay()];
+      return `${year}년 ${month}월 ${day}일(${weekday}) ${hour}시(JST)`;
+    }
+    return '';
   }
 
   return (
@@ -93,7 +104,7 @@ export default function JapanWaves(){
           </div>
           {/* 이미지 원본 텍스트에서 날짜/시간 추출 후 한자→한글 변환 */}
           <div style={{textAlign:'center',marginTop:8}}>
-            {images[idx].rawText ? formatJpWaveTime(images[idx].rawText) : ''}
+            {formatJpWaveTime(images[idx].rawText, images[idx].time)}
           </div>
           <div className="horizontal-scroll" style={{display:'flex',gap:8,overflowX:'auto',marginTop:12,width:'100%',boxSizing:'border-box',paddingBottom:8}}>
             {images.map((img,i)=> (

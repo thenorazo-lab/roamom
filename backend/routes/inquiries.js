@@ -22,7 +22,7 @@ router.post('/inquiry', async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     console.error('Inquiry save error:', error);
-    res.status(500).json({ error: 'Failed to save inquiry' });
+    res.status(500).json({ error: 'Failed to save inquiry: ' + error.message });
   }
 });
 
