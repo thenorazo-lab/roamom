@@ -16,7 +16,7 @@ const INTERVALS = (process.env.JAPAN_WAVE_INTERVAL_HOURS || '0,3,6,9,12,15,18,21
   .split(',')
   .map(s => parseInt(s.trim(), 10))
   .filter(n => !isNaN(n) && n >= 0 && n <= 23);
-const ENABLE_PROXY = process.env.ENABLE_IMAGE_PROXY === 'true';
+const ENABLE_PROXY = process.env.ENABLE_IMAGE_PROXY !== 'false';
 const IMOCWX_AREA = Number(process.env.IMOCWX_AREA || 1);
 const IMOCWX_STATIC_PREFIX = process.env.IMOCWX_STATIC_PREFIX || 'https://www.imocwx.com/cwm/cwmsjp_';
 const IMOCWX_STATIC_SUFFIX = process.env.IMOCWX_STATIC_SUFFIX || '.png?2000a';
@@ -104,7 +104,7 @@ router.get('/japan-waves', async (req, res) => {
           const bodyText = await page.evaluate(() => document.body.innerText);
           await browser.close();
           console.log('bodyText:', bodyText);
-          const match = bodyText.match(/南日本.*更新/);
+          const match = bodyText.match(/\d{4}年\d{1,2}月\d{1,2}日\(.+?\)\d{1,2}時\(JST\)/);
           if (match) {
             rawText = match[0].replace(/\s+/g, ' ').trim();
           }
