@@ -130,16 +130,17 @@ const HomePage = () => {
       <div className="nav-buttons">
         <Link to="/weather" className="nav-button">☁️ 바다날씨</Link>
         <Link to="/jp-wave" className="nav-button">🌊 일본 기상청 파고</Link>
-        <Link to="/points" className="nav-button">📍 해루질 포인트</Link>
+        <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
+          <Link to="/points" className="nav-button">📍 해루질 포인트</Link>
+          <div style={{textAlign:'center', marginTop:'4px', color:'#888', fontSize:'13px'}}>
+            ※ 포인트 페이지만 전면광고 포함
+          </div>
+        </div>
         <Link to="/guide" className="nav-button">📖 해루질 가이드</Link>
         <Link to="/app-guide" className="nav-button">📱 앱사용 가이드</Link>
         {isWeb && (
           <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>⚙️ 포인트 관리자</Link>
         )}
-      </div>
-      {/* 안내 문구 추가 */}
-      <div style={{textAlign:'center', marginTop:'10px', color:'#888', fontSize:'13px'}}>
-        ※ 포인트 페이지만 전면광고 포함
       </div>
     </div>
   );
