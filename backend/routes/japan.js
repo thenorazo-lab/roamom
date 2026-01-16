@@ -4,6 +4,7 @@ const router = express.Router();
 const sheets = require('../services/googleSheetsService');
 const axios = require('axios');
 const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
 console.log('[Routes] Japan waves router loaded');
 
 // 환경설정
@@ -76,17 +77,12 @@ router.get('/japan-waves', async (req, res) => {
         let rawText = '';
         try {
           const url = `https://www.imocwx.com/cwm.php?Area=${IMOCWX_AREA}&Time=${slot.idx}`;
-          const resp = await axios.get(url, {
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-              'Accept-Language': 'ko,en;q=0.9',
-              'Referer': 'https://www.imocwx.com/'
-            },
-            timeout: 10000
-          });
-          // cheerio로 HTML 파싱하여 날짜/시간 텍스트 추출
-          const $ = cheerio.load(resp.data);
-          const bodyText = $('body').text();
+          // Puppeteer로 브라우저 실행하여 동적 콘텐츠 추출
+          const browser = await puppeteer.launch({ headless: true });
+          const page = await browser.newPage();
+          await page.goto(url, { waitUntil: 'networkidle2' });
+          const bodyText = await page.evaluate(() => document.body.innerText);
+          await browser.close();
           const match = bodyText.match(/南日本.*更新/);
           if (match) {
             rawText = match[0].replace(/\s+/g, ' ').trim();
