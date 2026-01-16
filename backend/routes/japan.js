@@ -95,14 +95,13 @@ router.get('/japan-waves', async (req, res) => {
             },
             timeout: 10000
           });
-          // cheerio로 HTML 파싱하여 텍스트 추출
-          const $ = cheerio.load(resp.data);
-          const bodyText = $('body').text();
-          const match = bodyText.match(/南日本.*更新/);
+          // HTML에서 직접 정규식으로 텍스트 추출
+          const html = resp.data;
+          const match = html.match(/南日本.*更新/);
           if (match) {
             rawText = match[0].replace(/\s+/g, ' ').trim();
           } else {
-            rawText = 'No match: ' + bodyText.substring(0, 100);
+            rawText = 'No match in HTML';
           }
         } catch (e) {
           // 크롤링 실패 시 rawText는 빈 값
