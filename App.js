@@ -1,5 +1,3 @@
-// frontend/src/App.js
-
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
@@ -18,53 +16,53 @@ const getSampleSeaInfo = () => ({
     
     // 같은 페이지면 무시 (무한 루프 방지)
     if (prevPathRef.current === location.pathname) {
-      return;
-    }
+      useEffect(() => {
+        if (!Capacitor.isNativePlatform()) return;
     
-    prevPathRef.current = location.pathname;
-    const newCount = pageVisitCount + 1;
-    setPageVisitCount(newCount);
-    console.log('[전면광고] 📍 페이지 이동:', location.pathname, '/ 카운트:', newCount);
-
-    // 10번째 페이지 이동마다 광고 표시 (광고 표시 중이 아닐 때만)
-    if (newCount >= 10 && newCount % 10 === 0 && isAdLoaded && !isShowingAd) {
-      const showAd = async () => {
-        setIsShowingAd(true); // 광고 표시 시작
-        setIsAdLoaded(false); // 중복 표시 방지
-        
-        try {
-          console.log('[전면광고] 🎬 표시 시작:', newCount, '번째');
-          await AdMob.showInterstitial();
-          console.log('[전면광고] ✅ 표시 완료');
-        } catch (error) {
-          console.error('[전면광고] ❌ 표시 실패:', error);
-        } finally {
-          setIsShowingAd(false); // 광고 표시 종료
-          
-          // 다음 광고 미리 로드 (3초 후)
-          setTimeout(async () => {
-            try {
-              console.log('[전면광고] 🔄 다음 광고 로드 중...');
-              await AdMob.prepareInterstitial({
-                adId: 'ca-app-pub-1120357008550196/6769636401',
-              });
-              setIsAdLoaded(true);
-              console.log('[전면광고] ✅ 다음 광고 로드 완료');
-            } catch (error) {
-              console.error('[전면광고] ❌ 다음 광고 로드 실패:', error);
-            }
-          }, 3000);
+        // 같은 페이지면 무시 (무한 루프 방지)
+        if (prevPathRef.current === location.pathname) {
+          return;
         }
-      };
+    
+        prevPathRef.current = location.pathname;
+        const newCount = pageVisitCount + 1;
+        setPageVisitCount(newCount);
+        console.log('[전면광고] 📍 페이지 이동:', location.pathname, '/ 카운트:', newCount);
 
-      showAd();
-    }
-  }, [location.pathname, isAdLoaded, isShowingAd, pageVisitCount]); // 의존성 배열 추가
-           rel="noopener noreferrer" 
-           style={{color:'#0077be', fontSize:'1.1rem', fontWeight:'600', textDecoration:'underline'}}>
-          �� ��Ų �ط��� ���̵� ��������
-        </a>
-      </p>
+        // 10번째 페이지 이동마다 광고 표시 (광고 표시 중이 아닐 때만)
+        if (newCount >= 10 && newCount % 10 === 0 && isAdLoaded && !isShowingAd) {
+          const showAd = async () => {
+            setIsShowingAd(true); // 광고 표시 시작
+            setIsAdLoaded(false); // 중복 표시 방지
+        
+            try {
+              console.log('[전면광고] 🎬 표시 시작:', newCount, '번째');
+              await AdMob.showInterstitial();
+              console.log('[전면광고] ✅ 표시 완료');
+            } catch (error) {
+              console.error('[전면광고] ❌ 표시 실패:', error);
+            } finally {
+              setIsShowingAd(false); // 광고 표시 종료
+          
+              // 다음 광고 미리 로드 (3초 후)
+              setTimeout(async () => {
+                try {
+                  console.log('[전면광고] 🔄 다음 광고 로드 중...');
+                  await AdMob.prepareInterstitial({
+                    adId: 'ca-app-pub-1120357008550196/6769636401',
+                  });
+                  setIsAdLoaded(true);
+                  console.log('[전면광고] ✅ 다음 광고 로드 완료');
+                } catch (error) {
+                  console.error('[전면광고] ❌ 다음 광고 로드 실패:', error);
+                }
+              }, 3000);
+            }
+          };
+
+          showAd();
+        }
+      }, [location.pathname, isAdLoaded, isShowingAd, pageVisitCount]); // 의존성 배열 추가
     </div>
     <AdSense slot="2345678901" style={{ display: 'block', margin: '20px auto', maxWidth: '800px' }} />
     <div style={{marginTop: '24px'}}>
