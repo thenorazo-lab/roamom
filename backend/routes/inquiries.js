@@ -2,31 +2,38 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const Point = require('../models/Point');
 console.log('[Routes] Inquiries router loaded');
 
-// 개발자 문의 저장
+// 포인트 제보 저장
 router.post('/inquiry', async (req, res) => {
   console.log('POST /api/inquiry called');
   try {
-    const { email, message } = req.body;
-    console.log('Received:', { email, message });
-    if (!email || !message) {
-      return res.status(400).json({ error: 'Email and message are required' });
+    const { email, title, lat, lng, desc } = req.body;
+    console.log('Received:', { email, title, lat, lng, desc });
+    if (!email || !title || lat === undefined || lng === undefined || !desc) {
+      return res.status(400).json({ error: 'All fields are required' });
     }
 
-    console.log('readyState:', mongoose.connection.readyState);
-    console.log('db:', mongoose.connection.db);
-    const db = mongoose.connection.db || mongoose.connection.client.db('sea-weather-app');
-    console.log('using db:', db);
-    const inquiry = { email, message, createdAt: new Date() };
-    console.log('Inserting inquiry...');
-    await db.collection('inquiries').insertOne(inquiry);
-    console.log('Inquiry inserted');
+    // 고유 ID 생성
+    const id = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    const point = new Point({
+      id,
+      title,
+      lat,
+      lng,
+      desc,
+      email
+    });
+
+    await point.save();
+    console.log('Point saved');
 
     res.json({ success: true });
   } catch (error) {
-    console.error('Inquiry save error:', error);
-    res.status(500).json({ error: 'Failed to save inquiry: ' + error.message });
+    console.error('Save error:', error);
+    res.status(500).json({ error: 'Failed to save: ' + error.message });
   }
 });
 

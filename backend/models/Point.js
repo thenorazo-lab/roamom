@@ -27,6 +27,10 @@ const pointSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  email: {
+    type: String,
+    default: ''
+  },
   url: {
     type: String,
     default: ''
