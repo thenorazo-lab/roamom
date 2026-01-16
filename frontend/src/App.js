@@ -1,4 +1,4 @@
-﻿// frontend/src/App.js
+// frontend/src/App.js
 
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
