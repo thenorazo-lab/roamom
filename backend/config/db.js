@@ -19,7 +19,11 @@ const connectDB = async () => {
     await mongoose.connect(MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      ssl: true
+      ssl: true,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      bufferCommands: false,
+      bufferMaxEntries: 0
     });
 
     isConnected = true;
