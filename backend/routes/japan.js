@@ -85,37 +85,16 @@ router.get('/japan-waves', async (req, res) => {
             },
             timeout: 10000
           });
-        try {
-          const url = `https://www.imocwx.com/cwm.php?Area=${IMOCWX_AREA}&Time=${slot.idx}`;
-          const resp = await axios.get(url, {
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-              'Accept-Language': 'ko,en;q=0.9',
-              'Referer': 'https://www.imocwx.com/'
-            },
-            timeout: 10000
+          const $ = cheerio.load(resp.data);
+          // 이미지 아래 날짜/시간 텍스트 추출
+          $('div, p, span').each((_, el) => {
+            const txt = $(el).text().trim();
+            if (/\d{4}年\d{1,2}月\d{1,2}日.*?\d{1,2}時\(JST\)/.test(txt)) {
+              rawText = txt;
+              return false;
+            }
           });
-        try {
-          const url = `https://www.imocwx.com/cwm.php?Area=${IMOCWX_AREA}&Time=${slot.idx}`;
-          // Puppeteer로 브라우저 실행하여 동적 콘텐츠 추출
-          const browser = await puppeteer.launch({ headless: true });
-          const page = await browser.newPage();
-          await page.goto(url, { waitUntil: 'networkidle2' });
-          const bodyText = await page.evaluate(() => document.body.innerText);
-          await browser.close();
-          console.log('bodyText:', bodyText);
-          const match = bodyText.match(/\d{4}年\d{1,2}月\d{1,2}日\(.+?\)\d{1,2}時\(JST\)/);
-          if (match) {
-            rawText = match[0].replace(/\s+/g, ' ').trim();
-          }
           console.log('rawText:', rawText);
-        } catch (e) {
-          // 크롤링 실패 시 rawText는 빈 값
-          console.log('puppeteer error:', e.message);
-        }
-        } catch (e) {
-          // 크롤링 실패 시 rawText는 빈 값
-        }
         } catch (e) {
           rawText = 'Error: ' + e.message;
         }
