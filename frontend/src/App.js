@@ -10,6 +10,7 @@ import './App.css';
 import MapComponent from './components/MapComponent';
 import PointsAdmin from './pages/PointsAdmin';
 import JapanWaves from './pages/JapanWaves';
+import DeveloperInquiryPage from './pages/DeveloperInquiryPage';
 import AdSense from './components/AdSense';
 import AdMobBanner from './components/AdMobBanner';
 import axios from 'axios';
@@ -138,7 +139,7 @@ const HomePage = () => {
         </div>
         <Link to="/guide" className="nav-button">📖 해루질 가이드</Link>
         <Link to="/app-guide" className="nav-button">📱 앱사용 가이드</Link>
-        <a href="mailto:thenorazo@gmail.com" className="nav-button" style={{textDecoration: 'none'}}>👨‍💻 개발자 문의</a>
+        <Link to="/developer-inquiry" className="nav-button">👨‍💻 개발자 문의</Link>
         {isWeb && (
           <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>⚙️ 포인트 관리자</Link>
         )}
@@ -962,6 +963,7 @@ function App() {
           <Route path="/jp-wave" element={<JapanWaves />} />
           <Route path="/guide" element={<GuidePage />} />
           <Route path="/app-guide" element={<AppGuidePage />} />
+          <Route path="/developer-inquiry" element={<DeveloperInquiryPage />} />
           <Route path="/points" element={<PointsPage />} />
           <Route path="/points-admin" element={<PointsAdmin />} />
           <Route path="/map" element={<MapPage />} />

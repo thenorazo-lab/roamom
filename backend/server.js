@@ -44,6 +44,7 @@ app.use('/api', require('./routes/weather'));
 app.use('/api', require('./routes/japan'));
 app.use('/api', require('./routes/points'));
 app.use('/api', require('./routes/uploads'));
+app.use('/api', require('./routes/inquiries'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.get('/api/version', (req, res) => res.json({ version: '1.3.1', versionCode: 17 }));
