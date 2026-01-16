@@ -9,9 +9,9 @@ import MapComponent from './components/MapComponent';
 import PointsAdmin from './pages/PointsAdmin';
 import JapanWaves from './pages/JapanWaves';
 import AdSense from './components/AdSense';
-import AdMobBanner from './components/AdMobBanner';
+// ...existing code...
 import axios from 'axios';
-import AdMobBanner from './components/AdMobBanner';
+// ...existing code...
 import axios from 'axios';
 
 // API URL 상수 정의
@@ -1019,7 +1019,7 @@ function App() {
       <BackButtonHandler />
       <VersionChecker />
       <InterstitialAdManager />
-      <AdMobBanner />
+      {/* AdMobBanner 중복 제거됨 */}
       <div className="App">
         <Routes>
           <Route path="/" element={<HomePage />} />
