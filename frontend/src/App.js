@@ -14,6 +14,23 @@ import AdSense from './components/AdSense';
 import AdMobBanner from './components/AdMobBanner';
 import axios from 'axios';
 
+// ...existing code...
+// frontend/src/App.js
+
+import React, { useState, useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { App as CapApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
+import { AdMob } from '@capacitor-community/admob';
+import './App.css';
+import MapComponent from './components/MapComponent';
+import PointsAdmin from './pages/PointsAdmin';
+import JapanWaves from './pages/JapanWaves';
+import AdSense from './components/AdSense';
+import AdMobBanner from './components/AdMobBanner';
+import axios from 'axios';
+
 // API URL 상수 정의
 const API_BASE_URL = 'https://roamom-backend.onrender.com';
 
