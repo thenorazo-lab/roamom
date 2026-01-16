@@ -54,17 +54,14 @@ export default function JapanWaves(){
   function prev(){ setIdx(i => (i - 1 + images.length) % images.length); }
   function next(){ setIdx(i => (i + 1) % images.length); }
 
-  // 날짜/시간을 일본 기상청 이미지와 동일한 형식으로 변환
-  function formatJpWaveTime(timeStr) {
-    // timeStr: '2026-01-16 03:00' → '2026年1月16日(金)3時(JST)'
-    const m = timeStr.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):/);
-    if (!m) return timeStr;
-    const y = m[1], mon = m[2], d = m[3], h = m[4];
-    // 요일 계산
-    const weekDays = ['日','月','火','水','木','金','土'];
-    const dateObj = new Date(`${y}-${mon}-${d}`);
-    const week = weekDays[dateObj.getDay()];
-    return `${y}年${parseInt(mon)}月${parseInt(d)}日(${week})${parseInt(h)}時(JST)`;
+  // 이미지 원본 텍스트에서 날짜/시간을 그대로 파싱, 한자만 한글로 변환
+  function formatJpWaveTime(rawText) {
+    // 예시: '南日本 沿岸波浪予想（気象庁提供） 2026年1月16日(金)3時(JST)'
+    // 한자 → 한글 치환
+    if (!rawText) return '';
+    let txt = rawText;
+    txt = txt.replace(/年/g, '년').replace(/月/g, '월').replace(/日/g, '일');
+    return txt;
   }
 
   return (
@@ -86,7 +83,10 @@ export default function JapanWaves(){
             <div style={{textAlign:'center', fontSize:12, color:'#666'}}>ICOM 일본기상청 데이터</div>
             <button onClick={next} style={{padding:'8px 16px', cursor:'pointer', fontSize:18, border:'1px solid #ccc', borderRadius:4, background:'white'}}>▶</button>
           </div>
-          <div style={{textAlign:'center',marginTop:8}}>{formatJpWaveTime(images[idx].time)}</div>
+          {/* 이미지 원본 텍스트에서 날짜/시간 추출 후 한자→한글 변환 */}
+          <div style={{textAlign:'center',marginTop:8}}>
+            {images[idx].rawText ? formatJpWaveTime(images[idx].rawText) : ''}
+          </div>
           <div className="horizontal-scroll" style={{display:'flex',gap:8,overflowX:'auto',marginTop:12,width:'100%',boxSizing:'border-box',paddingBottom:8}}>
             {images.map((img,i)=> (
               <img
