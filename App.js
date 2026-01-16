@@ -10,7 +10,6 @@ import PointsAdmin from './pages/PointsAdmin';
 import JapanWaves from './pages/JapanWaves';
 import AdSense from './components/AdSense';
 // ...existing code...
-import axios from 'axios';
 
 // API URL 상수 정의
 const API_BASE_URL = 'https://roamom-backend.onrender.com';
@@ -1017,7 +1016,7 @@ function App() {
       <BackButtonHandler />
       <VersionChecker />
       <InterstitialAdManager />
-      <AdMobBanner />
+      {/* AdMobBanner 제거됨 */}
       <div className="App">
         <Routes>
           <Route path="/" element={<HomePage />} />
