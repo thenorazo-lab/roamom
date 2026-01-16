@@ -95,10 +95,9 @@ router.get('/japan-waves', async (req, res) => {
             },
             timeout: 10000
           });
-          // 각 이미지에 맞는 날짜/시간 계산하여 rawText 생성 (동적 콘텐츠 파싱 실패로 인한 대안)
+          // 각 이미지에 맞는 날짜/시간 계산하여 rawText 생성
           const now = new Date();
-          const baseDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 3, 0, 0); // 3시 시작
-          const imageDate = new Date(baseDate.getTime() + slot.dayOffset * 24 * 60 * 60 * 1000 + slot.hour * 60 * 60 * 1000);
+          const imageDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + slot.dayOffset, slot.hour, 0, 0);
           const year = imageDate.getFullYear();
           const month = imageDate.getMonth() + 1;
           const day = imageDate.getDate();
