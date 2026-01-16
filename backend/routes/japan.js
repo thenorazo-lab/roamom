@@ -85,9 +85,14 @@ router.get('/japan-waves', async (req, res) => {
             },
             timeout: 10000
           });
-          // HTML에서 텍스트 추출 시도
+          // HTML에서 직접 정규식으로 텍스트 추출
           const html = resp.data;
-          rawText = html.substring(0, 500); // 디버그용
+          const match = html.match(/南日本.*更新/);
+          if (match) {
+            rawText = match[0].replace(/\s+/g, ' ').trim();
+          } else {
+            rawText = 'No match found in HTML';
+          }
         } catch (e) {
           rawText = 'Error: ' + e.message;
         }
