@@ -70,21 +70,36 @@ router.get('/japan-waves', async (req, res) => {
         const hour = totalHours % 24;
         slots.push({ idx: timeIdx, hour, dayOffset });
       }
-      images = slots.map(slot => {
-        const labelDate = new Date(iso);
-        labelDate.setDate(labelDate.getDate() + slot.dayOffset);
-        const yyyy = labelDate.getFullYear();
-        const mm = String(labelDate.getMonth() + 1).padStart(2, '0');
-        const dd = String(labelDate.getDate()).padStart(2, '0');
-        const label = `${yyyy}-${mm}-${dd} ${String(slot.hour).padStart(2, '0')}:00`;
+      // 각 이미지 페이지에서 날짜/시간 텍스트(rawText) 크롤링
+      images = await Promise.all(slots.map(async slot => {
         const file = String(slot.idx).padStart(2, '0');
+        let rawText = '';
+        try {
+          const url = `https://www.imocwx.com/cwm.php?Area=${IMOCWX_AREA}&Time=${slot.idx}`;
+          const resp = await axios.get(url, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+              'Accept-Language': 'ko,en;q=0.9',
+              'Referer': 'https://www.imocwx.com/'
+            },
+            timeout: 10000
+          });
+          // 전체 HTML에서 정규식으로 날짜/시간 텍스트 추출
+          const html = resp.data;
+          const match = html.match(/南日本\s*沿岸波浪予想（気象庁提供）\s*\d{4}年\d{1,2}月\d{1,2}日\(.+?\)\d{1,2}時\(JST\)/);
+          if (match) {
+            rawText = match[0].replace(/\s+/g, ' ').trim();
+          }
+        } catch (e) {
+          // 크롤링 실패 시 rawText는 빈 값
+        }
         return {
-          time: label,
           url: ENABLE_PROXY 
             ? `/api/japan-waves/image?file=${file}`
-            : `${IMOCWX_STATIC_PREFIX}${file}${IMOCWX_STATIC_SUFFIX}`
+            : `${IMOCWX_STATIC_PREFIX}${file}${IMOCWX_STATIC_SUFFIX}`,
+          rawText
         };
-      });
+      }));
     } else if (process.env.JAPAN_WAVE_SOURCE === 'imocwx') {
       try {
         // User-provided mapping for IMOCWX: Area=1, Time=0..8
@@ -126,13 +141,23 @@ router.get('/japan-waves', async (req, res) => {
                 return false; // break
               }
             });
+            // 이미지 아래 날짜/시간 텍스트 추출 (예: '南日本 沿岸波浪予想（気象庁提供） 2026年1月16日(金)3時(JST)')
+            let rawText = '';
+            // 일반적으로 <div> 또는 <p> 태그에 포함됨
+            $('div, p, span').each((_, el) => {
+              const txt = $(el).text().trim();
+              if (/\d{4}年\d{1,2}月\d{1,2}日.*?\d{1,2}時\(JST\)/.test(txt)) {
+                rawText = txt;
+                return false;
+              }
+            });
             const labelDate = new Date(iso);
             labelDate.setDate(labelDate.getDate() + slot.dayOffset);
             const yyyy = labelDate.getFullYear();
             const mm = String(labelDate.getMonth() + 1).padStart(2, '0');
             const dd = String(labelDate.getDate()).padStart(2, '0');
             const label = `${yyyy}-${mm}-${dd} ${String(slot.hour).padStart(2, '0')}:00`;
-            if (imgUrl) results.push({ time: label, url: imgUrl });
+            if (imgUrl) results.push({ time: label, url: imgUrl, rawText });
           } catch (slotErr) {
             // skip failed slot, fallback later
           }
