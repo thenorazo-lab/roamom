@@ -9,7 +9,7 @@ import MapComponent from './components/MapComponent';
 import PointsAdmin from './pages/PointsAdmin';
 import JapanWaves from './pages/JapanWaves';
 import AdSense from './components/AdSense';
-import AdMobBanner from './components/AdMobBanner';
+// ...existing code...
 import axios from 'axios';
 
 // API URL 상수 정의
