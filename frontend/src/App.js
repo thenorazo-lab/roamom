@@ -131,7 +131,7 @@ const HomePage = () => {
         <Link to="/weather" className="nav-button">☁️ 바다날씨</Link>
         <Link to="/jp-wave" className="nav-button">🌊 일본 기상청 파고</Link>
         <div style={{display:'flex', flexDirection:'column', alignItems:'center', width: '100%'}}>
-          <Link to="/points" className="nav-button">📍 해루질 포인트</Link>
+          <Link to="/points" className="nav-button" style={{width: '100%', boxSizing: 'border-box'}}>📍 해루질 포인트</Link>
           <div style={{textAlign:'center', marginTop:'4px', color:'#888', fontSize:'13px'}}>
             ※ 포인트 페이지만 전면광고 포함
           </div>
