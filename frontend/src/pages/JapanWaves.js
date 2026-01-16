@@ -6,14 +6,11 @@ import AdSense from '../components/AdSense';
 const API_BASE_URL = 'https://able-tide-481608-m5.du.r.appspot.com';
 
 export default function JapanWaves(){
-  // KST 기준 오늘 날짜 생성 (UTC 오차 방지)
-  const kstString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' });
-  const kstDate = new Date(kstString);
-  const defaultDate = kstDate.getFullYear() + '-' + String(kstDate.getMonth() + 1).padStart(2, '0') + '-' + String(kstDate.getDate()).padStart(2, '0');
+  const defaultDate = new Date().toISOString().slice(0,10);
   const [idx, setIdx] = useState(0);
 
-  const buildPlaceholder = useCallback((dateStr) => {
-    const d = dateStr || defaultDate;
+  function buildPlaceholder(dateStr){
+    const d = dateStr || new Date().toISOString().slice(0,10);
     const yyyymmdd = d.replace(/-/g,'');
     const hours = [0,3,6,9,12,15,18,21];
     return hours.map(h => {
@@ -24,7 +21,7 @@ export default function JapanWaves(){
         url: `https://placehold.co/800x380?text=Wave+${yyyymmdd}+${hhmm}`
       };
     });
-  }, [defaultDate]);
+  }
 
   const [images, setImages] = useState(buildPlaceholder(defaultDate));
 
@@ -43,7 +40,7 @@ export default function JapanWaves(){
       setImages(buildPlaceholder(defaultDate));
       setIdx(0);
     }
-  }, [defaultDate, buildPlaceholder]);
+  }, [defaultDate]);
 
   // 처음 진입 시 오늘 날짜로 자동 로드
   useEffect(()=>{ fetchImages(); },[fetchImages]);

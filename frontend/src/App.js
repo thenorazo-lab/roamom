@@ -1,4 +1,6 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿// frontend/src/App.js
+
+import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
@@ -9,13 +11,11 @@ import MapComponent from './components/MapComponent';
 import PointsAdmin from './pages/PointsAdmin';
 import JapanWaves from './pages/JapanWaves';
 import AdSense from './components/AdSense';
-// ...existing code...
-import axios from 'axios';
-// ...existing code...
+import AdMobBanner from './components/AdMobBanner';
 import axios from 'axios';
 
 // API URL 상수 정의
-const API_BASE_URL = 'https://roamom-backend.onrender.com';
+const API_BASE_URL = 'https://able-tide-481608-m5.du.r.appspot.com';
 
 // 오프라인(file://) 전용 샘플 데이터
 const getSampleSeaInfo = () => ({
@@ -121,22 +121,7 @@ const GuidePage = () => (
 // 홈 화면
 const HomePage = () => {
   const isWeb = Capacitor.getPlatform() === 'web';
-  const [adInfo, setAdInfo] = useState({});
-
-  useEffect(() => {
-    const fetchAdInfo = async () => {
-      try {
-        console.log('Fetching ad info from:', `${API_BASE_URL}/api/ad-info`);
-        const res = await axios.get(`${API_BASE_URL}/api/ad-info`);
-        console.log('Ad info response:', res.data);
-        setAdInfo(res.data || {});
-      } catch (e) {
-        console.warn('Failed to fetch ad info:', e.message);
-      }
-    };
-    fetchAdInfo();
-  }, []);
-
+  
   return (
     <div className="container">
       <AdSense slot="1234567890" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
@@ -145,10 +130,7 @@ const HomePage = () => {
       <div className="nav-buttons">
         <Link to="/weather" className="nav-button">☁️ 바다날씨</Link>
         <Link to="/jp-wave" className="nav-button">🌊 일본 기상청 파고</Link>
-        <Link to="/points" className="nav-button">
-          📍 해루질 포인트
-          {adInfo.points && <div style={{fontSize: '0.6rem', color: '#666', marginTop: '2px'}}>{adInfo.points}</div>}
-        </Link>
+        <Link to="/points" className="nav-button">📍 해루질 포인트</Link>
         <Link to="/guide" className="nav-button">📖 해루질 가이드</Link>
         <Link to="/app-guide" className="nav-button">📱 앱사용 가이드</Link>
         {isWeb && (
@@ -507,26 +489,6 @@ const PointsPage = () => {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [selectedPoint, setSelectedPoint] = React.useState(null);
-  const [pinClickCount, setPinClickCount] = React.useState(0);
-  const [isAdReady, setIsAdReady] = React.useState(false);
-
-  // 전면 광고 초기화 (앱에서만)
-  React.useEffect(() => {
-    if (Capacitor.isNativePlatform()) {
-      const prepareAd = async () => {
-        try {
-          await AdMob.prepareInterstitial({
-            adId: 'ca-app-pub-1120357008550196/6769636401',
-          });
-          setIsAdReady(true);
-          console.log('[PointsPage] 전면광고 준비 완료');
-        } catch (error) {
-          console.error('[PointsPage] 전면광고 준비 실패:', error);
-        }
-      };
-      prepareAd();
-    }
-  }, []);
 
   React.useEffect(() => {
     fetch(`${API_BASE_URL}/api/points`)
@@ -546,41 +508,8 @@ const PointsPage = () => {
       });
   }, []);
 
-  const handleMarkerClick = async (marker) => {
+  const handleMarkerClick = (marker) => {
     setSelectedPoint(marker);
-    
-    // 앱에서만 핀 클릭 카운트
-    if (Capacitor.isNativePlatform()) {
-      const newCount = pinClickCount + 1;
-      setPinClickCount(newCount);
-      console.log('[PointsPage] 핀 클릭 카운트:', newCount);
-
-      // 3번째 클릭시 전면광고 표시
-      if (newCount >= 3 && newCount % 3 === 0 && isAdReady) {
-        try {
-          console.log('[PointsPage] 🎬 전면광고 표시 (3번째 핀 클릭)');
-          setIsAdReady(false);
-          await AdMob.showInterstitial();
-          console.log('[PointsPage] ✅ 전면광고 표시 완료');
-          
-          // 다음 광고 준비
-          setTimeout(async () => {
-            try {
-              await AdMob.prepareInterstitial({
-                adId: 'ca-app-pub-1120357008550196/6769636401',
-              });
-              setIsAdReady(true);
-              console.log('[PointsPage] ✅ 다음 광고 준비 완료');
-            } catch (error) {
-              console.error('[PointsPage] ❌ 다음 광고 준비 실패:', error);
-            }
-          }, 2000);
-        } catch (error) {
-          console.error('[PointsPage] ❌ 전면광고 표시 실패:', error);
-          setIsAdReady(true);
-        }
-      }
-    }
   };
 
   const closeModal = () => {
@@ -1019,7 +948,7 @@ function App() {
       <BackButtonHandler />
       <VersionChecker />
       <InterstitialAdManager />
-      {/* AdMobBanner 중복 제거됨 */}
+      <AdMobBanner />
       <div className="App">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -1173,7 +1102,7 @@ function InterstitialAdManager() {
 
       showAd();
     }
-  }, [location.pathname, isAdLoaded, isShowingAd, pageVisitCount]); // dependencies 추가
+  }, [location.pathname]); // pathname만 감지
 
   return null;
 }

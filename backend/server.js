@@ -26,12 +26,6 @@ app.use(morgan('dev'));
 // 정적 파일 (예: 업로드된 이미지) 서빙
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
-// app-ads.txt 서빙 (AdMob 인증용)
-app.get('/app-ads.txt', (req, res) => {
-  res.type('text/plain');
-  res.sendFile(path.join(__dirname, 'public', 'app-ads.txt'));
-});
-
 // Rate limiter (조건부 활성화)
 const shouldDisableRateLimit = process.env.DISABLE_RATE_LIMIT === 'true';
 if (!shouldDisableRateLimit) {
@@ -53,7 +47,6 @@ app.use('/api', require('./routes/uploads'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.get('/api/version', (req, res) => res.json({ version: '1.3.1', versionCode: 17 }));
-app.get('/api/ad-info', (req, res) => res.json({ points: '해루질포인트 페이지만 전면광고포함' }));
 
   app.listen(port, () => {
       console.log(`Backend server is running on http://localhost:${port}`);
