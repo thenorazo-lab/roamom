@@ -1102,7 +1102,7 @@ function InterstitialAdManager() {
 
       showAd();
     }
-  }, [location.pathname]); // pathname만 감지
+  }, [location.pathname, isAdLoaded, isShowingAd, pageVisitCount]); // 의존성 추가
 
   return null;
 }
