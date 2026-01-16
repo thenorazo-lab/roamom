@@ -28,13 +28,19 @@ export default function JapanWaves(){
   const fetchImages = useCallback(async () => {
     try{
       const res = await axios.get(`${API_BASE_URL}/api/japan-waves?date=${defaultDate}`);
-      const imgs = res.data?.images || [];
+      let imgs = res.data?.images || [];
       // 상대 경로를 절대 경로로 변환
-      const imgsWithAbsoluteUrls = imgs.map(img => ({
+      imgs = imgs.map(img => ({
         ...img,
         url: img.url.startsWith('http') ? img.url : `${API_BASE_URL}${img.url}`
       }));
-      setImages(imgsWithAbsoluteUrls.length > 0 ? imgsWithAbsoluteUrls : buildPlaceholder(defaultDate));
+      // 시간 기준 오름차순 정렬
+      imgs.sort((a, b) => {
+        // img.time: '2026-01-16 03:00' 형태
+        if (!a.time || !b.time) return 0;
+        return new Date(a.time) - new Date(b.time);
+      });
+      setImages(imgs.length > 0 ? imgs : buildPlaceholder(defaultDate));
       setIdx(0);
     }catch(e){
       setImages(buildPlaceholder(defaultDate));
