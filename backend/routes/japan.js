@@ -107,8 +107,10 @@ router.get('/japan-waves', async (req, res) => {
           if (match) {
             rawText = match[0].replace(/\s+/g, ' ').trim();
           }
+          console.log('rawText:', rawText);
         } catch (e) {
           // 크롤링 실패 시 rawText는 빈 값
+          console.log('puppeteer error:', e.message);
         }
         } catch (e) {
           // 크롤링 실패 시 rawText는 빈 값

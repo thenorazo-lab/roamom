@@ -14,9 +14,13 @@ router.post('/inquiry', async (req, res) => {
       return res.status(400).json({ error: 'Email and message are required' });
     }
 
+    console.log('readyState:', mongoose.connection.readyState);
+    console.log('db:', mongoose.connection.db);
+    const db = mongoose.connection.db || mongoose.connection.client.db('sea-weather-app');
+    console.log('using db:', db);
     const inquiry = { email, message, createdAt: new Date() };
     console.log('Inserting inquiry...');
-    await mongoose.connection.db.collection('inquiries').insertOne(inquiry);
+    await db.collection('inquiries').insertOne(inquiry);
     console.log('Inquiry inserted');
 
     res.json({ success: true });

@@ -104,7 +104,11 @@ export default function JapanWaves(){
           </div>
           {/* 이미지 원본 텍스트에서 날짜/시간 추출 후 한자→한글 변환 */}
           <div style={{textAlign:'center',marginTop:8}}>
-            {formatJpWaveTime(images[idx].rawText, images[idx].time)}
+            {(() => {
+              const formatted = formatJpWaveTime(images[idx].rawText, images[idx].time);
+              console.log('rawText:', images[idx].rawText, 'time:', images[idx].time, 'formatted:', formatted);
+              return formatted;
+            })()}
           </div>
           <div className="horizontal-scroll" style={{display:'flex',gap:8,overflowX:'auto',marginTop:12,width:'100%',boxSizing:'border-box',paddingBottom:8}}>
             {images.map((img,i)=> (
