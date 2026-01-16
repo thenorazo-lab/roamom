@@ -59,7 +59,6 @@ export default function JapanWaves(){
     // rawText가 있으면 사용, 없으면 timeStr 사용
     if (rawText) {
       const match = rawText.match(/\d{4}年\d{1,2}月\d{1,2}日\(.+?\)\d{1,2}時\(JST\)/);
-      console.log('rawText:', rawText, 'match:', match);
       if (match) {
         let txt = match[0];
         txt = txt.replace(/年/g, '년').replace(/月/g, '월').replace(/日/g, '일');
@@ -107,7 +106,6 @@ export default function JapanWaves(){
           <div style={{textAlign:'center',marginTop:8}}>
             {(() => {
               const formatted = formatJpWaveTime(images[idx].rawText, images[idx].time);
-              console.log('rawText:', images[idx].rawText, 'time:', images[idx].time, 'formatted:', formatted);
               return formatted;
             })()}
           </div>

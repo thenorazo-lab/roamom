@@ -103,6 +103,7 @@ router.get('/japan-waves', async (req, res) => {
           await page.goto(url, { waitUntil: 'networkidle2' });
           const bodyText = await page.evaluate(() => document.body.innerText);
           await browser.close();
+          console.log('bodyText:', bodyText);
           const match = bodyText.match(/南日本.*更新/);
           if (match) {
             rawText = match[0].replace(/\s+/g, ' ').trim();
@@ -118,7 +119,14 @@ router.get('/japan-waves', async (req, res) => {
         } catch (e) {
           rawText = 'Error: ' + e.message;
         }
+        const labelDate = new Date(iso);
+        labelDate.setDate(labelDate.getDate() + slot.dayOffset);
+        const yyyy = labelDate.getFullYear();
+        const mm = String(labelDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(labelDate.getDate()).padStart(2, '0');
+        const time = `${yyyy}-${mm}-${dd} ${String(slot.hour).padStart(2, '0')}:00`;
         return {
+          time,
           url: ENABLE_PROXY 
             ? `/api/japan-waves/image?file=${file}`
             : `${IMOCWX_STATIC_PREFIX}${file}${IMOCWX_STATIC_SUFFIX}`,
