@@ -23,7 +23,7 @@ export default function DeveloperInquiryPage() {
       setEmail('');
       setMessage('');
     } catch (error) {
-      alert('문의 전송에 실패했습니다. 다시 시도해 주세요.');
+      alert('문의 전송에 실패했습니다: ' + (error.response?.data?.error || error.message));
     }
     setLoading(false);
   };
