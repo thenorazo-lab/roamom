@@ -138,6 +138,7 @@ const HomePage = () => {
         </div>
         <Link to="/guide" className="nav-button">📖 해루질 가이드</Link>
         <Link to="/app-guide" className="nav-button">📱 앱사용 가이드</Link>
+        <a href="mailto:thenorazo@gmail.com" className="nav-button" style={{textDecoration: 'none'}}>👨‍💻 개발자 문의</a>
         {isWeb && (
           <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>⚙️ 포인트 관리자</Link>
         )}
