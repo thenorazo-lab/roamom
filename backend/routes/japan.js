@@ -124,7 +124,17 @@ router.get('/japan-waves', async (req, res) => {
         const yyyy = labelDate.getFullYear();
         const mm = String(labelDate.getMonth() + 1).padStart(2, '0');
         const dd = String(labelDate.getDate()).padStart(2, '0');
-        const time = `${yyyy}-${mm}-${dd} ${String(slot.hour).padStart(2, '0')}:00`;
+        let time = `${yyyy}-${mm}-${dd} ${String(slot.hour).padStart(2, '0')}:00`;
+        if (rawText) {
+          const match = rawText.match(/(\d{4})年(\d{1,2})月(\d{1,2})日\(.+?\)(\d{1,2})時/);
+          if (match) {
+            const year = match[1];
+            const month = String(match[2]).padStart(2, '0');
+            const day = String(match[3]).padStart(2, '0');
+            const hour = String(match[4]).padStart(2, '0');
+            time = `${year}-${month}-${day} ${hour}:00`;
+          }
+        }
         return {
           time,
           url: ENABLE_PROXY 
