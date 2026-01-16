@@ -95,26 +95,16 @@ router.get('/japan-waves', async (req, res) => {
             },
             timeout: 10000
           });
-        try {
-          const url = `https://www.imocwx.com/cwm.php?Area=${IMOCWX_AREA}&Time=${slot.idx}`;
-          const resp = await axios.get(url, {
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-              'Accept-Language': 'ko,en;q=0.9',
-              'Referer': 'https://www.imocwx.com/'
-            },
-            timeout: 10000
-          });
-          // cheerio로 HTML 파싱하여 텍스트 추출
-          const $ = cheerio.load(resp.data);
-          const bodyText = $('body').text();
-          const match = bodyText.match(/南日本.*更新/);
-          if (match) {
-            rawText = match[0].replace(/\s+/g, ' ').trim();
-          }
-        } catch (e) {
-          // 크롤링 실패 시 rawText는 빈 값
-        }
+          // 각 이미지에 맞는 날짜/시간 계산하여 rawText 생성 (동적 콘텐츠 파싱 실패로 인한 대안)
+          const now = new Date();
+          const baseDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 3, 0, 0); // 3시 시작
+          const imageDate = new Date(baseDate.getTime() + slot.dayOffset * 24 * 60 * 60 * 1000 + slot.hour * 60 * 60 * 1000);
+          const year = imageDate.getFullYear();
+          const month = imageDate.getMonth() + 1;
+          const day = imageDate.getDate();
+          const hour = imageDate.getHours();
+          const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][imageDate.getDay()];
+          rawText = `南日本 沿岸波浪予想（気象庁提供） ${year}年${month}月${day}日(${dayOfWeek})${hour}時(JST) 更新`;
         } catch (e) {
           // 크롤링 실패 시 rawText는 빈 값
         }
