@@ -1,19 +1,23 @@
 // routes/inquiries.js
 const express = require('express');
 const router = express.Router();
-const Inquiry = require('../models/Inquiry');
+const mongoose = require('mongoose');
 console.log('[Routes] Inquiries router loaded');
 
 // 개발자 문의 저장
 router.post('/inquiry', async (req, res) => {
+  console.log('POST /api/inquiry called');
   try {
     const { email, message } = req.body;
+    console.log('Received:', { email, message });
     if (!email || !message) {
       return res.status(400).json({ error: 'Email and message are required' });
     }
 
-    const inquiry = new Inquiry({ email, message });
-    await inquiry.save();
+    const inquiry = { email, message, createdAt: new Date() };
+    console.log('Inserting inquiry...');
+    await mongoose.connection.db.collection('inquiries').insertOne(inquiry);
+    console.log('Inquiry inserted');
 
     res.json({ success: true });
   } catch (error) {

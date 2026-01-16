@@ -21,7 +21,7 @@ async function startServer() {
 // Security & middleware
 app.use(helmet());
 app.use(cors());
-app.use(express.json());
+app.use(require('body-parser').json());
 app.use(morgan('dev'));
 // 정적 파일 (예: 업로드된 이미지) 서빙
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));

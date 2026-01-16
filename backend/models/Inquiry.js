@@ -4,17 +4,15 @@ const mongoose = require('mongoose');
 const inquirySchema = new mongoose.Schema({
   email: {
     type: String,
-    required: true,
-    trim: true
+    required: true
   },
   message: {
     type: String,
-    required: true,
-    trim: true
+    required: true
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: () => new Date()
   }
 });
 

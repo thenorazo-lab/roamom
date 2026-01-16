@@ -9,17 +9,22 @@ const connectDB = async () => {
   }
 
   try {
-    const MONGODB_URI = process.env.MONGODB_URI;
+    const MONGODB_URI = process.env.MONGODB_URI.replace('/?', '/sea-weather-app?');
     
     if (!MONGODB_URI) {
       console.warn('MONGODB_URI가 설정되지 않았습니다. JSON 파일 모드로 작동합니다.');
       return;
     }
 
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      ssl: true
+    });
 
     isConnected = true;
     console.log('MongoDB 연결 성공:', mongoose.connection.host);
+    console.log('readyState:', mongoose.connection.readyState);
   } catch (error) {
     console.error('MongoDB 연결 실패:', error.message);
     // 연결 실패 시에도 앱은 계속 작동 (JSON 파일 fallback)
