@@ -95,15 +95,21 @@ router.get('/japan-waves', async (req, res) => {
             },
             timeout: 10000
           });
-          // 각 이미지에 맞는 날짜/시간 계산하여 rawText 생성
-          const now = new Date();
-          const imageDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + slot.dayOffset, slot.hour, 0, 0);
-          const year = imageDate.getFullYear();
-          const month = imageDate.getMonth() + 1;
-          const day = imageDate.getDate();
-          const hour = imageDate.getHours();
-          const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][imageDate.getDay()];
-          rawText = `南日本 沿岸波浪予想（気象庁提供） ${year}年${month}月${day}日(${dayOfWeek})${hour}時(JST) 更新`;
+        try {
+          const url = `https://www.imocwx.com/cwm.php?Area=${IMOCWX_AREA}&Time=${slot.idx}`;
+          // Puppeteer로 브라우저 실행하여 동적 콘텐츠 추출
+          const browser = await puppeteer.launch({ headless: true });
+          const page = await browser.newPage();
+          await page.goto(url, { waitUntil: 'networkidle2' });
+          const bodyText = await page.evaluate(() => document.body.innerText);
+          await browser.close();
+          const match = bodyText.match(/南日本.*更新/);
+          if (match) {
+            rawText = match[0].replace(/\s+/g, ' ').trim();
+          }
+        } catch (e) {
+          // 크롤링 실패 시 rawText는 빈 값
+        }
         } catch (e) {
           // 크롤링 실패 시 rawText는 빈 값
         }

@@ -7,6 +7,7 @@ export default function PointsAdmin(){
   const [password, setPassword] = useState('');
   const [authed, setAuthed] = useState(false);
   const [points, setPoints] = useState([]);
+  const [inquiries, setInquiries] = useState([]);
   const [form, setForm] = useState({title:'',lat:'',lng:'',image:'',desc:'',url:''});
   const [uploading, setUploading] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -20,7 +21,12 @@ export default function PointsAdmin(){
     setPoints(res.data);
   }, []);
 
-  useEffect(()=>{ fetchPoints(); },[fetchPoints]);
+  const fetchInquiries = useCallback(async () => {
+    const res = await axios.get(`${API_BASE_URL}/api/inquiries`);
+    setInquiries(res.data);
+  }, []);
+
+  useEffect(()=>{ fetchPoints(); fetchInquiries(); },[fetchPoints, fetchInquiries]);
 
   function authHeaders(){ return password ? { 'x-admin-password': password } : {}; }
 
@@ -93,6 +99,19 @@ export default function PointsAdmin(){
     } 
   }
 
+  async function deleteInquiry(id){ 
+    if(!window.confirm('이 문의를 정말 삭제하시겠습니까?')) return; 
+    try{ 
+      await axios.delete(`${API_BASE_URL}/api/inquiry/${id}`, { headers: authHeaders() }); 
+      console.log('✅ 문의 삭제 성공:', id);
+      alert('✅ 문의가 삭제되었습니다.');
+      await fetchInquiries(); 
+    }catch(e){ 
+      console.error('❌ 문의 삭제 실패:', e);
+      alert('❌ 문의 삭제 실패: ' + (e.response?.data?.error || e.message)); 
+    } 
+  }
+
   return (
     <div style={{padding:20}}>
       <h2>포인트 관리자</h2>
@@ -156,6 +175,18 @@ export default function PointsAdmin(){
                     )}
                   </div>
                 )}
+              </li>
+            ))}
+          </ul>
+
+          <h3>개발자 문의 목록</h3>
+          <ul>
+            {inquiries.map(inq => (
+              <li key={inq._id} style={{marginBottom:10, border:'1px solid #ccc', padding:10}}>
+                <strong>Email:</strong> {inq.email} <br />
+                <strong>메시지:</strong> {inq.message} <br />
+                <strong>시간:</strong> {new Date(inq.createdAt).toLocaleString('ko-KR')} <br />
+                <button onClick={()=>deleteInquiry(inq._id)}>삭제</button>
               </li>
             ))}
           </ul>

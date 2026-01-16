@@ -1,7 +1,7 @@
 // routes/inquiries.js
 const express = require('express');
 const router = express.Router();
-const sheets = require('../services/googleSheetsService');
+const Inquiry = require('../models/Inquiry');
 console.log('[Routes] Inquiries router loaded');
 
 // 개발자 문의 저장
@@ -12,23 +12,36 @@ router.post('/inquiry', async (req, res) => {
       return res.status(400).json({ error: 'Email and message are required' });
     }
 
-    // 구글 시트에 저장
-    const spreadsheetId = '1uOXfkdeArzgLe_brMPp39IYpJRylgPAhbpacyY_jQak';
-    const range = 'Sheet1!A:B'; // A: timestamp, B: email, C: message
-
-    const values = [[new Date().toISOString(), email, message]];
-
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range,
-      valueInputOption: 'RAW',
-      resource: { values },
-    });
+    const inquiry = new Inquiry({ email, message });
+    await inquiry.save();
 
     res.json({ success: true });
   } catch (error) {
     console.error('Inquiry save error:', error);
     res.status(500).json({ error: 'Failed to save inquiry' });
+  }
+});
+
+// 문의 목록 가져오기
+router.get('/inquiries', async (req, res) => {
+  try {
+    const inquiries = await Inquiry.find().sort({ createdAt: -1 });
+    res.json(inquiries);
+  } catch (error) {
+    console.error('Inquiry fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch inquiries' });
+  }
+});
+
+// 문의 삭제
+router.delete('/inquiry/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Inquiry.findByIdAndDelete(id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Inquiry delete error:', error);
+    res.status(500).json({ error: 'Failed to delete inquiry' });
   }
 });
 
