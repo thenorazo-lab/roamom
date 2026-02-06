@@ -755,4 +755,227 @@ router.get('/sea-info', async (req, res) => {
     }
 });
 
+// 위도/경도로 중기예보 지역코드 결정 함수
+function getRegionCode(lat, lon) {
+    const latNum = parseFloat(lat);
+    const lonNum = parseFloat(lon);
+
+    // 제주도
+    if (latNum >= 33.0 && latNum <= 34.0 && lonNum >= 126.0 && lonNum <= 127.0) {
+        return { regId: '11G00000', name: '제주도' };
+    }
+    // 부산, 울산, 경상남도
+    else if (latNum >= 34.5 && latNum <= 36.0 && lonNum >= 128.0) {
+        return { regId: '11H20000', name: '부산/울산/경남' };
+    }
+    // 대구, 경상북도
+    else if (latNum >= 35.5 && latNum <= 37.5 && lonNum >= 128.0) {
+        return { regId: '11H10000', name: '대구/경북' };
+    }
+    // 광주, 전라남도
+    else if (latNum >= 34.0 && latNum <= 35.5 && lonNum >= 126.0 && lonNum <= 127.5) {
+        return { regId: '11F20000', name: '광주/전남' };
+    }
+    // 전북자치도
+    else if (latNum >= 35.0 && latNum <= 36.5 && lonNum >= 126.5 && lonNum <= 127.5) {
+        return { regId: '11F10000', name: '전북' };
+    }
+    // 대전, 세종, 충남
+    else if (latNum >= 36.0 && latNum <= 37.0 && lonNum >= 126.5 && lonNum <= 127.5) {
+        return { regId: '11C20000', name: '대전/세종/충남' };
+    }
+    // 충청북도
+    else if (latNum >= 36.0 && latNum <= 37.5 && lonNum >= 127.0 && lonNum <= 128.5) {
+        return { regId: '11C10000', name: '충북' };
+    }
+    // 강원도 영동
+    else if (latNum >= 37.0 && lonNum >= 128.5) {
+        return { regId: '11D20000', name: '강원영동' };
+    }
+    // 강원도 영서
+    else if (latNum >= 37.0 && latNum <= 38.5 && lonNum >= 127.0 && lonNum <= 128.5) {
+        return { regId: '11D10000', name: '강원영서' };
+    }
+    // 서울, 인천, 경기도 (기본값)
+    else {
+        return { regId: '11B00000', name: '서울/인천/경기' };
+    }
+}
+
+// 중기예보 API 엔드포인트 (중기육상예보조회)
+router.get('/mid-forecast', async (req, res) => {
+    try {
+        const { lat, lon } = req.query;
+
+        if (!lat || !lon) {
+            return res.status(400).json({ error: '위도와 경도가 필요합니다.' });
+        }
+
+        // 위도/경도로 지역 코드 결정
+        const region = getRegionCode(lat, lon);
+
+        // 발표시각 계산 (06시 또는 18시)
+        const now = new Date();
+        const hour = now.getHours();
+        let tmFc;
+
+        if (hour < 6) {
+            // 전날 18시
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const y = yesterday.getFullYear();
+            const m = String(yesterday.getMonth() + 1).padStart(2, '0');
+            const d = String(yesterday.getDate()).padStart(2, '0');
+            tmFc = `${y}${m}${d}1800`;
+        } else if (hour < 18) {
+            // 오늘 06시
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            tmFc = `${y}${m}${d}0600`;
+        } else {
+            // 오늘 18시
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            tmFc = `${y}${m}${d}1800`;
+        }
+
+        // 기상청 중기육상예보조회 API 호출
+        const apiUrl = 'http://apis.data.go.kr/1360000/MidFcstInfoService/getMidLandFcst';
+        const params = {
+            serviceKey: DATA_GO_KR_API_KEY,
+            numOfRows: 10,
+            pageNo: 1,
+            dataType: 'JSON',
+            regId: region.regId,
+            tmFc: tmFc
+        };
+
+        console.log('[MidForecast] API 요청:', { regId: region.regId, regionName: region.name, tmFc });
+
+        const response = await axios.get(apiUrl, {
+            params,
+            timeout: 10000,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        console.log('[MidForecast] API 응답 타입:', typeof response.data);
+        
+        // API 응답 확인 (resultCode는 "0" 또는 "00" 문자열)
+        const resultCode = response.data?.response?.header?.resultCode;
+        if (resultCode !== '0' && resultCode !== '00') {
+            const errorMsg = response.data?.response?.header?.resultMsg || 'API 오류';
+            console.error('[MidForecast] API Error:', errorMsg, 'resultCode:', resultCode);
+            throw new Error(errorMsg);
+        }
+
+        const forecastData = response.data.response.body.items.item[0];
+
+        res.json({
+            success: true,
+            regId: region.regId,
+            regionName: region.name,
+            tmFc,
+            data: forecastData
+        });
+
+    } catch (error) {
+        console.error('[MidForecast] Error:', error.message);
+        res.status(500).json({
+            success: false,
+            error: '중기예보를 불러오지 못했습니다.',
+            detail: error.message
+        });
+    }
+});
+
+// 중기기온조회 API 엔드포인트
+router.get('/mid-temp', async (req, res) => {
+    try {
+        const { lat, lon } = req.query;
+
+        if (!lat || !lon) {
+            return res.status(400).json({ error: '위도와 경도가 필요합니다.' });
+        }
+
+        // 위도/경도로 지역 코드 결정
+        const region = getRegionCode(lat, lon);
+
+        // 발표시각 계산
+        const now = new Date();
+        const hour = now.getHours();
+        let tmFc;
+
+        if (hour < 6) {
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const y = yesterday.getFullYear();
+            const m = String(yesterday.getMonth() + 1).padStart(2, '0');
+            const d = String(yesterday.getDate()).padStart(2, '0');
+            tmFc = `${y}${m}${d}1800`;
+        } else if (hour < 18) {
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            tmFc = `${y}${m}${d}0600`;
+        } else {
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            tmFc = `${y}${m}${d}1800`;
+        }
+
+        const apiUrl = 'http://apis.data.go.kr/1360000/MidFcstInfoService/getMidTa';
+        const params = {
+            serviceKey: DATA_GO_KR_API_KEY,
+            numOfRows: 10,
+            pageNo: 1,
+            dataType: 'JSON',
+            regId: region.regId,
+            tmFc: tmFc
+        };
+
+        console.log('[MidTemp] API 요청:', { regId: region.regId, regionName: region.name, tmFc });
+
+        const response = await axios.get(apiUrl, { 
+            params, 
+            timeout: 10000,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        console.log('[MidTemp] API 응답 타입:', typeof response.data);
+
+        // API 응답 확인 (resultCode는 "0" 또는 "00" 문자열)
+        const resultCode = response.data?.response?.header?.resultCode;
+        if (resultCode !== '0' && resultCode !== '00') {
+            const errorMsg = response.data?.response?.header?.resultMsg || 'API 오류';
+            console.error('[MidTemp] API Error:', errorMsg, 'resultCode:', resultCode);
+            throw new Error(errorMsg);
+        }
+
+        const tempData = response.data.response.body.items.item[0];
+
+        res.json({
+            success: true,
+            regId: region.regId,
+            regionName: region.name,
+            tmFc,
+            data: tempData
+        });
+
+    } catch (error) {
+        console.error('[MidTemp] Error:', error.message);
+        res.status(500).json({
+            success: false,
+            error: '중기기온조회를 불러오지 못했습니다.',
+            detail: error.message
+        });
+    }
+});
+
 module.exports = router;
