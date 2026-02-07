@@ -15,6 +15,14 @@ const {
 const { appendRecord } = require('../services/googleSheetsService');
 const { getOceanObservation } = require('../services/kmaService');
 
+// 날짜 포맷 함수 (YYYYMMDD)
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
+}
+
 // .env 파일에서 API 키를 가져옵니다.
 const DATA_GO_KR_API_KEY = process.env.DATA_GO_KR_API_KEY;
 const DATA_GO_KR_NEW_API_KEY = process.env.DATA_GO_KR_NEW_API_KEY; // 공공데이터포털 조석예보 API 키
@@ -812,21 +820,21 @@ function getTempRegionCode(lat, lon) {
         return { regId: '11G00201', name: '제주' };
     }
     // 부산, 울산, 경상남도
-    else if (latNum >= 35.0 && latNum <= 36.0 && lonNum >= 128.5) {
+    else if (latNum >= 35.0 && latNum <= 36.2 && lonNum >= 129.0) {
         return { regId: '11H20201', name: '부산' };
     }
-    else if (latNum >= 34.5 && latNum <= 36.0 && lonNum >= 128.0) {
+    else if (latNum >= 34.5 && latNum <= 36.0 && lonNum >= 128.0 && lonNum < 129.0) {
         return { regId: '11H20101', name: '창원' };
     }
     // 대구, 경상북도
-    else if (latNum >= 35.5 && latNum <= 37.0 && lonNum >= 128.5) {
+    else if (latNum >= 35.5 && latNum <= 36.5 && lonNum >= 128.5) {
         return { regId: '11H10201', name: '대구' };
     }
-    else if (latNum >= 35.5 && latNum <= 37.5 && lonNum >= 128.0) {
+    else if (latNum >= 36.0 && latNum <= 37.5 && lonNum >= 128.0) {
         return { regId: '11H10101', name: '안동' };
     }
     // 광주, 전라남도
-    else if (latNum >= 34.5 && latNum <= 35.5 && lonNum >= 126.5 && lonNum <= 127.5) {
+    else if (latNum >= 35.0 && latNum <= 35.5 && lonNum >= 126.5 && lonNum <= 127.5) {
         return { regId: '11F20201', name: '광주' };
     }
     else if (latNum >= 34.0 && latNum <= 35.5 && lonNum >= 126.0 && lonNum <= 127.5) {
@@ -843,7 +851,7 @@ function getTempRegionCode(lat, lon) {
     else if (latNum >= 36.3 && latNum <= 37.0 && lonNum >= 127.0 && lonNum <= 127.5) {
         return { regId: '11C20401', name: '대전' };
     }
-    else if (latNum >= 36.0 && latNum <= 37.0 && lonNum >= 126.5 && lonNum <= 127.5) {
+    else if (latNum >= 36.0 && latNum <= 37.0 && lonNum >= 126.0 && lonNum <= 127.5) {
         return { regId: '11C20101', name: '홍성' };
     }
     // 충청북도
@@ -865,9 +873,10 @@ function getTempRegionCode(lat, lon) {
     else if (latNum >= 37.4 && latNum <= 37.7 && lonNum >= 126.8 && lonNum <= 127.2) {
         return { regId: '11B10101', name: '서울' };
     }
-    else if (latNum >= 37.3 && latNum <= 37.6 && lonNum >= 126.5 && lonNum <= 126.8) {
+    else if (latNum >= 37.3 && latNum <= 37.6 && lonNum >= 126.3 && lonNum <= 126.9) {
         return { regId: '11B20201', name: '인천' };
     }
+    // 기본값 (경기도 - 수원)
     else {
         return { regId: '11B20601', name: '수원' };
     }
