@@ -358,7 +358,7 @@ router.get('/sea-info', async (req, res) => {
     try {
         // 1. 위치 기반 정보 찾기
         console.log('[/api/sea-info] Converting coordinates:', { lat: parsedLat, lon: parsedLon });
-        const grid = dfs_xy_conv(parsedLat, parsedLon);
+        const grid = dfs_xy_conv("toXY", parsedLat, parsedLon);
         console.log('[/api/sea-info] Grid:', grid);
         
         // grid 검증
