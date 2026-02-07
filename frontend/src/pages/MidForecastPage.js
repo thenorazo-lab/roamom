@@ -83,31 +83,37 @@ const MidForecastPage = () => {
     }
   }, [searchParams]);
 
-  // 날씨 정보 파싱 함수 (5일 후부터 10일까지)
+  // 날씨 정보 파싱 함수 (API가 제공하는 가장 빠른 날부터)
   const parseForecast = () => {
     if (!data || !tempData) return [];
 
     const days = [];
     const today = new Date();
 
-    // 5일 후부터 10일까지
-    for (let i = 5; i <= 10; i++) {
+    // 3일 후부터 10일까지 확인하여 데이터가 있는 것만 추가
+    for (let i = 3; i <= 10; i++) {
       const date = new Date(today);
       date.setDate(date.getDate() + i);
       const dayStr = String(i);
 
-      const dayInfo = {
-        date: date.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' }),
-        day: i,
-        landAM: data[`wf${dayStr}Am`] || data[`wf${dayStr}`] || 'N/A',
-        landPM: data[`wf${dayStr}Pm`] || data[`wf${dayStr}`] || 'N/A',
-        rainAM: data[`rnSt${dayStr}Am`] || null,
-        rainPM: data[`rnSt${dayStr}Pm`] || data[`rnSt${dayStr}`] || null,
-        minTemp: tempData[`taMin${dayStr}`] || 'N/A',
-        maxTemp: tempData[`taMax${dayStr}`] || 'N/A',
-      };
+      // 데이터가 있는지 확인
+      const hasLandData = data[`wf${dayStr}Am`] || data[`wf${dayStr}Pm`] || data[`wf${dayStr}`];
+      const hasTempData = tempData[`taMin${dayStr}`] || tempData[`taMax${dayStr}`];
 
-      days.push(dayInfo);
+      if (hasLandData || hasTempData) {
+        const dayInfo = {
+          date: date.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' }),
+          day: i,
+          landAM: data[`wf${dayStr}Am`] || data[`wf${dayStr}`] || 'N/A',
+          landPM: data[`wf${dayStr}Pm`] || data[`wf${dayStr}`] || 'N/A',
+          rainAM: data[`rnSt${dayStr}Am`] || null,
+          rainPM: data[`rnSt${dayStr}Pm`] || data[`rnSt${dayStr}`] || null,
+          minTemp: tempData[`taMin${dayStr}`] || 'N/A',
+          maxTemp: tempData[`taMax${dayStr}`] || 'N/A',
+        };
+
+        days.push(dayInfo);
+      }
     }
 
     return days;

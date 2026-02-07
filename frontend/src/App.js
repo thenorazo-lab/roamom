@@ -963,6 +963,30 @@ const MapPage = () => {
       console.log('[MapPage] Buoy data:', json.buoy);
       console.log('[MapPage] Tide data:', json.tide);
       console.log('[MapPage] nearestObs:', json.nearestObs);
+      
+      // 단기예보 3일치 데이터 가져오기
+      try {
+        const forecastUrl = `${API_BASE_URL}/api/short-forecast?lat=${latlng.lat}&lng=${latlng.lng}`;
+        console.log('[MapPage] 단기예보 요청:', forecastUrl);
+        const forecastResponse = await fetch(forecastUrl);
+        console.log('[MapPage] 단기예보 응답 상태:', forecastResponse.status);
+        if (forecastResponse.ok) {
+          const forecastData = await forecastResponse.json();
+          console.log('[MapPage] 단기예보 데이터:', forecastData);
+          if (forecastData.success) {
+            json.shortForecast = forecastData.data;
+            console.log('[MapPage] ✅ 단기예보 설정 완료:', forecastData.data.length, '개');
+          } else {
+            console.error('[MapPage] ❌ 단기예보 success=false:', forecastData.error);
+          }
+        } else {
+          const errorText = await forecastResponse.text();
+          console.error('[MapPage] ❌ 단기예보 HTTP 오류:', forecastResponse.status, errorText);
+        }
+      } catch (err) {
+        console.error('[MapPage] ❌ 단기예보 예외:', err);
+      }
+      
       setInfo(json);
     } catch (e) {
       if (e.name === 'AbortError') {
@@ -1015,9 +1039,30 @@ const MapPage = () => {
           <div className="info-cards">
             <div className="card">
               <h3>☀️ 날씨 {info.weatherError && <span style={{color:'#a33', fontSize:12, marginLeft:8}}>({info.weatherError})</span>}</h3>
-              <p>상태: {getWeatherStatus(info.weather?.SKY, info.weather?.PTY) ?? 'N/A'}</p>
-              <p>기온: {info.weather?.T1H ?? info.weather?.TMP ?? 'N/A'}°C</p>
-              <p>풍속: {info.weather?.WSD ?? 'N/A'} m/s</p>
+              <div style={{ borderBottom: '1px solid #eee', paddingBottom: '15px', marginBottom: '15px' }}>
+                <strong>오늘</strong>
+                <p>상태: {getWeatherStatus(info.weather?.SKY, info.weather?.PTY) ?? 'N/A'}</p>
+                <p>기온: {info.weather?.T1H ?? info.weather?.TMP ?? 'N/A'}°C</p>
+                <p>풍속: {info.weather?.WSD ?? 'N/A'} m/s</p>
+              </div>
+
+              {/* 단기예보 (내일~글피) */}
+              {info.shortForecast && info.shortForecast.length > 1 && (
+                <div style={{ borderTop: '1px solid #eee', paddingTop: '15px', marginTop: '15px' }}>
+                  {info.shortForecast.slice(1, 4).map((day, idx) => {
+                    const dayName = ['내일', '모레', '글피'][idx];
+                    return (
+                      <div key={idx} style={{ marginBottom: '10px', fontSize: '14px' }}>
+                        <strong>{dayName}</strong>
+                        <div style={{ color: '#666' }}>
+                          {getWeatherStatus(day.sky, day.pty)} / {day.temp}°C / 강수 {day.pop}%
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
               <div style={{ marginTop: '15px' }}>
                 <Link
                   to={`/mid-forecast?lat=${marker.lat}&lon=${marker.lng}`}
