@@ -5,7 +5,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 export default function PointsAdmin(){
   // localStorage에 admin_pw가 있으면 자동 인증
-  const [password, setPassword] = useState(localStorage.getItem('admin_pw')||'');
+  const [password] = useState(localStorage.getItem('admin_pw')||'');
   const [authed, setAuthed] = useState(!!localStorage.getItem('admin_pw'));
   const [points, setPoints] = useState([]);
   const [inquiries, setInquiries] = useState([]);
@@ -30,20 +30,6 @@ export default function PointsAdmin(){
   useEffect(()=>{ fetchPoints(); fetchInquiries(); },[fetchPoints, fetchInquiries]);
 
   function authHeaders(){ return password ? { 'x-admin-password': password } : {}; }
-
-  async function doAuth(){
-    // simple: try to create a temp point and delete it to validate
-    try {
-      const r = await axios.post(`${API_BASE_URL}/api/points`, { title:'auth-test', lat:0, lng:0 }, { headers: authHeaders() });
-      await axios.delete(`${API_BASE_URL}/api/points/${r.data.id}`, { headers: authHeaders() });
-      setAuthed(true);
-      localStorage.setItem('admin_pw', password);
-      fetchPoints();
-    } catch(e){
-      alert('인증 실패: 비밀번호가 틀렸습니다');
-      localStorage.removeItem('admin_pw');
-    }
-  }
 
   async function createPoint(){
     if(!isValidPoint(form)){ alert('제목, 위도, 경도는 필수입니다.'); return; }
