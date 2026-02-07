@@ -6,7 +6,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL;
 export default function PointsAdmin(){
   // localStorage에 admin_pw가 있으면 자동 인증
   const [password] = useState(localStorage.getItem('admin_pw')||'');
-  const [authed, setAuthed] = useState(!!localStorage.getItem('admin_pw'));
+  const authed = !!localStorage.getItem('admin_pw');
   const [points, setPoints] = useState([]);
   const [inquiries, setInquiries] = useState([]);
   const [form, setForm] = useState({title:'',lat:'',lng:'',image:'',desc:'',url:''});
