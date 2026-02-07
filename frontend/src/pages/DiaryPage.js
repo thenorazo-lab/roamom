@@ -793,7 +793,20 @@ const DiaryPage = () => {
                   <>
                     <button
                       type="button"
-                      onClick={() => setEditMode(true)}
+                      onClick={() => {
+                        setEditMode(true);
+                        // 편집 모드로 전환 시 formData를 현재 일기 내용으로 설정
+                        setFormData({
+                          title: selectedDiary.title || '',
+                          date: selectedDiary.date || new Date().toISOString().split('T')[0],
+                          weather: selectedDiary.weather || '',
+                          waterTemp: selectedDiary.waterTemp || '',
+                          visibility: selectedDiary.visibility || '',
+                          catch: selectedDiary.catch || '',
+                          notes: selectedDiary.notes || '',
+                          photos: selectedDiary.photos || []
+                        });
+                      }}
                       style={{
                         flex: 1,
                         padding: '12px',

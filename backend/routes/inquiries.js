@@ -13,6 +13,7 @@ router.post('/inquiry', async (req, res) => {
     const { email, desc } = req.body;
     console.log('Received:', { email, desc });
     if (!email || !desc) {
+      console.warn('문의 전송: 필수값 누락', { email, desc });
       return res.status(400).json({ error: 'Email and desc are required' });
     }
 
@@ -26,8 +27,8 @@ router.post('/inquiry', async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error('Save error:', error);
-    res.status(500).json({ error: 'Failed to save: ' + error.message });
+    console.error('문의 저장 실패:', error);
+    res.status(500).json({ error: 'Failed to save: ' + error.message, details: error });
   }
 });
 

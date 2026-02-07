@@ -14,6 +14,8 @@ const inquirySchema = new mongoose.Schema({
     type: Date,
     default: () => new Date()
   }
+}, {
+  bufferCommands: false
 });
 
 module.exports = mongoose.model('Inquiry', inquirySchema);

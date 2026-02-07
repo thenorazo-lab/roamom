@@ -8,6 +8,7 @@ const Point = require('../models/Point');
 
 const DATA_FILE = path.join(__dirname, '..', 'data', 'points.json');
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '756400';
+console.log('[ADMIN_PASSWORD] 설정된 값:', ADMIN_PASSWORD);
 
 // MongoDB 사용 가능 여부 확인
 const useDB = () => {
@@ -72,6 +73,7 @@ function writePoints(points) {
 // simple admin auth middleware
 function requireAdmin(req, res, next) {
   const pass = req.headers['x-admin-password'] || req.query.adminPassword || req.body?.adminPassword;
+  console.log('[AUTH] 받은 비밀번호:', pass, '기대값:', ADMIN_PASSWORD);
   if (pass && pass === ADMIN_PASSWORD) return next();
   return res.status(401).json({ error: 'Unauthorized' });
 }
@@ -93,7 +95,7 @@ router.get('/points', async (req, res) => {
 });
 
 // Admin: create point
-router.post('/points', express.json(), requireAdmin, async (req, res) => {
+router.post('/points', requireAdmin, async (req, res) => {
   try {
     const { title, lat, lng, image, desc, url } = req.body;
     // accept zero coordinates; validate numerically
@@ -130,7 +132,7 @@ router.post('/points', express.json(), requireAdmin, async (req, res) => {
 });
 
 // Admin: update point
-router.put('/points/:id', express.json(), requireAdmin, async (req, res) => {
+router.put('/points/:id', requireAdmin, async (req, res) => {
   try {
     const id = req.params.id;
     const { title, lat, lng, image, desc, url } = req.body;
@@ -195,7 +197,7 @@ router.delete('/points/:id', requireAdmin, async (req, res) => {
 });
 
 // Public: click record
-router.post('/points/click', express.json(), async (req, res) => {
+router.post('/points/click', async (req, res) => {
   try {
     const { pointId } = req.body;
     let point;

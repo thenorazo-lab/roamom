@@ -21,7 +21,7 @@ async function startServer() {
 // Security & middleware
 app.use(helmet());
 app.use(cors());
-app.use(require('body-parser').json());
+app.use(express.json());
 app.use(morgan('dev'));
 // 정적 파일 (예: 업로드된 이미지) 서빙
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
@@ -47,7 +47,7 @@ app.use('/api', require('./routes/uploads'));
 app.use('/api', require('./routes/inquiries'));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
-app.get('/api/version', (req, res) => res.json({ version: '1.3.1', versionCode: 20 }));
+app.get('/api/version', (req, res) => res.json({ version: '1.3.1', versionCode: 21 }));
 
   app.listen(port, () => {
       console.log(`Backend server is running on http://localhost:${port}`);

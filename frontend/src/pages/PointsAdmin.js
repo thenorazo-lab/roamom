@@ -4,8 +4,9 @@ import axios from 'axios';
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 export default function PointsAdmin(){
-  const [password, setPassword] = useState('');
-  const [authed, setAuthed] = useState(false);
+  // localStorage에 admin_pw가 있으면 자동 인증
+  const [password, setPassword] = useState(localStorage.getItem('admin_pw')||'');
+  const [authed, setAuthed] = useState(!!localStorage.getItem('admin_pw'));
   const [points, setPoints] = useState([]);
   const [inquiries, setInquiries] = useState([]);
   const [form, setForm] = useState({title:'',lat:'',lng:'',image:'',desc:'',url:''});
@@ -36,9 +37,11 @@ export default function PointsAdmin(){
       const r = await axios.post(`${API_BASE_URL}/api/points`, { title:'auth-test', lat:0, lng:0 }, { headers: authHeaders() });
       await axios.delete(`${API_BASE_URL}/api/points/${r.data.id}`, { headers: authHeaders() });
       setAuthed(true);
+      localStorage.setItem('admin_pw', password);
       fetchPoints();
     } catch(e){
       alert('인증 실패: 비밀번호가 틀렸습니다');
+      localStorage.removeItem('admin_pw');
     }
   }
 
@@ -54,8 +57,7 @@ export default function PointsAdmin(){
         form.image = up.data.url;
         setUploading(false);
       }
-      const response = await axios.post(`${API_BASE_URL}/api/points`, { title: form.title, lat: form.lat, lng: form.lng, image: form.image, desc: form.desc, url: form.url }, { headers: authHeaders() });
-      console.log('✅ 포인트 저장 성공:', response.data);
+      await axios.post(`${API_BASE_URL}/api/points`, { title: form.title, lat: form.lat, lng: form.lng, image: form.image, desc: form.desc, url: form.url }, { headers: authHeaders() });
       alert(`✅ "${form.title}" 포인트가 서버에 저장되었습니다!`);
       setForm({title:'',lat:'',lng:'',image:'',desc:'',url:'', _file: null});
       await fetchPoints();
@@ -74,8 +76,7 @@ export default function PointsAdmin(){
   async function updatePoint(p){
     if(!isValidPoint(form)){ alert('제목, 위도, 경도는 필수입니다.'); return; }
     try{ 
-      const response = await axios.put(`${API_BASE_URL}/api/points/${p.id}`, form, { headers: authHeaders() }); 
-      console.log('✅ 포인트 수정 성공:', response.data);
+      await axios.put(`${API_BASE_URL}/api/points/${p.id}`, form, { headers: authHeaders() });
       alert(`✅ "${form.title}" 포인트가 수정되었습니다!`);
       setEditingId(null); 
       setForm({title:'',lat:'',lng:'',image:'',desc:'',url:''}); 
@@ -90,7 +91,6 @@ export default function PointsAdmin(){
     if(!window.confirm(`"${p.title}" 포인트를 정말 삭제하시겠습니까?`)) return; 
     try{ 
       await axios.delete(`${API_BASE_URL}/api/points/${p.id}`, { headers: authHeaders() }); 
-      console.log('✅ 포인트 삭제 성공:', p.id);
       alert(`✅ "${p.title}" 포인트가 삭제되었습니다.`);
       await fetchPoints(); 
     }catch(e){ 
@@ -103,7 +103,6 @@ export default function PointsAdmin(){
     if(!window.confirm('이 문의를 정말 삭제하시겠습니까?')) return; 
     try{ 
       await axios.delete(`${API_BASE_URL}/api/inquiry/${id}`, { headers: authHeaders() }); 
-      console.log('✅ 문의 삭제 성공:', id);
       alert('✅ 문의가 삭제되었습니다.');
       await fetchInquiries(); 
     }catch(e){ 
@@ -115,12 +114,7 @@ export default function PointsAdmin(){
   return (
     <div style={{padding:20}}>
       <h2>포인트 관리자</h2>
-      {!authed ? (
-        <div>
-          <label>관리자 비밀번호: <input value={password} onChange={e=>setPassword(e.target.value)} type="password" /></label>
-          <button onClick={doAuth}>로그인</button>
-        </div>
-      ):( 
+      {!authed ? null : (
         <div>
           <h3>새 포인트 추가</h3>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,maxWidth:800}}>

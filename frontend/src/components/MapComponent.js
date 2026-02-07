@@ -23,7 +23,7 @@ function ClickHandler({ onClick }) {
   return null;
 }
 
-export default function MapComponent({ center = [36, 128], zoom = 7, markers = [], onMapClick, onMarkerClick }) {
+export default function MapComponent({ center = [36, 128], zoom = 7, markers = [], onMapClick, onMarkerClick, mapHeight = '60vh' }) {
   const mapRef = useRef();
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function MapComponent({ center = [36, 128], zoom = 7, markers = [
 
   return (
     <div className="map-container">
-      <MapContainer center={center} zoom={zoom} style={{ height: '60vh', width: '100%' }} ref={mapRef}>
+      <MapContainer center={center} zoom={zoom} style={{ height: mapHeight, width: '100%' }} ref={mapRef}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -45,7 +45,10 @@ export default function MapComponent({ center = [36, 128], zoom = 7, markers = [
         {markers.map((m) => (
           <Marker key={m.id || `${m.lat}-${m.lng}`} position={[m.lat, m.lng]} eventHandlers={{ 
             click: ()=>{ 
-              fetch('/api/points/click',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ pointId: m.id })}).catch(()=>{});
+              // 포인트 페이지에서만 클릭 기록 (id가 문자열이고 타임스탬프가 아닌 경우)
+              if (m.id && typeof m.id === 'string' && !Number.isFinite(m.id)) {
+                fetch('/api/points/click',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ pointId: m.id })}).catch(()=>{});
+              }
               if (onMarkerClick) onMarkerClick(m);
             }
           }}>

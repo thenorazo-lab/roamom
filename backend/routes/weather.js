@@ -975,6 +975,8 @@ router.get('/mid-temp', async (req, res) => {
         // 위도/경도로 지역 코드 결정 (기온 API는 상세 코드 사용)
         const region = getTempRegionCode(lat, lon);
 
+        console.log('[MidTemp] 위치:', { lat, lon, regId: region.regId, regionName: region.name });
+
         // 발표시각 계산
         const now = new Date();
         const hour = now.getHours();
@@ -1025,8 +1027,8 @@ router.get('/mid-temp', async (req, res) => {
         const resultCode = response.data?.response?.header?.resultCode;
         if (resultCode !== '0' && resultCode !== '00') {
             const errorMsg = response.data?.response?.header?.resultMsg || 'API 오류';
-            console.error('[MidTemp] API Error:', errorMsg, 'resultCode:', resultCode);
-            throw new Error(errorMsg);
+            console.error('[MidTemp] API Error:', { errorMsg, resultCode, regId: region.regId, tmFc, response: JSON.stringify(response.data) });
+            throw new Error(`${errorMsg} (지역코드: ${region.regId}, 발표시각: ${tmFc})`);
         }
 
         const tempData = response.data.response.body.items.item[0];
@@ -1044,6 +1046,101 @@ router.get('/mid-temp', async (req, res) => {
         res.status(500).json({
             success: false,
             error: '중기기온조회를 불러오지 못했습니다.',
+            detail: error.message
+        });
+    }
+});
+
+// 단기예보 3일치 데이터 조회 엔드포인트
+router.get('/short-forecast', async (req, res) => {
+    try {
+        const { lat, lng } = req.query;
+
+        if (!lat || !lng) {
+            return res.status(400).json({ error: '위도와 경도가 필요합니다.' });
+        }
+
+        // 위경도를 기상청 격자로 변환
+        const grid = dfs_xy_conv("toXY", parseFloat(lat), parseFloat(lng));
+        
+        // 발표시각 계산 (02, 05, 08, 11, 14, 17, 20, 23시)
+        const now = new Date();
+        const hour = now.getHours();
+        let base_time;
+        
+        if (hour < 2) base_time = '2300';
+        else if (hour < 5) base_time = '0200';
+        else if (hour < 8) base_time = '0500';
+        else if (hour < 11) base_time = '0800';
+        else if (hour < 14) base_time = '1100';
+        else if (hour < 17) base_time = '1400';
+        else if (hour < 20) base_time = '1700';
+        else if (hour < 23) base_time = '2000';
+        else base_time = '2300';
+
+        const base_date = base_time === '2300' && hour < 2
+            ? formatDate(new Date(now.getTime() - 24 * 60 * 60 * 1000))
+            : formatDate(now);
+
+        const apiUrl = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst';
+        const params = {
+            serviceKey: DATA_GO_KR_API_KEY,
+            pageNo: 1,
+            numOfRows: 1000,
+            dataType: 'JSON',
+            base_date,
+            base_time,
+            nx: grid.x,
+            ny: grid.y
+        };
+
+        console.log('[ShortForecast] API 요청:', { lat, lng, grid, base_date, base_time });
+
+        const response = await axios.get(apiUrl, { params, timeout: 10000 });
+
+        if (response.data?.response?.header?.resultCode !== '00') {
+            const errorMsg = response.data?.response?.header?.resultMsg || 'API 오류';
+            console.error('[ShortForecast] API Error:', errorMsg);
+            throw new Error(errorMsg);
+        }
+
+        const items = response.data.response.body.items.item;
+
+        // 오늘, 내일, 모레, 글피 데이터 추출
+        const today = new Date();
+        const forecasts = [];
+
+        for (let dayOffset = 0; dayOffset <= 3; dayOffset++) {
+            const targetDate = new Date(today);
+            targetDate.setDate(today.getDate() + dayOffset);
+            const dateStr = formatDate(targetDate);
+
+            // 해당 날짜의 12시(낮 12시) 데이터 추출
+            const dayData = items.filter(item => item.fcstDate === dateStr && item.fcstTime === '1200');
+
+            const forecast = {
+                date: dateStr,
+                dayOffset,
+                temp: dayData.find(i => i.category === 'TMP')?.fcstValue || 'N/A',
+                sky: dayData.find(i => i.category === 'SKY')?.fcstValue || 'N/A',
+                pty: dayData.find(i => i.category === 'PTY')?.fcstValue || '0',
+                pop: dayData.find(i => i.category === 'POP')?.fcstValue || 'N/A',
+                wsd: dayData.find(i => i.category === 'WSD')?.fcstValue || 'N/A'
+            };
+
+            forecasts.push(forecast);
+        }
+
+        res.json({
+            success: true,
+            data: forecasts
+        });
+
+    } catch (error) {
+        console.error('[ShortForecast] Error:', error.message);
+        res.status(500).json({
+            success: false,
+            error: '단기예보를 불러오지 못했습니다.',
             detail: error.message
         });
     }

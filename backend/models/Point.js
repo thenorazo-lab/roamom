@@ -43,6 +43,8 @@ const pointSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  bufferCommands: false
 });
 
 // 업데이트 시 updatedAt 자동 갱신

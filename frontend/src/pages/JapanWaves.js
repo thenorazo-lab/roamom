@@ -1,128 +1,88 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import AdSense from '../components/AdSense';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-export default function JapanWaves(){
-  const defaultDate = new Date().toISOString().slice(0,10);
+import React, { useEffect, useState } from 'react';
+
+export default function JapanWaves() {
+  const [waves, setWaves] = useState([]);
   const [idx, setIdx] = useState(0);
 
-  function buildPlaceholder(dateStr){
-    const d = dateStr || new Date().toISOString().slice(0,10);
-    const yyyymmdd = d.replace(/-/g,'');
-    const hours = [0,3,6,9,12,15,18,21];
-    return hours.map(h => {
-      const hh = String(h).padStart(2,'0');
-      const hhmm = `${hh}00`;
-      return {
-        time: `${d} ${hh}:00`,
-        url: `https://placehold.co/800x380?text=Wave+${yyyymmdd}+${hhmm}`
-      };
-    });
-  }
-
-  const [images, setImages] = useState(buildPlaceholder(defaultDate));
-
-  const fetchImages = useCallback(async () => {
-    try{
-      const res = await axios.get(`${API_BASE_URL}/api/japan-waves?date=${defaultDate}`);
-      let imgs = res.data?.images || [];
-      // 상대 경로를 절대 경로로 변환
-      imgs = imgs.map(img => ({
-        ...img,
-        url: img.url.startsWith('http') ? img.url : `${API_BASE_URL}${img.url}`
-      }));
-      // 시간 기준 오름차순 정렬
-      imgs.sort((a, b) => {
-        // img.time: '2026-01-16 03:00' 형태
-        if (!a.time || !b.time) return 0;
-        return new Date(a.time) - new Date(b.time);
-      });
-      setImages(imgs.length > 0 ? imgs : buildPlaceholder(defaultDate));
-      setIdx(0);
-    }catch(e){
-      setImages(buildPlaceholder(defaultDate));
-      setIdx(0);
-    }
-  }, [defaultDate]);
-
-  // 처음 진입 시 오늘 날짜로 자동 로드
-  useEffect(()=>{ fetchImages(); },[fetchImages]);
-
-  function prev(){ setIdx(i => (i - 1 + images.length) % images.length); }
-  function next(){ setIdx(i => (i + 1) % images.length); }
-
-  // 이미지 원본 텍스트에서 날짜/시간을 그대로 파싱, 한자만 한글로 변환
-  function formatJpWaveTime(rawText, timeStr) {
-    // rawText가 있으면 사용, 없으면 timeStr 사용
-    if (rawText) {
-      const match = rawText.match(/\d{4}年\d{1,2}月\d{1,2}日\(.+?\)\d{1,2}時\(JST\)/);
-      if (match) {
-        let txt = match[0];
-        txt = txt.replace(/年/g, '년').replace(/月/g, '월').replace(/日/g, '일');
-        txt = txt.replace(/時/g, '시');
-        txt = txt.replace(/\(日\)/g, '(일)').replace(/\(月\)/g, '(월)').replace(/\(火\)/g, '(화)');
-        txt = txt.replace(/\(水\)/g, '(수)').replace(/\(木\)/g, '(목)').replace(/\(金\)/g, '(금)');
-        txt = txt.replace(/\(土\)/g, '(토)');
-        return txt;
+  useEffect(() => {
+    const fetchAll = async () => {
+      const corsProxy = 'https://corsproxy.io/?';
+      const area = 1;
+      const results = [];
+      for (let i = 0; i <= 24; i++) {
+        try {
+          const url = `https://www.imocwx.com/cwm.php?Area=${area}&Time=${i}`;
+          const resp = await fetch(corsProxy + encodeURIComponent(url));
+          const html = await resp.text();
+          const parser = new window.DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          let label = '';
+          const titleEl = doc.querySelector('p.title');
+          if (titleEl) {
+            const txt = titleEl.textContent.replace(/\u00A0/g, ' ').trim();
+            const match = txt.match(/(\d{4})年(\d{1,2})月(\d{1,2})日\((日|月|火|水|木|金|土)\)(\d{1,2})時/);
+            if (match) {
+              const weekMap = { '日':'일', '月':'월', '火':'화', '水':'수', '木':'목', '金':'금', '土':'토' };
+              label = `${match[1]}년 ${match[2]}월 ${match[3]}일 (${weekMap[match[4]]}) ${match[5]}시`;
+            }
+          }
+          if (!label) {
+            const textEls = doc.querySelectorAll('div, p, span');
+            for (const el of textEls) {
+              const txt = el.textContent.trim();
+              const match = txt.match(/(\d{4})年(\d{1,2})月(\d{1,2})日\s*(\d{1,2})時\((日|月|火|水|木|金|土)\)/);
+              if (match) {
+                const weekMap = { '日':'일', '月':'월', '火':'화', '水':'수', '木':'목', '금':'금', '土':'토' };
+                label = `${match[1]}년 ${match[2]}월 ${match[3]}일 ${match[4]}시 (${weekMap[match[5]]})`;
+                break;
+              }
+            }
+          }
+          const imgIdx = String(i).padStart(2, '0');
+          // 캐시 방지용 타임스탬프를 추가한 고정 URL 사용
+          const imgUrl = `https://www.imocwx.com/cwm/cwmsjp_${imgIdx}.png?${Date.now()}`;
+          results.push({ label, imgUrl });
+        } catch (e) {
+          results.push({ label: '', imgUrl: '', error: e.message });
+        }
       }
-    }
-    // rawText가 없으면 timeStr에서 변환
-    if (timeStr) {
-      const d = new Date(timeStr);
-      const year = d.getFullYear();
-      const month = d.getMonth() + 1;
-      const day = d.getDate();
-      const hour = d.getHours();
-      const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-      const weekday = weekdays[d.getDay()];
-      return `${year}년 ${month}월 ${day}일(${weekday}) ${hour}시(JST)`;
-    }
-    return '';
-  }
+      setWaves(results);
+    };
+    fetchAll();
+  }, []);
 
   return (
-    <div className="container">
-      <AdSense slot="3456789012" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
-      <h2 className="page-title">일본 파고</h2>
-      <div style={{marginTop: '10px', marginBottom: '20px', textAlign: 'center'}}>
-        <Link to="/" className="nav-button">🏠 홈으로</Link>
-      </div>
-      {images.length===0 ? (
-        <p>해당 날짜의 이미지가 없습니다.</p>
+    <div style={{maxWidth:800, width:'100%', margin:'0 auto', padding:'16px 0', background:'#eaf6fb'}}>
+      <h2 style={{textAlign:'center',fontSize:28,fontWeight:700,margin:'16px 0 8px'}}>일본 기상청 파고</h2>
+      {waves.length === 0 ? (
+        <p style={{textAlign:'center',fontSize:18}}>파고 데이터를 불러오는 중...</p>
       ) : (
-        <div style={{maxWidth:800, width:'100%'}}>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
-            <img src={images[idx].url} alt={images[idx].time} style={{maxHeight:380,maxWidth:'100%'}} crossOrigin="anonymous" referrerPolicy="no-referrer" onError={()=>{ setImages(buildPlaceholder(defaultDate)); setIdx(0); }} />
+        <>
+          <img src={waves[idx].imgUrl} alt={waves[idx].label} style={{display:'block',margin:'0 auto',maxHeight:480,maxWidth:'100%',border:'2px solid #2b7',background:'#f8f8f8',boxShadow:'0 2px 12px #0002'}} onError={e=>e.target.style.opacity=0.3} />
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',margin:'18px 0'}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:12}}>
+              <button onClick={()=>setIdx(i=>(i-1+waves.length)%waves.length)} style={{padding:'8px 16px', cursor:'pointer', fontSize:18, border:'1px solid #2b7', borderRadius:6, background:'white'}}>◀</button>
+              <span style={{fontSize:22,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',textAlign:'center',width:'100%'}}>
+                {waves[idx].label ? waves[idx].label : `${idx}번째 (파싱 실패)`}
+                {waves[idx].error && <span style={{color:'red',marginLeft:8}}> - 에러: {waves[idx].error}</span>}
+              </span>
+              <button onClick={()=>setIdx(i=>(i+1)%waves.length)} style={{padding:'8px 16px', cursor:'pointer', fontSize:18, border:'1px solid #2b7', borderRadius:6, background:'white'}}>▶</button>
+            </div>
           </div>
-          <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:12, marginTop:4}}>
-            <button onClick={prev} style={{padding:'8px 16px', cursor:'pointer', fontSize:18, border:'1px solid #ccc', borderRadius:4, background:'white'}}>◀</button>
-            <div style={{textAlign:'center', fontSize:12, color:'#666'}}>ICOM 일본기상청 데이터</div>
-            <button onClick={next} style={{padding:'8px 16px', cursor:'pointer', fontSize:18, border:'1px solid #ccc', borderRadius:4, background:'white'}}>▶</button>
-          </div>
-          {/* 이미지 원본 텍스트에서 날짜/시간 추출 후 한자→한글 변환 */}
-          <div style={{textAlign:'center',marginTop:8}}>
-            {(() => {
-              const formatted = formatJpWaveTime(images[idx].rawText, images[idx].time);
-              return formatted;
-            })()}
-          </div>
-          <div className="horizontal-scroll" style={{display:'flex',gap:8,overflowX:'auto',marginTop:12,width:'100%',boxSizing:'border-box',paddingBottom:8}}>
-            {images.map((img,i)=> (
+          <div style={{display:'flex',gap:8,overflowX:'auto',margin:'0 0 8px 0',width:'100%',boxSizing:'border-box',paddingBottom:8}}>
+            {waves.map((w,i)=>(
               <img
                 key={i}
-                src={img.url}
-                alt={img.time}
-                crossOrigin="anonymous"
-                referrerPolicy="no-referrer"
-                style={{ width:120, height:80, objectFit:'cover', border: i===idx ? '3px solid #2b7' : '1px solid #ccc', cursor:'pointer', flexShrink:0 }}
+                src={w.imgUrl}
+                alt={w.label}
+                style={{ width:80, height:48, objectFit:'contain', border: i===idx ? '3px solid #2b7' : '1px solid #ccc', cursor:'pointer', flexShrink:0, background:'#f8f8f8', opacity: 1 }}
                 onClick={()=>setIdx(i)}
               />
             ))}
           </div>
-        </div>
+        </>
       )}
     </div>
   );

@@ -25,7 +25,8 @@ const connectDB = async () => {
       maxPoolSize: 10,
       minPoolSize: 5,
       maxIdleTimeMS: 30000,
-      heartbeatFrequencyMS: 10000
+      heartbeatFrequencyMS: 10000,
+      bufferCommands: false
     });
 
     isConnected = true;

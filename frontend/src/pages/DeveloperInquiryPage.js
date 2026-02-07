@@ -23,7 +23,15 @@ export default function DeveloperInquiryPage() {
       setEmail('');
       setDesc('');
     } catch (error) {
-      alert('전송에 실패했습니다: ' + (error.response?.data?.error || error.message));
+      let msg = '전송에 실패했습니다.';
+      if (error.response?.data?.error) {
+        msg += '\n서버 응답: ' + error.response.data.error;
+      } else if (error.message) {
+        msg += '\n에러: ' + error.message;
+      }
+      alert(msg);
+      // 콘솔에 상세 에러 출력
+      console.error('문의 전송 실패:', error);
     }
     setLoading(false);
   };

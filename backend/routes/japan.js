@@ -217,22 +217,22 @@ router.get('/japan-waves', async (req, res) => {
 
 // 선택적 이미지 프록시 (핫링크 차단 회피용). 라이선스 준수 필요.
 router.get('/japan-waves/image', async (req, res) => {
-  if (!ENABLE_PROXY) return res.status(404).send('proxy disabled');
+  if (!ENABLE_PROXY) {
+    console.error('[image proxy] proxy disabled');
+    return res.status(404).json({ error: 'proxy disabled' });
+  }
   const { yyyymmdd, hhmm, file } = req.query;
-  
   try {
     let target;
     if (file !== undefined) {
-      // imocwx-static mode: use file parameter
       target = `${IMOCWX_STATIC_PREFIX}${String(file).padStart(2, '0')}${IMOCWX_STATIC_SUFFIX}`;
     } else if (yyyymmdd && hhmm && TEMPLATE) {
-      // template mode
       target = buildUrlFromTemplate(TEMPLATE, String(yyyymmdd), String(hhmm));
     } else {
-      return res.status(400).send('bad request');
+      console.error('[image proxy] bad request', req.query);
+      return res.status(400).json({ error: 'bad request', query: req.query });
     }
-    
-    const resp = await axios.get(target, { 
+    const resp = await axios.get(target, {
       responseType: 'arraybuffer',
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -245,8 +245,8 @@ router.get('/japan-waves/image', async (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=3600');
     return res.send(Buffer.from(resp.data));
   } catch (e) {
-    console.error('[image proxy] failed:', e.message);
-    return res.status(502).send('proxy fetch failed');
+    console.error('[image proxy] failed:', e.message, req.query);
+    return res.status(502).json({ error: 'proxy fetch failed', message: e.message, query: req.query });
   }
 });
 

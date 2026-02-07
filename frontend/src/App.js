@@ -216,6 +216,7 @@ const WeatherPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentLocation, setCurrentLocation] = useState({ lat: null, lon: null });
+  const [shortForecast, setShortForecast] = useState(null);
 
   useEffect(() => {
     // file:// 로 열렸을 때는 API 호출 대신 샘플 데이터를 사용
@@ -257,6 +258,20 @@ const WeatherPage = () => {
         const result = await response.json();
         setData(result);
         setError(null);
+
+        // 단기예보 3일치 데이터 가져오기
+        try {
+          const forecastUrl = `${API_BASE_URL}/api/short-forecast?lat=${lat}&lng=${lon}`;
+          const forecastResponse = await fetch(forecastUrl);
+          if (forecastResponse.ok) {
+            const forecastData = await forecastResponse.json();
+            if (forecastData.success) {
+              setShortForecast(forecastData.data);
+            }
+          }
+        } catch (err) {
+          console.error('단기예보 불러오기 실패:', err);
+        }
       } catch (e) {
         setError(e.message);
       } finally {
@@ -471,9 +486,30 @@ const WeatherPage = () => {
           <div className="info-cards">
             <div className="card">
               <h3>☀️ 날씨 {data.weatherError && <span style={{color:'#a33', fontSize:12, marginLeft:8}}>({data.weatherError})</span>}</h3>
-              <p>상태: {getWeatherStatus(data.weather?.SKY, data.weather?.PTY) ?? 'N/A'}</p>
-              <p>기온: {data.weather?.T1H ?? data.weather?.TMP ?? 'N/A'}°C</p>
-              <p>풍속: {data.weather?.WSD ?? 'N/A'} m/s</p>
+              <div style={{ marginBottom: '15px' }}>
+                <strong>오늘</strong>
+                <p>상태: {getWeatherStatus(data.weather?.SKY, data.weather?.PTY) ?? 'N/A'}</p>
+                <p>기온: {data.weather?.T1H ?? data.weather?.TMP ?? 'N/A'}°C</p>
+                <p>풍속: {data.weather?.WSD ?? 'N/A'} m/s</p>
+              </div>
+
+              {/* 단기예보 (내일~글피) */}
+              {shortForecast && shortForecast.length > 1 && (
+                <div style={{ borderTop: '1px solid #eee', paddingTop: '15px', marginTop: '15px' }}>
+                  {shortForecast.slice(1, 4).map((day, idx) => {
+                    const dayName = ['내일', '모레', '글피'][idx];
+                    return (
+                      <div key={idx} style={{ marginBottom: '10px', fontSize: '14px' }}>
+                        <strong>{dayName}</strong>
+                        <div style={{ color: '#666' }}>
+                          {getWeatherStatus(day.sky, day.pty)} / {day.temp}°C / 강수 {day.pop}%
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
               <div style={{ marginTop: '15px' }}>
                 <Link
                   to={currentLocation.lat && currentLocation.lon ? `/mid-forecast?lat=${currentLocation.lat}&lon=${currentLocation.lon}` : '/mid-forecast'}
@@ -491,7 +527,7 @@ const WeatherPage = () => {
                     textAlign: 'center'
                   }}
                 >
-                  📅 날씨 예보 (3~10일)
+                  📅 날씨 예보 (5~10일)
                 </Link>
               </div>
             </div>
