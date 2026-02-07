@@ -11,7 +11,6 @@ const MidForecastPage = () => {
   const [tempData, setTempData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [location, setLocation] = useState({ lat: null, lon: null });
   const [regionInfo, setRegionInfo] = useState({ name: '', regId: '' });
 
   useEffect(() => {

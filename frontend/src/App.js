@@ -123,22 +123,12 @@ const GuidePage = () => (
 
 // 홈 화면
 const HomePage = () => {
-  const isWeb = Capacitor.getPlatform() === 'web';
-  const [adminTrigger, setAdminTrigger] = useState(0);
   const [showPw, setShowPw] = useState(false);
   const [pwInput, setPwInput] = useState('');
   const navigate = useNavigate();
   // 1차 비밀번호 통과 시 localStorage에 저장 후 바로 관리자 진입
   const handleLogoClick = () => {
-    setAdminTrigger((prev) => {
-      if (prev >= 9) {
-        setTimeout(() => setAdminTrigger(0), 500);
-        setShowPw(true);
-        return 0;
-      }
-      setTimeout(() => setAdminTrigger(0), 2000);
-      return prev + 1;
-    });
+    setShowPw(true);
   };
   const handlePwSubmit = (e) => {
     e.preventDefault();
