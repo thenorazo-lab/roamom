@@ -66,14 +66,12 @@ const MidForecastPage = () => {
     if (lat && lon) {
       const latitude = parseFloat(lat);
       const longitude = parseFloat(lon);
-      setLocation({ lat: latitude, lon: longitude });
       fetchForecast(latitude, longitude);
     } else {
       // 현재 위치 가져오기
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          setLocation({ lat: latitude, lon: longitude });
           fetchForecast(latitude, longitude);
         },
         (err) => {
