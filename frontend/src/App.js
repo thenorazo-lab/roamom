@@ -11,12 +11,14 @@ import MapComponent from './components/MapComponent';
 import PointsAdmin from './pages/PointsAdmin';
 import JapanWaves from './pages/JapanWaves';
 import DeveloperInquiryPage from './pages/DeveloperInquiryPage';
+import MidForecastPage from './pages/MidForecastPage';
+import DiaryPage from './pages/DiaryPage';
 import AdSense from './components/AdSense';
 import AdMobBanner from './components/AdMobBanner';
 import axios from 'axios';
 
 // API URL 상수 정의
-const API_BASE_URL = 'https://able-tide-481608-m5.du.r.appspot.com';
+const API_BASE_URL = 'https://roamom-backend.onrender.com';
 
 // 오프라인(file://) 전용 샘플 데이터
 const getSampleSeaInfo = () => ({
@@ -34,8 +36,8 @@ const getSampleSeaInfo = () => ({
 });
 
 // 현재 앱 버전
-const CURRENT_VERSION = '1.5.0';
-const CURRENT_VERSION_CODE = 19;
+const CURRENT_VERSION = '1.5.4';
+const CURRENT_VERSION_CODE = 27;
 
 // 앱사용 가이드 페이지
 const AppGuidePage = () => (
@@ -122,11 +124,48 @@ const GuidePage = () => (
 // 홈 화면
 const HomePage = () => {
   const isWeb = Capacitor.getPlatform() === 'web';
-  
+  const [adminTrigger, setAdminTrigger] = useState(0);
+  const [showPw, setShowPw] = useState(false);
+  const [pwInput, setPwInput] = useState('');
+  const navigate = useNavigate();
+  // 1차 비밀번호 통과 시 localStorage에 저장 후 바로 관리자 진입
+  const handleLogoClick = () => {
+    setAdminTrigger((prev) => {
+      if (prev >= 9) {
+        setTimeout(() => setAdminTrigger(0), 500);
+        setShowPw(true);
+        return 0;
+      }
+      setTimeout(() => setAdminTrigger(0), 2000);
+      return prev + 1;
+    });
+  };
+  const handlePwSubmit = (e) => {
+    e.preventDefault();
+    if (pwInput.trim() === '756400') {
+      setShowPw(false);
+      setPwInput('');
+      localStorage.setItem('admin_pw','756400');
+      navigate('/points-admin');
+    } else {
+      alert('비밀번호가 틀렸습니다.');
+      setPwInput('');
+    }
+  };
   return (
     <div className="container">
+      {showPw && (
+        <div style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.4)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
+          <form onSubmit={handlePwSubmit} style={{background:'white',padding:32,borderRadius:12,boxShadow:'0 4px 16px #0002',display:'flex',flexDirection:'column',gap:12,minWidth:280}}>
+            <label style={{fontWeight:'bold'}}>관리자 비밀번호 입력</label>
+            <input type="password" value={pwInput} onChange={e=>setPwInput(e.target.value)} autoFocus style={{fontSize:18,padding:8,borderRadius:4,border:'1px solid #ccc'}} />
+            <button type="submit" style={{padding:10,fontSize:16,borderRadius:4,background:'#0077be',color:'white',border:'none'}}>확인</button>
+            <button type="button" onClick={()=>{setShowPw(false);setPwInput('');}} style={{padding:8,fontSize:14,borderRadius:4,background:'#eee',color:'#333',border:'none'}}>취소</button>
+          </form>
+        </div>
+      )}
       <AdSense slot="1234567890" format="horizontal" style={{ display: 'block', width: '100%', height: '90px', margin: '10px 0' }} />
-      <h1 className="main-title">해루질가자</h1>
+      <h1 className="main-title" onClick={handleLogoClick} style={{userSelect:'none'}} tabIndex={-1}>해루질가자</h1>
       <p className="sub-title">바다날씨, 포인트, 일본 파고를 한 곳에서</p>
       <div className="nav-buttons">
         <Link to="/weather" className="nav-button">☁️ 바다날씨</Link>
@@ -137,12 +176,11 @@ const HomePage = () => {
             ※ 포인트 페이지만 전면광고 포함
           </div>
         </div>
+        <Link to="/diary" className="nav-button">📔 해루질 일기</Link>
         <Link to="/guide" className="nav-button">📖 해루질 가이드</Link>
         <Link to="/app-guide" className="nav-button">📱 앱사용 가이드</Link>
-        <Link to="/developer-inquiry" className="nav-button">� 포인트 제보&개발자 문의</Link>
-        {isWeb && (
-          <Link to="/points-admin" className="nav-button" style={{fontSize: '0.6rem', padding: '8px 12px', maxWidth: '180px', alignSelf: 'center'}}>⚙️ 포인트 관리자</Link>
-        )}
+        <a href="https://form.naver.com/response/2fvmbWcJ6F2KB-AxsPuolQ" className="nav-button" target="_blank" rel="noopener noreferrer">✉️ 포인트 제보&개발자 문의</a>
+        {/* 관리자 진입 트리거는 숨김, 웹에서만 직접 노출 X */}
       </div>
     </div>
   );
@@ -177,6 +215,7 @@ const WeatherPage = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState({ lat: null, lon: null });
 
   useEffect(() => {
     // file:// 로 열렸을 때는 API 호출 대신 샘플 데이터를 사용
@@ -201,6 +240,7 @@ const WeatherPage = () => {
 
     const fetchWeatherData = async (lat, lon, useSampleFallback = false) => {
       try {
+        setCurrentLocation({ lat, lon }); // 좌표 저장
         const params = new URLSearchParams();
         params.set('lat', lat);
         params.set('lng', lon);
@@ -434,6 +474,26 @@ const WeatherPage = () => {
               <p>상태: {getWeatherStatus(data.weather?.SKY, data.weather?.PTY) ?? 'N/A'}</p>
               <p>기온: {data.weather?.T1H ?? data.weather?.TMP ?? 'N/A'}°C</p>
               <p>풍속: {data.weather?.WSD ?? 'N/A'} m/s</p>
+              <div style={{ marginTop: '15px' }}>
+                <Link
+                  to={currentLocation.lat && currentLocation.lon ? `/mid-forecast?lat=${currentLocation.lat}&lon=${currentLocation.lon}` : '/mid-forecast'}
+                  className="nav-button"
+                  style={{
+                    display: 'inline-block',
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    backgroundColor: '#1976d2',
+                    color: 'white',
+                    textDecoration: 'none',
+                    borderRadius: '5px',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    textAlign: 'center'
+                  }}
+                >
+                  📅 날씨 예보 (3~10일)
+                </Link>
+              </div>
             </div>
 
             <div className="card">
@@ -496,6 +556,8 @@ const PointsPage = () => {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [selectedPoint, setSelectedPoint] = React.useState(null);
+  const [pointClickCount, setPointClickCount] = React.useState(0);
+  const [isAdReady, setIsAdReady] = React.useState(false);
 
   React.useEffect(() => {
     fetch(`${API_BASE_URL}/api/points`)
@@ -515,8 +577,55 @@ const PointsPage = () => {
       });
   }, []);
 
-  const handleMarkerClick = (marker) => {
+  // 포인트 페이지 전면 광고 준비 (네이티브 앱에서만)
+  React.useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const prepareAd = async () => {
+      try {
+        console.log('[포인트 광고] 준비 시작...');
+        await AdMob.prepareInterstitial({
+          adId: 'ca-app-pub-1120357008550196/6769636401', // 같은 광고 ID 사용
+        });
+        setIsAdReady(true);
+        console.log('[포인트 광고] ✅ 준비 완료');
+      } catch (error) {
+        console.error('[포인트 광고] ❌ 준비 실패:', error);
+      }
+    };
+
+    prepareAd();
+  }, []);
+
+  const handleMarkerClick = async (marker) => {
     setSelectedPoint(marker);
+    
+    // 포인트 클릭 카운트 증가
+    const newCount = pointClickCount + 1;
+    setPointClickCount(newCount);
+
+    // 3번 누를 때마다 전면 광고 표시 (네이티브 앱에서만)
+    if (newCount % 3 === 0 && Capacitor.isNativePlatform() && isAdReady) {
+      try {
+        setIsAdReady(false);
+        await AdMob.showInterstitial();
+
+        // 다음 광고 준비 (3초 후)
+        setTimeout(async () => {
+          try {
+            await AdMob.prepareInterstitial({
+              adId: 'ca-app-pub-1120357008550196/6769636401',
+            });
+            setIsAdReady(true);
+          } catch (error) {
+            console.error('[포인트 광고] 준비 실패:', error);
+          }
+        }, 3000);
+      } catch (error) {
+        console.error('[전면광고] 표시 실패:', error);
+        setIsAdReady(true);
+      }
+    }
   };
 
   const closeModal = () => {
@@ -874,6 +983,26 @@ const MapPage = () => {
               <p>상태: {getWeatherStatus(info.weather?.SKY, info.weather?.PTY) ?? 'N/A'}</p>
               <p>기온: {info.weather?.T1H ?? info.weather?.TMP ?? 'N/A'}°C</p>
               <p>풍속: {info.weather?.WSD ?? 'N/A'} m/s</p>
+              <div style={{ marginTop: '15px' }}>
+                <Link
+                  to={`/mid-forecast?lat=${marker.lat}&lon=${marker.lng}`}
+                  className="nav-button"
+                  style={{
+                    display: 'inline-block',
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    backgroundColor: '#1976d2',
+                    color: 'white',
+                    textDecoration: 'none',
+                    borderRadius: '5px',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    textAlign: 'center'
+                  }}
+                >
+                  📅 날씨 예보 (3~10일)
+                </Link>
+              </div>
             </div>
 
             <div className="card">
@@ -923,7 +1052,7 @@ const MapPage = () => {
             </div>
           </div>
 
-          <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>출처: 오픈API 기상청_단기예보 / 해양수산부 국립해양조사원_해양관측부이 최신 관측데이터 / 해양수산부 국립해양조사원_조석예보</p>
+          <p style={{fontSize: '12px', color: '#888', textAlign: 'center', margin: '16px 0'}}>출처: 오픈API 기상청_단기예보 / 기상청_중기예보 / 해양수산부 국립해양조사원_해양관측부이 최신 관측데이터 / 해양수산부 국립해양조사원_조석예보</p>
         </div>
       )}
 
@@ -960,6 +1089,8 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/weather" element={<WeatherPage />} />
+          <Route path="/mid-forecast" element={<MidForecastPage />} />
+          <Route path="/diary" element={<DiaryPage />} />
           <Route path="/jp-wave" element={<JapanWaves />} />
           <Route path="/guide" element={<GuidePage />} />
           <Route path="/app-guide" element={<AppGuidePage />} />
@@ -982,6 +1113,7 @@ function BottomNav() {
     { path: '/weather', icon: '☁️', label: '바다날씨' },
     { path: '/jp-wave', icon: '🌊', label: '일본파고' },
     { path: '/points', icon: '📍', label: '포인트' },
+    { path: '/diary', icon: '📔', label: '일기' },
     { path: '/guide', icon: '📖', label: '가이드' },
   ];
 
@@ -1035,83 +1167,10 @@ function BackButtonHandler() {
   return null;
 }
 
-// 전면 광고 관리 컴포넌트
+// 전면 광고 관리 컴포넌트 (포인트 페이지용 광고는 PointsPage에서 직접 처리)
 function InterstitialAdManager() {
-  const location = useLocation();
-  const [pageVisitCount, setPageVisitCount] = useState(0);
-  const [isAdLoaded, setIsAdLoaded] = useState(false);
-  const [isShowingAd, setIsShowingAd] = useState(false); // 광고 표시 중 플래그
-  const prevPathRef = React.useRef(location.pathname); // 이전 경로 저장
-
-  // AdMob 초기화 및 전면 광고 준비 (한 번만 실행)
-  useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
-
-    const initializeAds = async () => {
-      try {
-        console.log('[전면광고] 초기화 시작...');
-        await AdMob.prepareInterstitial({
-          adId: 'ca-app-pub-1120357008550196/6769636401',
-        });
-        setIsAdLoaded(true);
-        console.log('[전면광고] ✅ 로드 완료');
-      } catch (error) {
-        console.error('[전면광고] ❌ 로드 실패:', error);
-      }
-    };
-
-    initializeAds();
-  }, []); // 빈 배열 - 한 번만 실행
-
-  // 페이지 이동 감지 및 광고 표시
-  useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
-    
-    // 같은 페이지면 무시 (무한 루프 방지)
-    if (prevPathRef.current === location.pathname) {
-      return;
-    }
-    
-    prevPathRef.current = location.pathname;
-    const newCount = pageVisitCount + 1;
-    setPageVisitCount(newCount);
-    console.log('[전면광고] 📍 페이지 이동:', location.pathname, '/ 카운트:', newCount);
-
-    // 10번째 페이지 이동마다 광고 표시 (광고 표시 중이 아닐 때만)
-    if (newCount >= 10 && newCount % 10 === 0 && isAdLoaded && !isShowingAd) {
-      const showAd = async () => {
-        setIsShowingAd(true); // 광고 표시 시작
-        setIsAdLoaded(false); // 중복 표시 방지
-        
-        try {
-          console.log('[전면광고] 🎬 표시 시작:', newCount, '번째');
-          await AdMob.showInterstitial();
-          console.log('[전면광고] ✅ 표시 완료');
-        } catch (error) {
-          console.error('[전면광고] ❌ 표시 실패:', error);
-        } finally {
-          setIsShowingAd(false); // 광고 표시 종료
-          
-          // 다음 광고 미리 로드 (3초 후)
-          setTimeout(async () => {
-            try {
-              console.log('[전면광고] 🔄 다음 광고 로드 중...');
-              await AdMob.prepareInterstitial({
-                adId: 'ca-app-pub-1120357008550196/6769636401',
-              });
-              setIsAdLoaded(true);
-              console.log('[전면광고] ✅ 다음 광고 로드 완료');
-            } catch (error) {
-              console.error('[전면광고] ❌ 다음 광고 로드 실패:', error);
-            }
-          }, 3000);
-        }
-      };
-
-      showAd();
-    }
-  }, [location.pathname, isAdLoaded, isShowingAd, pageVisitCount]); // 의존성 추가
-
+  // 페이지 이동 기반 광고 표시 로직 제거됨
+  // 포인트 페이지에서만 클릭 기반으로 광고 표시
   return null;
 }
 
@@ -1132,12 +1191,11 @@ function VersionChecker() {
         
         if (serverVersion > CURRENT_VERSION_CODE) {
           if (window.confirm(`새로운 버전이 있습니다!\n현재: ${CURRENT_VERSION}\n최신: ${response.data.version}\n\nPlay 스토어에서 업데이트하시겠습니까?`)) {
-            // Play 스토어로 이동
             window.open('https://play.google.com/store/apps/details?id=com.harujil.app', '_system');
           }
         }
       } catch (error) {
-        console.log('[버전 체크] 실패:', error.message);
+        // 버전 체크 실패는 조용히 처리
       }
     };
 

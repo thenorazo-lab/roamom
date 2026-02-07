@@ -802,6 +802,77 @@ function getRegionCode(lat, lon) {
     }
 }
 
+// 위도/경도 기반 중기기온 지역 코드 반환 (기온예보용 - 상세 코드)
+function getTempRegionCode(lat, lon) {
+    const latNum = parseFloat(lat);
+    const lonNum = parseFloat(lon);
+
+    // 제주도
+    if (latNum >= 33.0 && latNum <= 34.0 && lonNum >= 126.0 && lonNum <= 127.0) {
+        return { regId: '11G00201', name: '제주' };
+    }
+    // 부산, 울산, 경상남도
+    else if (latNum >= 35.0 && latNum <= 36.0 && lonNum >= 128.5) {
+        return { regId: '11H20201', name: '부산' };
+    }
+    else if (latNum >= 34.5 && latNum <= 36.0 && lonNum >= 128.0) {
+        return { regId: '11H20101', name: '창원' };
+    }
+    // 대구, 경상북도
+    else if (latNum >= 35.5 && latNum <= 37.0 && lonNum >= 128.5) {
+        return { regId: '11H10201', name: '대구' };
+    }
+    else if (latNum >= 35.5 && latNum <= 37.5 && lonNum >= 128.0) {
+        return { regId: '11H10101', name: '안동' };
+    }
+    // 광주, 전라남도
+    else if (latNum >= 34.5 && latNum <= 35.5 && lonNum >= 126.5 && lonNum <= 127.5) {
+        return { regId: '11F20201', name: '광주' };
+    }
+    else if (latNum >= 34.0 && latNum <= 35.5 && lonNum >= 126.0 && lonNum <= 127.5) {
+        return { regId: '21F20101', name: '목포' };
+    }
+    // 전북자치도
+    else if (latNum >= 35.5 && latNum <= 36.5 && lonNum >= 126.5 && lonNum <= 127.5) {
+        return { regId: '11F10201', name: '전주' };
+    }
+    else if (latNum >= 35.0 && latNum <= 36.5 && lonNum >= 126.0 && lonNum <= 127.0) {
+        return { regId: '21F10101', name: '군산' };
+    }
+    // 대전, 세종, 충남
+    else if (latNum >= 36.3 && latNum <= 37.0 && lonNum >= 127.0 && lonNum <= 127.5) {
+        return { regId: '11C20401', name: '대전' };
+    }
+    else if (latNum >= 36.0 && latNum <= 37.0 && lonNum >= 126.5 && lonNum <= 127.5) {
+        return { regId: '11C20101', name: '홍성' };
+    }
+    // 충청북도
+    else if (latNum >= 36.0 && latNum <= 37.5 && lonNum >= 127.0 && lonNum <= 128.5) {
+        return { regId: '11C10101', name: '청주' };
+    }
+    // 강원도 영동
+    else if (latNum >= 37.0 && lonNum >= 129.0) {
+        return { regId: '11D20501', name: '강릉' };
+    }
+    else if (latNum >= 37.0 && lonNum >= 128.5) {
+        return { regId: '11D20401', name: '속초' };
+    }
+    // 강원도 영서
+    else if (latNum >= 37.0 && latNum <= 38.5 && lonNum >= 127.0 && lonNum <= 128.5) {
+        return { regId: '11D10301', name: '춘천' };
+    }
+    // 서울, 인천, 경기도
+    else if (latNum >= 37.4 && latNum <= 37.7 && lonNum >= 126.8 && lonNum <= 127.2) {
+        return { regId: '11B10101', name: '서울' };
+    }
+    else if (latNum >= 37.3 && latNum <= 37.6 && lonNum >= 126.5 && lonNum <= 126.8) {
+        return { regId: '11B20201', name: '인천' };
+    }
+    else {
+        return { regId: '11B20601', name: '수원' };
+    }
+}
+
 // 중기예보 API 엔드포인트 (중기육상예보조회)
 router.get('/mid-forecast', async (req, res) => {
     try {
@@ -901,8 +972,8 @@ router.get('/mid-temp', async (req, res) => {
             return res.status(400).json({ error: '위도와 경도가 필요합니다.' });
         }
 
-        // 위도/경도로 지역 코드 결정
-        const region = getRegionCode(lat, lon);
+        // 위도/경도로 지역 코드 결정 (기온 API는 상세 코드 사용)
+        const region = getTempRegionCode(lat, lon);
 
         // 발표시각 계산
         const now = new Date();
