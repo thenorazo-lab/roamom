@@ -143,7 +143,7 @@ const buoyStations = [
 ];
 
 // 위도, 경도를 기상청 격자 좌표로 변환하는 함수
-function dfs_xy_conv(v1, v2) {
+function dfs_xy_conv(code, v1, v2) {
     const RE = 6371.00877; // 지구 반경(km)
     const GRID = 5.0; // 격자 간격(km)
     const SLAT1 = 30.0; // 투영 위도1(degree)
@@ -167,17 +167,21 @@ function dfs_xy_conv(v1, v2) {
     let ro = Math.tan(Math.PI * 0.25 + olat * 0.5);
     ro = (re * sf) / Math.pow(ro, sn);
 
-    let ra = Math.tan(Math.PI * 0.25 + v1 * DEGRAD * 0.5);
-    ra = (re * sf) / Math.pow(ra, sn);
-    let theta = v2 * DEGRAD - olon;
-    if (theta > Math.PI) theta -= 2.0 * Math.PI;
-    if (theta < -Math.PI) theta += 2.0 * Math.PI;
-    theta *= sn;
+    if (code === "toXY") {
+        let ra = Math.tan(Math.PI * 0.25 + v1 * DEGRAD * 0.5);
+        ra = (re * sf) / Math.pow(ra, sn);
+        let theta = v2 * DEGRAD - olon;
+        if (theta > Math.PI) theta -= 2.0 * Math.PI;
+        if (theta < -Math.PI) theta += 2.0 * Math.PI;
+        theta *= sn;
 
-    return {
-        x: Math.floor(ra * Math.sin(theta) + XO + 0.5),
-        y: Math.floor(ro - ra * Math.cos(theta) + YO + 0.5)
-    };
+        return {
+            x: Math.floor(ra * Math.sin(theta) + XO + 0.5),
+            y: Math.floor(ro - ra * Math.cos(theta) + YO + 0.5)
+        };
+    }
+    // toLL 변환은 필요시 추가 가능
+    return { x: 0, y: 0 };
 }
 
 // 두 지점 간의 거리를 계산하는 함수 (haversine formula)
