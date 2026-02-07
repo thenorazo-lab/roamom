@@ -252,15 +252,24 @@ const WeatherPage = () => {
         // 단기예보 3일치 데이터 가져오기
         try {
           const forecastUrl = `${API_BASE_URL}/api/short-forecast?lat=${lat}&lng=${lon}`;
+          console.log('[단기예보] 요청:', forecastUrl);
           const forecastResponse = await fetch(forecastUrl);
+          console.log('[단기예보] 응답 상태:', forecastResponse.status);
           if (forecastResponse.ok) {
             const forecastData = await forecastResponse.json();
+            console.log('[단기예보] 데이터:', forecastData);
             if (forecastData.success) {
               setShortForecast(forecastData.data);
+              console.log('[단기예보] ✅ 설정 완료:', forecastData.data.length, '개');
+            } else {
+              console.error('[단기예보] ❌ success=false:', forecastData.error);
             }
+          } else {
+            const errorText = await forecastResponse.text();
+            console.error('[단기예보] ❌ HTTP 오류:', forecastResponse.status, errorText);
           }
         } catch (err) {
-          console.error('단기예보 불러오기 실패:', err);
+          console.error('[단기예보] ❌ 예외:', err);
         }
       } catch (e) {
         setError(e.message);
